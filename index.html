@@ -487,8 +487,8 @@
 </head>
 <body>
 <div id="cur"></div>
-<canvas id="seasons-canvas" style="position:fixed;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;"></canvas>
-<div id="season-badge" style="position:fixed;bottom:18px;right:18px;z-index:50;display:flex;align-items:center;gap:7px;background:rgba(8,8,10,.82);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:6px 14px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:2px;color:#9997a0;backdrop-filter:blur(8px);transition:opacity .4s;" id="season-badge"></div>
+<canvas id="seasons-canvas" style="position:fixed;inset:0;z-index:10;pointer-events:none;width:100%;height:100%;"></canvas>
+<div id="season-badge" style="position:fixed;bottom:18px;right:18px;z-index:150;display:flex;align-items:center;gap:7px;background:rgba(8,8,10,.82);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:6px 14px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:2px;color:#9997a0;backdrop-filter:blur(8px);transition:opacity .4s;" id="season-badge"></div>
 
 <!-- ════════════ NAV ════════════ -->
 <nav>
@@ -1345,10 +1345,10 @@ loadQuestion();
     month >= 8 && month <= 10 ? 'autumn' : 'winter';
 
   const CONFIGS = {
-    spring: { label:'🌸 Spring', count:55, color:['#ffb7c5','#ff8fab','#ffd6e0','#ff6b9d','#fff0f5'] },
-    summer: { label:'✨ Summer', count:60, color:['#fffbe6','#ffd700','#fff9c4','#0df2d4','#ffffff'] },
-    autumn: { label:'🍂 Autumn', count:45, color:['#e8651a','#c0392b','#f39c12','#8b4513','#d4a017'] },
-    winter: { label:'❄️ Winter', count:70, color:['#e0f7ff','#b3e5fc','#ffffff','#cce5ff','#ddeeff'] },
+    spring: { label:'🌸 Spring', count:80,  color:['#ffb7c5','#ff8fab','#ffd6e0','#ff6b9d','#fff0f5'] },
+    summer: { label:'✨ Summer', count:90,  color:['#fffbe6','#ffd700','#fff9c4','#0df2d4','#ffffff'] },
+    autumn: { label:'🍂 Autumn', count:65,  color:['#e8651a','#c0392b','#f39c12','#8b4513','#d4a017'] },
+    winter: { label:'❄️ Winter', count:100, color:['#e0f7ff','#b3e5fc','#ffffff','#cce5ff','#ddeeff'] },
   };
 
   const cfg = CONFIGS[SEASON];
@@ -1372,7 +1372,7 @@ loadQuestion();
       x:     Math.random() * sw,
       y:     -20 - Math.random() * 120,
       color,
-      alpha: 0.15 + Math.random() * 0.55,
+      alpha: 0.35 + Math.random() * 0.55,
       size:  2 + Math.random() * 5,
       speedY: 0.4 + Math.random() * 1.2,
       speedX: (Math.random() - 0.5) * 0.7,
@@ -1523,9 +1523,8 @@ loadQuestion();
 
   animate();
 
-  // Fade badge out after 4s
-  setTimeout(() => { badge.style.opacity = '0'; }, 4000);
-  setTimeout(() => { badge.style.display = 'none'; }, 4500);
+  // Badge stays visible permanently
+  // badge fades after 4s — removed so it stays as season indicator
 })();
 </script>
 </body>
