@@ -119,19 +119,18 @@
     /* Banner bg */
     .hero-bg {
       position: absolute; inset: 0; z-index: 0;
-      background: url('banner.jpg') center/cover no-repeat;
-      filter: brightness(.18) saturate(.7);
-      transform: scale(1.04);
-      animation: bgDrift 18s ease-in-out infinite alternate;
+      background: url('banner.jpg') center center/contain no-repeat;
+      filter: brightness(.12) saturate(.6);
+      transform: scale(1.0);
+      animation: none;
     }
-    @keyframes bgDrift { 0%{transform:scale(1.04) translate(0,0);} 100%{transform:scale(1.08) translate(-1%,-1%);} }
 
     /* gradient vignette */
     .hero-vignette {
       position: absolute; inset: 0; z-index: 1;
       background:
-        radial-gradient(ellipse 80% 50% at 50% 60%, transparent 20%, rgba(8,8,10,.7) 80%),
-        linear-gradient(180deg, rgba(8,8,10,.4) 0%, rgba(8,8,10,.1) 40%, rgba(8,8,10,.85) 100%);
+        radial-gradient(ellipse 100% 100% at 50% 50%, transparent 10%, rgba(8,8,10,.55) 70%),
+        linear-gradient(180deg, rgba(8,8,10,.6) 0%, rgba(8,8,10,.2) 40%, rgba(8,8,10,.9) 100%);
     }
 
     .hero-inner {
@@ -143,9 +142,10 @@
     /* avatar */
     .hero-av-wrap { position: relative; margin-bottom: 28px; }
     .hero-av {
-      width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
-      border: 2px solid rgba(13,242,212,.5);
-      box-shadow: 0 0 0 6px rgba(13,242,212,.06), 0 0 40px rgba(13,242,212,.14);
+      width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+      object-position: center top;
+      border: 3px solid rgba(13,242,212,.7);
+      box-shadow: 0 0 0 8px rgba(13,242,212,.07), 0 0 0 16px rgba(13,242,212,.03), 0 0 60px rgba(13,242,212,.22);
       display: block;
     }
     .hero-av-live {
