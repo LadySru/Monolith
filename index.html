@@ -284,32 +284,211 @@
     /* ═══════════════════════════════
        RESPONSIVE
     ═══════════════════════════════ */
+    /* ═══════════════════════════════
+       RESPONSIVE — TABLET 960px
+    ═══════════════════════════════ */
     @media(max-width:960px) {
-      nav { padding: 0 20px; }
-      .nav-link { display: none; }
       .wrap { padding: 0 20px; }
       #seals { padding: 18px 20px; }
+      .section-pad { padding: 64px 0; }
+
+      /* nav */
+      nav { padding: 0 16px; height: 58px; }
+      .nav-link { display: none; }
+      .nav-cta { font-size: .65rem; padding: 7px 14px; white-space: nowrap; }
+      .nav-pill { display: none; }
+
+      /* hero */
+      #hero { padding: 74px 20px 52px; }
+      .hero-av { width: 100px; height: 100px; }
+      h1 { font-size: clamp(2.6rem, 10vw, 4rem); letter-spacing: -1px; }
+
+      /* features */
       .feat-grid { grid-template-columns: repeat(2,1fr); }
+
+      /* games */
       .games-grid { grid-template-columns: repeat(3,1fr); }
+      .games-hdr { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .games-hdr .btn-outline { align-self: flex-start !important; }
+
+      /* inside */
       .inside-grid { grid-template-columns: 1fr; }
+
+      /* reviews */
       .reviews-grid { grid-template-columns: repeat(2,1fr); }
+      .reviews-summary { gap: 20px; }
+
+      /* quiz */
       .quiz-options { grid-template-columns: 1fr; }
-      footer { flex-direction: column; align-items: flex-start; }
+      .quiz-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .quiz-progress-bar { width: 100%; }
+
+      /* footer */
+      footer { flex-direction: column; align-items: flex-start; padding: 24px 20px; }
     }
-    @media(max-width:600px) {
-      h1 { letter-spacing: -1px; }
+
+    /* ═══════════════════════════════
+       RESPONSIVE — MOBILE 480px
+    ═══════════════════════════════ */
+    @media(max-width:480px) {
+      .section-pad { padding: 52px 0; }
+      .wrap { padding: 0 16px; }
+
+      /* nav — show only logo + join button */
+      nav { padding: 0 14px; height: 54px; gap: 8px; }
+      .nav-name { font-size: .82rem; }
+      .nav-av { width: 28px; height: 28px; }
+      .nav-cta { font-size: .62rem; padding: 6px 12px; letter-spacing: .5px; }
+
+      /* hero */
+      #hero { padding: 68px 16px 44px; min-height: auto; padding-bottom: 60px; }
+      .hero-av { width: 88px; height: 88px; }
+      .hero-av-wrap { margin-bottom: 20px; }
+      h1 { font-size: clamp(2.4rem, 12vw, 3.2rem); letter-spacing: -1px; margin-bottom: 14px; }
+      .hero-hook { font-size: .9rem; margin-bottom: 8px; }
+      .hero-tagline { font-size: .9rem; margin-bottom: 24px; }
+      .eyebrow { font-size: .58rem; letter-spacing: 2px; margin-bottom: 10px; }
+
+      /* CTA buttons stack */
+      .hero-cta { flex-direction: column; align-items: center; gap: 10px; margin-bottom: 30px; width: 100%; }
+      .btn-primary, .btn-outline { width: 100%; justify-content: center; padding: 13px 20px; font-size: .78rem; }
+
+      /* stats — 2x2 grid */
+      .hero-stats { display: grid; grid-template-columns: 1fr 1fr; border-radius: 8px; width: 100%; }
+      .stat { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 12px 10px; }
+      .stat:nth-child(2) { border-right: none; }
+      .stat:nth-child(3) { border-bottom: none; }
+      .stat:nth-child(4) { border-right: none; border-bottom: none; }
+      .stat-n { font-size: 1.25rem; }
+      .stat-l { font-size: .52rem; letter-spacing: 1px; }
+
+      /* seals scroll horizontally */
+      #seals { padding: 14px 0; }
+      .seals-row { flex-wrap: nowrap; overflow-x: auto; padding: 0 16px; justify-content: flex-start; gap: 7px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .seals-row::-webkit-scrollbar { display: none; }
+      .seal { flex-shrink: 0; font-size: .6rem; padding: 6px 12px; }
+
+      /* features single col */
       .feat-grid { grid-template-columns: 1fr; }
-      .games-grid { grid-template-columns: repeat(2,1fr); }
-      .hero-stats { flex-direction: column; width: 100%; }
-      .stat { border-right: none; border-bottom: 1px solid var(--border); }
-      .stat:last-child { border-bottom: none; }
-      .reviews-grid { grid-template-columns: 1fr; }
-      .email-form { flex-direction: column; }
+      .feat { padding: 24px 20px; }
+
+      /* games 2-col */
+      .games-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
+      .game-label { padding: 18px 8px 8px; }
+      .game-title { font-size: .65rem; }
+      .game-genre { font-size: .52rem; }
+      .games-hdr h2 { font-size: 1.5rem; }
+
+      /* inside single col */
+      .inside-grid { gap: 8px; }
+      .inside-card { padding: 18px 16px; gap: 12px; }
+      .inside-icon { width: 36px; height: 36px; font-size: 1rem; }
+
+      /* reviews single col */
+      .reviews-grid { grid-template-columns: 1fr; gap: 10px; }
+      .reviews-summary { flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+      .reviews-bars { width: 100%; }
+      .reviews-big { font-size: 3rem; }
+      .review-form-wrap { padding: 22px 16px; }
+      .star-btn { font-size: 2rem; }
+
+      /* quiz */
+      .quiz-body { padding: 22px 18px; }
+      .quiz-footer { padding: 0 18px 22px; }
+      .quiz-question { font-size: .95rem; margin-bottom: 18px; }
+      .quiz-opt { padding: 12px 14px; font-size: .84rem; }
+      .quiz-result { padding: 30px 20px; }
+      .score-big { font-size: 2.8rem; }
+      .email-form { flex-direction: column; gap: 8px; }
+      .email-input, .email-form button { width: 100%; justify-content: center; }
+
+      /* section headers */
+      h2 { font-size: clamp(1.4rem, 6vw, 1.9rem); }
+      .sec-sub { font-size: .88rem; }
+
+      /* cta final */
+      .cta-box { padding: 52px 20px; }
+      .cta-box .btn-primary { width: 100%; justify-content: center; }
+
+      /* scroll cue hidden on small */
+      .scroll-cue { display: none; }
+    }
+
+    /* ═══════════════════════════════
+       ARCADE
+    ═══════════════════════════════ */
+    .arcade-tabs { display:flex; gap:8px; margin-bottom:20px; justify-content:center; flex-wrap:wrap; }
+    .arc-tab { background:var(--card); border:1px solid var(--border2); border-radius:8px; padding:10px 24px; font-family:'Share Tech Mono',monospace; font-size:.75rem; letter-spacing:1px; color:var(--text2); cursor:pointer; transition:all .2s; }
+    .arc-tab.active, .arc-tab:hover { background:var(--teal-dim); border-color:var(--teal); color:var(--teal); }
+
+    .arc-panel { max-width:500px; margin:0 auto; }
+    .arc-box { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .arc-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:rgba(13,242,212,.04); border-bottom:1px solid var(--border); }
+    .arc-title { font-family:'Cinzel',serif; font-weight:700; font-size:.9rem; color:var(--text); }
+    .arc-meta { display:flex; align-items:center; gap:6px; }
+    .arc-score-lbl { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+    .arc-score { font-family:'Cinzel',serif; font-weight:900; font-size:1.1rem; color:var(--teal); }
+
+    /* Snake canvas */
+    .arc-canvas-wrap { position:relative; display:flex; justify-content:center; background:#05050a; }
+    #snakeCanvas { display:block; max-width:100%; height:auto; touch-action:none; }
+    .arc-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(8,8,10,.9); z-index:10; padding:20px; text-align:center; }
+    .arc-overlay-icon { font-size:3rem; }
+    .arc-overlay-title { font-family:'Cinzel',serif; font-weight:900; font-size:1.3rem; color:var(--text); }
+    .arc-overlay-sub { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--text2); letter-spacing:1.5px; margin-bottom:6px; }
+
+    /* D-pad for mobile */
+    .dpad { display:none; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr; gap:6px; padding:14px; background:rgba(0,0,0,.3); justify-items:center; }
+    .dpad-btn { width:52px; height:52px; background:var(--card2); border:1px solid var(--border2); border-radius:8px; font-size:1.1rem; color:var(--teal); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; user-select:none; -webkit-user-select:none; }
+    .dpad-btn:active { background:var(--teal-dim); }
+    .dpad-up    { grid-column:2; grid-row:1; }
+    .dpad-left  { grid-column:1; grid-row:2; }
+    .dpad-right { grid-column:3; grid-row:2; }
+    .dpad-down  { grid-column:2; grid-row:2; }
+    @media(hover:none) { .dpad { display:grid; } }
+
+    /* Silhouette game */
+    .sil-body { padding:24px 20px; min-height:420px; }
+    .sil-intro { text-align:center; padding:32px 0; }
+    .sil-hint { font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:2px; color:var(--teal); text-align:center; margin-bottom:14px; min-height:18px; }
+    .sil-canvas-wrap { display:flex; justify-content:center; margin-bottom:16px; }
+    #silCanvas { border-radius:8px; background:#05050a; max-width:100%; height:auto; }
+    .sil-streak { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--amber); text-align:center; min-height:16px; margin-bottom:10px; letter-spacing:2px; }
+    .sil-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .sil-opt { background:var(--bg2); border:1px solid var(--border2); border-radius:8px; padding:11px 14px; font-family:'Nunito',sans-serif; font-size:.85rem; color:var(--text2); cursor:pointer; text-align:left; transition:all .2s; }
+    .sil-opt:hover:not(:disabled) { border-color:var(--teal); color:var(--text); background:var(--teal-dim); }
+    .sil-opt.correct { border-color:var(--green); background:rgba(61,220,132,.12); color:var(--green); }
+    .sil-opt.wrong   { border-color:var(--red);   background:rgba(255,77,109,.1);  color:var(--red); }
+    .sil-opt:disabled { cursor:not-allowed; }
+    .sil-feedback { min-height:20px; margin-top:12px; text-align:center; font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:1px; }
+    .sil-feedback.ok  { color:var(--green); }
+    .sil-feedback.bad { color:var(--red); }
+
+    @media(max-width:480px) {
+      .arc-panel { max-width:100%; }
+      .sil-options { grid-template-columns:1fr; }
+      .sil-body { padding:16px 14px; }
+    }
+    @media(hover:none) {
+      #cur { display: none; }
+      body { cursor: auto; }
+      /* Enlarge tap targets */
+      .btn-primary, .btn-outline, .nav-cta { min-height: 44px; }
+      .quiz-opt { min-height: 48px; padding: 14px 16px; }
+      .star-btn { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+      .form-group input, .form-group textarea, .email-input { font-size: 16px; /* prevents iOS zoom */ }
+      /* hover styles won't fire on touch, so show borders on active instead */
+      .feat:active { background: var(--card2); }
+      .inside-card:active { border-color: var(--border2); background: var(--card2); }
+      .seal:active { border-color: var(--teal); color: var(--text); }
+      .game-card { transform: none !important; } /* disable float animation on touch */
     }
   </style>
 </head>
 <body>
 <div id="cur"></div>
+<canvas id="seasons-canvas" style="position:fixed;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;"></canvas>
+<div id="season-badge" style="position:fixed;bottom:18px;right:18px;z-index:50;display:flex;align-items:center;gap:7px;background:rgba(8,8,10,.82);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:6px 14px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:2px;color:#9997a0;backdrop-filter:blur(8px);transition:opacity .4s;" id="season-badge"></div>
 
 <!-- ════════════ NAV ════════════ -->
 <nav>
@@ -321,6 +500,7 @@
   <div class="nav-r">
     <a href="#features" class="nav-link">Server</a>
     <a href="#games" class="nav-link">Games</a>
+    <a href="#arcade" class="nav-link">Arcade</a>
     <a href="#quiz-sec" class="nav-link">Quiz</a>
     <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
   </div>
@@ -527,6 +707,106 @@
   </div>
 </section>
 
+<!-- ════════════ ARCADE ════════════ -->
+<section id="arcade" class="section-pad" style="background:var(--bg2);border-top:1px solid var(--border);">
+  <div class="wrap">
+    <div class="reveal" style="text-align:center;margin-bottom:40px;">
+      <span class="label" style="display:block;text-align:center;">◈ Arcade</span>
+      <h2 style="text-align:center;">Play While You <em>Hang Around.</em></h2>
+      <p class="sec-sub" style="max-width:460px;margin:0 auto;">Two games built for the community. Post your scores in the server.</p>
+    </div>
+
+    <!-- GAME TABS -->
+    <div class="arcade-tabs reveal">
+      <button class="arc-tab active" onclick="switchGame('snake')">🐍 Neon Snake</button>
+      <button class="arc-tab" onclick="switchGame('silhouette')">🎌 Anime Guesser</button>
+    </div>
+
+    <!-- ── NEON SNAKE ── -->
+    <div id="game-snake" class="arc-panel reveal">
+      <div class="arc-box">
+        <div class="arc-header">
+          <span class="arc-title">🐍 Neon Snake</span>
+          <div class="arc-meta">
+            <span class="arc-score-lbl">Score</span>
+            <span class="arc-score" id="snake-score">0</span>
+            <span class="arc-score-lbl" style="margin-left:12px;">Best</span>
+            <span class="arc-score" id="snake-best" style="color:var(--amber);">0</span>
+          </div>
+        </div>
+        <div class="arc-canvas-wrap">
+          <canvas id="snakeCanvas" width="400" height="400"></canvas>
+          <div class="arc-overlay" id="snake-overlay">
+            <div class="arc-overlay-icon">🐍</div>
+            <div class="arc-overlay-title">Neon Snake</div>
+            <div class="arc-overlay-sub">Use arrow keys or swipe to move</div>
+            <button class="btn-primary" onclick="startSnake()">Play →</button>
+          </div>
+          <div class="arc-overlay" id="snake-gameover" style="display:none;">
+            <div class="arc-overlay-icon">💀</div>
+            <div class="arc-overlay-title">Game Over</div>
+            <div class="arc-overlay-sub" id="snake-final-score">Score: 0</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+              <button class="btn-primary" onclick="startSnake()">Retry →</button>
+              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score in Discord</a>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile D-Pad -->
+        <div class="dpad">
+          <button class="dpad-btn dpad-up"    onclick="snakeDpad('UP')">▲</button>
+          <button class="dpad-btn dpad-left"  onclick="snakeDpad('LEFT')">◀</button>
+          <button class="dpad-btn dpad-right" onclick="snakeDpad('RIGHT')">▶</button>
+          <button class="dpad-btn dpad-down"  onclick="snakeDpad('DOWN')">▼</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANIME SILHOUETTE GUESSER ── -->
+    <div id="game-silhouette" class="arc-panel reveal" style="display:none;">
+      <div class="arc-box">
+        <div class="arc-header">
+          <span class="arc-title">🎌 Anime Guesser</span>
+          <div class="arc-meta">
+            <span class="arc-score-lbl">Round</span>
+            <span class="arc-score" id="sil-round">1/8</span>
+            <span class="arc-score-lbl" style="margin-left:12px;">Score</span>
+            <span class="arc-score" id="sil-score">0</span>
+          </div>
+        </div>
+        <div class="sil-body" id="sil-screen">
+          <div class="sil-intro" id="sil-intro">
+            <div style="font-size:3rem;margin-bottom:12px;">🎌</div>
+            <div class="arc-overlay-title" style="position:static;transform:none;color:var(--text);font-size:1.2rem;margin-bottom:8px;">Anime Character Guesser</div>
+            <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:20px;">8 rounds. Guess the anime from the character silhouette.</div>
+            <button class="btn-primary" onclick="startSilhouette()">Start Game →</button>
+          </div>
+          <div id="sil-game" style="display:none;">
+            <div class="sil-hint" id="sil-hint">Hint: ···</div>
+            <div class="sil-canvas-wrap">
+              <canvas id="silCanvas" width="300" height="320"></canvas>
+            </div>
+            <div class="sil-streak" id="sil-streak"></div>
+            <div class="sil-options" id="sil-options"></div>
+            <div class="sil-feedback" id="sil-feedback"></div>
+          </div>
+          <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;">
+            <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
+            <div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.4rem;margin-bottom:6px;">Game Over!</div>
+            <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text3);letter-spacing:1px;margin-bottom:20px;" id="sil-final-rank"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+              <button class="btn-primary" onclick="startSilhouette()">Play Again →</button>
+              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- ════════════ FINAL CTA ════════════ -->
 <section id="cta-final">
   <div class="cta-box reveal">
@@ -554,8 +834,281 @@
 
 <script>
 /* ══════════════════════════════════
-   CURSOR
+   ARCADE — TAB SWITCH
 ══════════════════════════════════ */
+function switchGame(id) {
+  document.getElementById('game-snake').style.display      = id === 'snake'      ? '' : 'none';
+  document.getElementById('game-silhouette').style.display = id === 'silhouette' ? '' : 'none';
+  document.querySelectorAll('.arc-tab').forEach((t,i) => t.classList.toggle('active', i === (id==='snake'?0:1)));
+  if (id === 'snake') snakePause();
+}
+
+/* ══════════════════════════════════
+   NEON SNAKE
+══════════════════════════════════ */
+(function(){
+  const C = document.getElementById('snakeCanvas');
+  const ctx = C.getContext('2d');
+  const CELL = 20, COLS = 20, ROWS = 20;
+  const TEAL = '#0df2d4', DIM = '#0a3a34', RED = '#ff4d6d', AMBER = '#f5c842';
+  let snake, dir, nextDir, food, bonus, bonusTimer, loop, score, best = 0, running = false;
+
+  function resize() {
+    const w = Math.min(400, C.parentElement.clientWidth);
+    C.style.width = w + 'px'; C.style.height = w + 'px';
+  }
+  window.addEventListener('resize', resize); resize();
+
+  function rndCell() { return { x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS) }; }
+  function spawnFood() {
+    do { food = rndCell(); } while (snake.some(s=>s.x===food.x&&s.y===food.y));
+  }
+  function spawnBonus() {
+    if (Math.random() < .3) {
+      do { bonus = rndCell(); } while (snake.some(s=>s.x===bonus.x&&s.y===bonus.y) || (food.x===bonus.x&&food.y===bonus.y));
+      bonusTimer = 60;
+    }
+  }
+
+  window.startSnake = function() {
+    document.getElementById('snake-overlay').style.display = 'none';
+    document.getElementById('snake-gameover').style.display = 'none';
+    snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+    dir = {x:1,y:0}; nextDir = {x:1,y:0};
+    score = 0; bonus = null; bonusTimer = 0; running = true;
+    spawnFood();
+    clearInterval(loop);
+    loop = setInterval(tick, 115);
+    updateScoreDisplay();
+  };
+
+  window.snakePause = function() { running = false; clearInterval(loop); };
+
+  function tick() {
+    dir = nextDir;
+    const head = { x: (snake[0].x + dir.x + COLS) % COLS, y: (snake[0].y + dir.y + ROWS) % ROWS };
+    if (snake.some(s=>s.x===head.x&&s.y===head.y)) { gameOver(); return; }
+    snake.unshift(head);
+    let ate = false;
+    if (head.x===food.x && head.y===food.y) { score += 10; ate = true; spawnFood(); if(score%50===0) spawnBonus(); }
+    else if (bonus && head.x===bonus.x && head.y===bonus.y) { score += 25; bonus = null; ate = true; }
+    else snake.pop();
+    if (bonus && --bonusTimer <= 0) bonus = null;
+    updateScoreDisplay();
+    draw();
+  }
+
+  function updateScoreDisplay() {
+    if (score > best) best = score;
+    document.getElementById('snake-score').textContent = score;
+    document.getElementById('snake-best').textContent = best;
+  }
+
+  function gameOver() {
+    running = false; clearInterval(loop);
+    document.getElementById('snake-final-score').textContent = `Score: ${score}  |  Best: ${best}`;
+    document.getElementById('snake-gameover').style.display = 'flex';
+  }
+
+  function draw() {
+    ctx.fillStyle = '#05050a'; ctx.fillRect(0,0,C.width,C.height);
+    // grid
+    ctx.strokeStyle = 'rgba(13,242,212,.05)'; ctx.lineWidth = .5;
+    for (let i=0;i<=COLS;i++) { ctx.beginPath(); ctx.moveTo(i*(C.width/COLS),0); ctx.lineTo(i*(C.width/COLS),C.height); ctx.stroke(); }
+    for (let j=0;j<=ROWS;j++) { ctx.beginPath(); ctx.moveTo(0,j*(C.height/ROWS)); ctx.lineTo(C.width,j*(C.height/ROWS)); ctx.stroke(); }
+    const cw = C.width/COLS, ch = C.height/ROWS;
+    // food
+    ctx.fillStyle = RED; ctx.shadowColor = RED; ctx.shadowBlur = 12;
+    ctx.fillRect(food.x*cw+2, food.y*ch+2, cw-4, ch-4);
+    ctx.shadowBlur = 0;
+    // bonus
+    if (bonus) {
+      ctx.fillStyle = AMBER; ctx.shadowColor = AMBER; ctx.shadowBlur = 16;
+      ctx.fillRect(bonus.x*cw+2, bonus.y*ch+2, cw-4, ch-4);
+      ctx.shadowBlur = 0;
+    }
+    // snake
+    snake.forEach((seg, i) => {
+      ctx.fillStyle = i===0 ? TEAL : DIM;
+      ctx.shadowColor = i===0 ? TEAL : 'transparent'; ctx.shadowBlur = i===0 ? 14 : 0;
+      ctx.fillRect(seg.x*cw+1, seg.y*ch+1, cw-2, ch-2);
+    });
+    ctx.shadowBlur = 0;
+  }
+
+  // Keyboard
+  const DIRS = { ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0},
+                 w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0} };
+  document.addEventListener('keydown', e => {
+    if (!running) return;
+    const d = DIRS[e.key];
+    if (d && !(d.x===-dir.x&&d.y===-dir.y)) { nextDir=d; e.preventDefault(); }
+  });
+
+  // Touch swipe
+  let tx=0, ty=0;
+  C.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; e.preventDefault(); }, {passive:false});
+  C.addEventListener('touchend', e=>{
+    if (!running) return;
+    const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if (Math.abs(dx)>Math.abs(dy)) nextDir=dx>0?{x:1,y:0}:{x:-1,y:0};
+    else nextDir=dy>0?{x:0,y:1}:{x:0,y:-1};
+  }, {passive:false});
+
+  // D-pad
+  window.snakeDpad = function(k) {
+    if (!running) return;
+    const m = {UP:{x:0,y:-1},DOWN:{x:0,y:1},LEFT:{x:-1,y:0},RIGHT:{x:1,y:0}};
+    const d = m[k];
+    if (d && !(d.x===-dir.x&&d.y===-dir.y)) nextDir=d;
+  };
+
+  // Draw idle
+  draw();
+})();
+
+/* ══════════════════════════════════
+   ANIME SILHOUETTE GUESSER
+══════════════════════════════════ */
+(function(){
+  const CHARS = [
+    { name:'Naruto Uzumaki',   anime:'Naruto',              hint:'Ninja with a fox spirit sealed inside him',     color:'#ff8c00', shape:'spiky' },
+    { name:'Sailor Moon',      anime:'Sailor Moon',          hint:'Magical girl warrior of justice and love',      color:'#ffd700', shape:'twin'  },
+    { name:'Goku',             anime:'Dragon Ball Z',        hint:'Saiyan warrior with legendary golden hair',     color:'#f5c842', shape:'spiky' },
+    { name:'Zero Two',         anime:'Darling in the FranXX',hint:'Pink-haired girl with small red horns',        color:'#ff4d6d', shape:'horns' },
+    { name:'Levi Ackerman',    anime:'Attack on Titan',      hint:'Humanity\'s strongest soldier',                 color:'#9997a0', shape:'short' },
+    { name:'Rem',              anime:'Re:Zero',              hint:'Blue-haired demon maid',                        color:'#4db8ff', shape:'maid'  },
+    { name:'Itachi Uchiha',    anime:'Naruto',               hint:'Elite shinobi with Sharingan eyes',             color:'#9b59b6', shape:'long'  },
+    { name:'Hatsune Miku',     anime:'Vocaloid',             hint:'Teal twin-tail virtual idol singer',            color:'#0df2d4', shape:'twin'  },
+  ];
+
+  const C = document.getElementById('silCanvas');
+  const ctx = C.getContext('2d');
+  let round=0, score=0, streak=0, answered=false, chars=[];
+
+  function shuffle(a) { return [...a].sort(()=>Math.random()-.5); }
+
+  window.startSilhouette = function() {
+    round=0; score=0; streak=0; answered=false;
+    chars = shuffle(CHARS);
+    document.getElementById('sil-intro').style.display='none';
+    document.getElementById('sil-result').style.display='none';
+    document.getElementById('sil-game').style.display='block';
+    loadRound();
+  };
+
+  function loadRound() {
+    answered=false;
+    const c = chars[round];
+    document.getElementById('sil-round').textContent = `${round+1}/8`;
+    document.getElementById('sil-score').textContent = score;
+    document.getElementById('sil-hint').textContent = `Hint: ${c.hint}`;
+    document.getElementById('sil-feedback').textContent='';
+    document.getElementById('sil-feedback').className='sil-feedback';
+    document.getElementById('sil-streak').textContent = streak>=2 ? `🔥 ${streak} streak!` : '';
+    drawSilhouette(c);
+
+    // build options — correct + 3 random wrong
+    const wrong = shuffle(CHARS.filter(x=>x.name!==c.name)).slice(0,3).map(x=>x.anime);
+    const options = shuffle([c.anime, ...wrong]);
+    const el = document.getElementById('sil-options');
+    el.innerHTML='';
+    options.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='sil-opt';
+      btn.textContent=opt;
+      btn.onclick=()=>pick(btn,opt,c.anime);
+      el.appendChild(btn);
+    });
+  }
+
+  function pick(btn, chosen, correct) {
+    if (answered) return;
+    answered=true;
+    document.querySelectorAll('.sil-opt').forEach(b=>b.disabled=true);
+    const fb=document.getElementById('sil-feedback');
+    if (chosen===correct) {
+      btn.classList.add('correct'); score+=10+(streak*2);
+      streak++; fb.textContent='✓ Correct! +'+( 10+(streak-1)*2); fb.className='sil-feedback ok';
+    } else {
+      btn.classList.add('wrong');
+      document.querySelectorAll('.sil-opt').forEach(b=>{ if(b.textContent===correct) b.classList.add('correct'); });
+      streak=0; fb.textContent=`✗ It was: ${correct}`; fb.className='sil-feedback bad';
+    }
+    document.getElementById('sil-score').textContent=score;
+    document.getElementById('sil-streak').textContent = streak>=2?`🔥 ${streak} streak!`:'';
+    setTimeout(()=>{ round++; if(round>=chars.length) showResult(); else loadRound(); }, 1400);
+  }
+
+  function showResult() {
+    document.getElementById('sil-game').style.display='none';
+    document.getElementById('sil-result').style.display='block';
+    document.getElementById('sil-final-score').textContent=`Score: ${score} pts — ${Math.round(score/80*100)}% accuracy`;
+    const ranks=[['ANIME GOD 🏆','You know everything.'],['ELITE OTAKU ⭐','Seriously impressive.'],['SEASONED FAN 🎌','Solid knowledge!'],['CASUAL VIEWER 📺','Not bad at all!'],['NEW TO ANIME 🌱','Come learn with us!']];
+    const pct=score/80;
+    const [r,m]=pct>=.9?ranks[0]:pct>=.7?ranks[1]:pct>=.5?ranks[2]:pct>=.3?ranks[3]:ranks[4];
+    document.getElementById('sil-final-rank').textContent=`${r} — ${m}`;
+  }
+
+  function drawSilhouette(char) {
+    ctx.clearRect(0,0,C.width,C.height);
+    ctx.fillStyle='#05050a'; ctx.fillRect(0,0,C.width,C.height);
+
+    // Draw stylised silhouette based on shape tag
+    const cx=C.width/2, cy=C.height/2+20;
+    ctx.fillStyle='#1a1a22'; ctx.strokeStyle=char.color+'44'; ctx.lineWidth=1.5;
+
+    const s = char.shape;
+    // head
+    ctx.beginPath(); ctx.arc(cx, cy-90, 30, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+    if (s==='spiky'||s==='long') {
+      // spiky hair
+      const pts=s==='spiky'?8:4;
+      for(let i=0;i<pts;i++){
+        const a=-Math.PI/2+(i-(pts-1)/2)*0.28;
+        const r=s==='spiky'?52:42;
+        ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*28,cy-90+Math.sin(a)*28);
+        ctx.lineTo(cx+Math.cos(a)*r,cy-90+Math.sin(a)*r-10); ctx.lineWidth=8; ctx.strokeStyle='#1a1a22'; ctx.stroke();
+        ctx.strokeStyle=char.color+'44'; ctx.lineWidth=1.5;
+      }
+    }
+    if (s==='twin') {
+      // twin tails
+      ctx.beginPath(); ctx.ellipse(cx-38,cy-110,10,34,-.4,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(cx+38,cy-110,10,34,.4,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    }
+    if (s==='horns') {
+      ctx.beginPath(); ctx.moveTo(cx-18,cy-116); ctx.lineTo(cx-12,cy-148); ctx.lineTo(cx-6,cy-116); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+6,cy-116); ctx.lineTo(cx+12,cy-148); ctx.lineTo(cx+18,cy-116); ctx.fill(); ctx.stroke();
+    }
+    if (s==='maid') {
+      ctx.beginPath(); ctx.ellipse(cx,cy-122,36,8,.0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    }
+
+    // body
+    ctx.beginPath(); ctx.moveTo(cx-22,cy-62); ctx.bezierCurveTo(cx-28,cy-20,cx-24,cy+20,cx-20,cy+60);
+    ctx.lineTo(cx+20,cy+60); ctx.bezierCurveTo(cx+24,cy+20,cx+28,cy-20,cx+22,cy-62); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    // arms
+    ctx.beginPath(); ctx.moveTo(cx-22,cy-50); ctx.quadraticCurveTo(cx-55,cy-10,cx-44,cy+40); ctx.lineWidth=12; ctx.strokeStyle='#1a1a22'; ctx.stroke(); ctx.lineWidth=1.5; ctx.strokeStyle=char.color+'44';
+    ctx.beginPath(); ctx.moveTo(cx+22,cy-50); ctx.quadraticCurveTo(cx+55,cy-10,cx+44,cy+40); ctx.lineWidth=12; ctx.strokeStyle='#1a1a22'; ctx.stroke(); ctx.lineWidth=1.5; ctx.strokeStyle=char.color+'44';
+
+    // legs
+    ctx.beginPath(); ctx.moveTo(cx-10,cy+60); ctx.quadraticCurveTo(cx-16,cy+100,cx-14,cy+140); ctx.lineWidth=14; ctx.strokeStyle='#1a1a22'; ctx.stroke(); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx+10,cy+60); ctx.quadraticCurveTo(cx+16,cy+100,cx+14,cy+140); ctx.lineWidth=14; ctx.strokeStyle='#1a1a22'; ctx.stroke(); ctx.lineWidth=1.5;
+
+    // glow aura
+    const grd=ctx.createRadialGradient(cx,cy,10,cx,cy,150);
+    grd.addColorStop(0,char.color+'18'); grd.addColorStop(1,'transparent');
+    ctx.fillStyle=grd; ctx.fillRect(0,0,C.width,C.height);
+
+    // question mark
+    ctx.font='bold 48px Cinzel,serif'; ctx.fillStyle=char.color+'cc';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('?',cx,cy-90);
+  }
+})();
 const cur = document.getElementById('cur');
 document.addEventListener('mousemove', e => { cur.style.left = e.clientX+'px'; cur.style.top = e.clientY+'px'; });
 document.querySelectorAll('a,button,.game-card,.feat,.inside-card,.seal,.review-card').forEach(el => {
@@ -765,6 +1318,209 @@ function restartQuiz() {
 
 // Init quiz
 loadQuestion();
+
+/* ══════════════════════════════════
+   SEASONAL PARTICLES
+   Spring  (Mar–May)  → Cherry blossoms 🌸
+   Summer  (Jun–Aug)  → Fireflies ✨ + heat shimmer
+   Autumn  (Sep–Nov)  → Falling leaves 🍂
+   Winter  (Dec–Feb)  → Snow ❄️
+══════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('seasons-canvas');
+  const ctx    = canvas.getContext('2d');
+  const badge  = document.getElementById('season-badge');
+
+  // Detect season from current month
+  const month = new Date().getMonth(); // 0=Jan … 11=Dec
+  const SEASON =
+    month >= 2 && month <= 4 ? 'spring' :
+    month >= 5 && month <= 7 ? 'summer' :
+    month >= 8 && month <= 10 ? 'autumn' : 'winter';
+
+  const CONFIGS = {
+    spring: { label:'🌸 Spring', count:55, color:['#ffb7c5','#ff8fab','#ffd6e0','#ff6b9d','#fff0f5'] },
+    summer: { label:'✨ Summer', count:60, color:['#fffbe6','#ffd700','#fff9c4','#0df2d4','#ffffff'] },
+    autumn: { label:'🍂 Autumn', count:45, color:['#e8651a','#c0392b','#f39c12','#8b4513','#d4a017'] },
+    winter: { label:'❄️ Winter', count:70, color:['#e0f7ff','#b3e5fc','#ffffff','#cce5ff','#ddeeff'] },
+  };
+
+  const cfg = CONFIGS[SEASON];
+  badge.innerHTML = cfg.label;
+
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── Particle factory ──
+  function makeParticle() {
+    const color = cfg.color[Math.floor(Math.random() * cfg.color.length)];
+    const base = {
+      x:     Math.random() * W,
+      y:     -20 - Math.random() * 120,
+      color,
+      alpha: 0.15 + Math.random() * 0.55,
+      size:  2 + Math.random() * 5,
+      speedY: 0.4 + Math.random() * 1.2,
+      speedX: (Math.random() - 0.5) * 0.7,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.01 + Math.random() * 0.025,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.04,
+    };
+
+    // Season-specific overrides
+    if (SEASON === 'summer') {
+      // Fireflies — small, pulsing, drift slowly
+      base.size      = 1.5 + Math.random() * 2.5;
+      base.speedY    = -0.1 - Math.random() * 0.4; // float UP
+      base.speedX    = (Math.random() - 0.5) * 0.6;
+      base.y         = Math.random() * H;           // start anywhere
+      base.pulse     = Math.random() * Math.PI * 2;
+      base.pulseSpeed= 0.03 + Math.random() * 0.05;
+      base.glow      = true;
+    }
+    if (SEASON === 'winter') {
+      base.size  = 1.5 + Math.random() * 4;
+      base.speedY= 0.5 + Math.random() * 1.4;
+      base.speedX= (Math.random() - 0.5) * 0.4;
+    }
+    if (SEASON === 'spring') {
+      base.size  = 3 + Math.random() * 5;
+      base.speedY= 0.6 + Math.random() * 1.1;
+    }
+    if (SEASON === 'autumn') {
+      base.size   = 4 + Math.random() * 7;
+      base.speedY = 0.7 + Math.random() * 1.3;
+      base.speedX = (Math.random() - 0.5) * 1.2;
+    }
+    return base;
+  }
+
+  // Pre-spawn spread across screen height
+  for (let i = 0; i < cfg.count; i++) {
+    const p = makeParticle();
+    p.y = Math.random() * H; // stagger initial positions
+    particles.push(p);
+  }
+
+  // ── Draw helpers ──
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    // Petal shape
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawLeaf(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size * 0.55, p.size, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    // Leaf vein
+    ctx.strokeStyle = 'rgba(0,0,0,.2)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(0, -p.size); ctx.lineTo(0, p.size);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSnowflake(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = p.alpha;
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 0.8;
+    for (let a = 0; a < 6; a++) {
+      ctx.save();
+      ctx.rotate((a * Math.PI) / 3);
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.lineTo(0, -p.size);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawFirefly(p) {
+    p.pulse += p.pulseSpeed;
+    const glow = 0.3 + Math.sin(p.pulse) * 0.35;
+    ctx.save();
+    ctx.globalAlpha = glow;
+    // Outer glow
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 5);
+    g.addColorStop(0, p.color);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(p.x - p.size*5, p.y - p.size*5, p.size*10, p.size*10);
+    // Core dot
+    ctx.globalAlpha = 0.7 + Math.sin(p.pulse) * 0.3;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Main loop ──
+  function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      // Update position
+      p.wobble   += p.wobbleSpeed;
+      p.rotation += p.rotSpeed;
+      p.x += p.speedX + Math.sin(p.wobble) * 0.5;
+      p.y += p.speedY;
+
+      // Summer fireflies drift upward and wrap
+      if (SEASON === 'summer') {
+        if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W; }
+      } else {
+        if (p.y > H + 30) {
+          // Reset to top
+          Object.assign(p, makeParticle());
+          p.y = -20;
+        }
+        // Wrap horizontally
+        if (p.x < -30)  p.x = W + 30;
+        if (p.x > W+30) p.x = -30;
+      }
+
+      // Draw by season
+      if (SEASON === 'spring') drawPetal(p);
+      else if (SEASON === 'summer') drawFirefly(p);
+      else if (SEASON === 'autumn') drawLeaf(p);
+      else drawSnowflake(p);
+    }
+  }
+
+  animate();
+
+  // Fade badge out after 4s
+  setTimeout(() => { badge.style.opacity = '0'; }, 4000);
+  setTimeout(() => { badge.style.display = 'none'; }, 4500);
+})();
 </script>
 </body>
 </html>
