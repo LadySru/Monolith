@@ -165,7 +165,7 @@
         radial-gradient(ellipse 55% 50% at 80% 20%, rgba(255,0,170,0.18) 0%, transparent 55%),
         radial-gradient(ellipse 65% 50% at 60% 85%, rgba(0,255,231,0.14) 0%, transparent 55%),
         url('banner.jpg') center/contain no-repeat, var(--bg);
-      filter: brightness(.22) saturate(.75);
+      filter: brightness(.10) saturate(.5);
       animation: meshPulse 9s ease-in-out infinite alternate;
     }
     /* scrolling grid floor */
@@ -176,7 +176,12 @@
       animation: gridScroll 8s linear infinite;
       mask-image: linear-gradient(180deg,transparent 0%,rgba(0,0,0,.5) 40%,rgba(0,0,0,.9) 100%);
     }
-    .hero-vignette { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 15%, rgba(2,0,10,.65) 75%), linear-gradient(180deg,rgba(2,0,10,.55) 0%,transparent 40%,rgba(2,0,10,.95) 100%); }
+    .hero-vignette {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        radial-gradient(ellipse 85% 75% at 50% 50%, rgba(2,0,10,.55) 20%, rgba(2,0,10,.88) 100%),
+        linear-gradient(180deg, rgba(2,0,10,.75) 0%, rgba(2,0,10,.4) 35%, rgba(2,0,10,.75) 70%, rgba(2,0,10,.98) 100%);
+    }
 
     .shape { position: absolute; border-radius: 50%; filter: blur(55px); animation: floatBob 14s ease-in-out infinite; z-index: 0; }
     .s1 { width:300px; height:300px; background:var(--purple); opacity:.25; top:6%;  left:2%;  animation-delay:0s; }
@@ -192,11 +197,11 @@
     .eyebrow { font-family: 'Orbitron', monospace; font-size: .6rem; letter-spacing: 5px; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; opacity: 0; animation: fadeUp .7s .12s ease forwards; text-shadow: var(--neon-t); }
 
     h1 { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(2.8rem, 8vw, 6rem); line-height: .95; letter-spacing: 3px; margin-bottom: 18px; opacity: 0; animation: fadeUp .8s .2s ease forwards, glitch 6s 2s ease-in-out infinite; }
-    h1 .line1 { display: block; color: var(--text); text-shadow: 0 0 30px rgba(240,232,255,.2); }
-    h1 .line2 { display: block; color: var(--teal); text-shadow: var(--neon-t); animation: neonFlicker 8s 4s linear infinite; }
+    h1 .line1 { display: block; color: #ffffff; text-shadow: 0 2px 20px rgba(0,0,0,.9), 0 0 40px rgba(240,232,255,.15); }
+    h1 .line2 { display: block; color: var(--teal); text-shadow: var(--neon-t), 0 2px 20px rgba(0,0,0,.9); animation: neonFlicker 8s 4s linear infinite; }
 
-    .hero-hook { font-family: 'Rajdhani', sans-serif; font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 600; color: var(--text2); letter-spacing: 3px; margin-bottom: 10px; opacity: 0; animation: fadeUp .8s .3s ease forwards; text-transform: uppercase; }
-    .hero-tagline { font-size: 1rem; font-weight: 300; color: var(--text2); max-width: 460px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; }
+    .hero-hook { font-family: 'Rajdhani', sans-serif; font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 600; color: #c8c0e8; letter-spacing: 3px; margin-bottom: 10px; opacity: 0; animation: fadeUp .8s .3s ease forwards; text-transform: uppercase; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+    .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 460px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
 
     .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; opacity: 0; animation: fadeUp .8s .48s ease forwards; }
 
