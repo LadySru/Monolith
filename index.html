@@ -126,6 +126,8 @@
     .nav-name span { color: var(--teal); }
     .nav-pill { display: flex; align-items: center; gap: 6px; background: rgba(57,255,138,.08); border: 1px solid rgba(57,255,138,.3); border-radius: 20px; padding: 3px 10px; font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--green); letter-spacing: 2px; box-shadow: 0 0 10px rgba(57,255,138,.15); }
     .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
+    .nav-viewers { display: flex; align-items: center; gap: 5px; background: rgba(255,45,107,.08); border: 1px solid rgba(255,45,107,.25); border-radius: 20px; padding: 3px 10px; font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--red); letter-spacing: 1.5px; white-space: nowrap; }
+    .nav-viewers-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); box-shadow: 0 0 6px var(--red); animation: pulse 2s .5s ease-in-out infinite; flex-shrink: 0; }
     .nav-r { display: flex; align-items: center; gap: 16px; }
     .nav-link { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s, text-shadow .2s; }
     .nav-link:hover { color: var(--teal); text-shadow: var(--neon-t); }
@@ -372,7 +374,29 @@
     .footer-name span { color: var(--teal); }
     .footer-copy { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--text3); letter-spacing: 1px; }
 
-    /* ═══════ RESPONSIVE ═══════ */
+    /* ═══════ SCOREBOARD ═══════ */
+    .sb-wrap { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+    .sb-title { font-family: 'Orbitron', monospace; font-size: .6rem; letter-spacing: 3px; color: var(--teal); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .sb-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .sb-empty { font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--text3); letter-spacing: 2px; text-align: center; padding: 8px 0; }
+    .sb-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+    .sb-row:last-child { border-bottom: none; }
+    .sb-rank { font-family: 'Orbitron', monospace; font-size: .65rem; font-weight: 900; min-width: 22px; text-align: center; }
+    .sb-rank.gold   { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
+    .sb-rank.silver { color: #c0c0c0; }
+    .sb-rank.bronze { color: #cd7f32; }
+    .sb-rank.other  { color: var(--text3); }
+    .sb-name { font-family: 'Orbitron', monospace; font-size: .65rem; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: .5px; }
+    .sb-name.you { color: var(--teal); text-shadow: 0 0 8px rgba(0,255,231,.3); }
+    .sb-score { font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 900; color: var(--amber); }
+    .sb-new { font-family: 'Orbitron', monospace; font-size: .5rem; color: var(--green); letter-spacing: 2px; margin-left: 4px; vertical-align: middle; }
+    /* name entry form in game over */
+    .sb-entry { display: flex; gap: 8px; margin: 12px 0 4px; }
+    .sb-input { flex: 1; background: var(--bg); border: 1px solid var(--border2); padding: 9px 12px; font-family: 'Orbitron', monospace; font-size: .65rem; color: var(--text); outline: none; letter-spacing: 1px; transition: border-color .2s; max-width: 180px; }
+    .sb-input:focus { border-color: var(--teal); }
+    .sb-save { background: transparent; border: 1px solid var(--teal); color: var(--teal); font-family: 'Orbitron', monospace; font-size: .6rem; letter-spacing: 1px; padding: 9px 16px; cursor: pointer; transition: background .2s; white-space: nowrap; }
+    .sb-save:hover { background: var(--teal-dim); }
+    .sb-saved { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--green); letter-spacing: 2px; display: none; margin: 4px 0; }
     @media(max-width:960px){
       nav,#seals,footer { padding-left:20px; padding-right:20px; }
       .nav-link { display:none; }
@@ -432,6 +456,10 @@
       <span class="nav-name">Monolith <span>Social</span></span>
     </a>
     <div class="nav-pill"><span class="nav-dot"></span> Live</div>
+    <div class="nav-viewers" id="nav-viewers" title="People viewing right now">
+      <span class="nav-viewers-dot"></span>
+      <span id="viewer-count">—</span> viewing
+    </div>
   </div>
   <div class="nav-r">
     <a href="#features" class="nav-link">Server</a>
@@ -486,8 +514,7 @@
     <div class="seal">🎮 Weekly Game Nights</div>
     <div class="seal">🚫 No Gatekeeping</div>
     <div class="seal">🌐 All Platforms</div>
-    <div class="seal">🤝 Open Partnerships</div>
-  </div>
+     </div>
 </section>
 
 <!-- FEATURES -->
@@ -563,7 +590,21 @@
         <div class="arc-canvas-wrap">
           <canvas id="snakeCanvas" width="400" height="400"></canvas>
           <div class="arc-overlay" id="snake-overlay"><div class="arc-overlay-icon">🐍</div><div class="arc-overlay-title">Neon Snake</div><div class="arc-overlay-sub">Arrow keys · WASD · Swipe</div><button class="btn-primary" onclick="startSnake()">Play →</button></div>
-          <div class="arc-overlay" id="snake-gameover" style="display:none;"><div class="arc-overlay-icon">💀</div><div class="arc-overlay-title">Game Over</div><div class="arc-overlay-sub" id="snake-final-score">Score: 0</div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"><button class="btn-primary" onclick="startSnake()">Retry →</button><a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a></div></div>
+          <div class="arc-overlay" id="snake-gameover" style="display:none;">
+            <div class="arc-overlay-icon">💀</div>
+            <div class="arc-overlay-title">Game Over</div>
+            <div class="arc-overlay-sub" id="snake-final-score">Score: 0</div>
+            <div class="sb-entry">
+              <input class="sb-input" id="snake-name-input" placeholder="Your name..." maxlength="16"/>
+              <button class="sb-save" onclick="saveSnakeScore()">Save →</button>
+            </div>
+            <div class="sb-saved" id="snake-score-saved">✓ Saved to leaderboard!</div>
+            <div class="sb-wrap" id="snake-sb"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
+              <button class="btn-primary" onclick="startSnake()">Retry →</button>
+              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
+            </div>
+          </div>
         </div>
         <div class="dpad"><button class="dpad-btn dpad-up" onclick="snakeDpad('UP')">▲</button><button class="dpad-btn dpad-left" onclick="snakeDpad('LEFT')">◀</button><button class="dpad-btn dpad-right" onclick="snakeDpad('RIGHT')">▶</button><button class="dpad-btn dpad-down" onclick="snakeDpad('DOWN')">▼</button></div>
       </div>
@@ -577,7 +618,22 @@
         <div class="sil-body" id="sil-screen">
           <div class="sil-intro" id="sil-intro"><div style="font-size:3rem;margin-bottom:12px;">🎌</div><div class="arc-overlay-title" style="position:static;transform:none;color:var(--text);font-size:1.1rem;margin-bottom:8px;letter-spacing:2px;">Anime Character Guesser</div><div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:20px;">8 rounds — guess the anime from the silhouette.</div><button class="btn-primary" onclick="startSilhouette()">Start Game →</button></div>
           <div id="sil-game" style="display:none;"><div class="sil-hint" id="sil-hint">Hint: ···</div><div class="sil-canvas-wrap"><canvas id="silCanvas" width="300" height="320"></canvas></div><div class="sil-streak" id="sil-streak"></div><div class="sil-options" id="sil-options"></div><div class="sil-feedback" id="sil-feedback"></div></div>
-          <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;"><div style="font-size:2.5rem;margin-bottom:10px;">🏆</div><div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;">Game Over!</div><div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div><div style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;margin-bottom:20px;" id="sil-final-rank"></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"><button class="btn-primary" onclick="startSilhouette()">Play Again →</button><a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a></div></div>
+          <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;">
+            <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
+            <div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;">Game Over!</div>
+            <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div>
+            <div style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;margin-bottom:16px;" id="sil-final-rank"></div>
+            <div class="sb-entry" style="justify-content:center;">
+              <input class="sb-input" id="sil-name-input" placeholder="Your name..." maxlength="16"/>
+              <button class="sb-save" onclick="saveSilScore()">Save →</button>
+            </div>
+            <div class="sb-saved" id="sil-score-saved">✓ Saved to leaderboard!</div>
+            <div class="sb-wrap" id="sil-sb"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+              <button class="btn-primary" onclick="startSilhouette()">Play Again →</button>
+              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -599,11 +655,17 @@
           <div class="quiz-body"><div class="quiz-q-num" id="q-num">Question 1 of 10</div><div class="quiz-question" id="q-text">Loading...</div><div class="quiz-options" id="q-opts"></div><div class="quiz-feedback" id="q-feedback"></div></div>
           <div class="quiz-footer"><span class="quiz-score-sm" id="q-score-foot">Score: 0</span><button class="btn-primary" id="q-next" onclick="nextQuestion()" style="display:none;">Next →</button></div>
         </div>
-        <div class="quiz-result" id="quiz-result">
+          <div class="quiz-result" id="quiz-result">
           <h3>Quiz Complete!</h3>
           <div class="score-big" id="res-score">0<span>/10</span></div>
           <div class="rank-label" id="res-rank"></div>
-          <p id="res-msg" style="font-size:.9rem;color:var(--text2);margin-bottom:22px;font-weight:300;"></p>
+          <p id="res-msg" style="font-size:.9rem;color:var(--text2);margin-bottom:16px;font-weight:300;"></p>
+          <div class="sb-entry" style="justify-content:center;margin-bottom:4px;">
+            <input class="sb-input" id="quiz-name-input" placeholder="Your name..." maxlength="16"/>
+            <button class="sb-save" onclick="saveQuizScore()">Save →</button>
+          </div>
+          <div class="sb-saved" id="quiz-score-saved">✓ Saved to leaderboard!</div>
+          <div class="sb-wrap" id="quiz-sb" style="max-width:420px;margin:0 auto 16px;"></div>
           <p style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text2);letter-spacing:2px;margin-bottom:14px;">Get your result + server news to your inbox:</p>
           <div class="email-form"><input type="email" class="email-input" id="quiz-email" placeholder="your@email.com"/><button class="btn-primary" onclick="sendResult()" style="white-space:nowrap;">Send →</button></div>
           <div class="email-sent" id="email-sent">✓ Sent! Check your inbox. Welcome to the newsletter 🎌</div>
@@ -657,7 +719,7 @@
       <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.114 18.1.133 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127c-.598.35-1.22.645-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       Join the Community →
     </a>
-    <p class="cta-meta">discord.gg/pnRCbEAtTk </p>
+    <p class="cta-meta">discord.gg/pnRCbEAtTk · No account needed to browse</p>
   </div>
 </section>
 
@@ -727,7 +789,19 @@ function switchGame(id){
     updateDisp();draw();
   }
   function updateDisp(){if(score>best)best=score;document.getElementById('snake-score').textContent=score;document.getElementById('snake-best').textContent=best;}
-  function gameOver(){running=false;clearInterval(loop);document.getElementById('snake-final-score').textContent=`Score: ${score}  |  Best: ${best}`;document.getElementById('snake-gameover').style.display='flex';}
+  function gameOver(){
+    running=false;clearInterval(loop);
+    document.getElementById('snake-final-score').textContent=`Score: ${score}  |  Best: ${best}`;
+    document.getElementById('snake-gameover').style.display='flex';
+    // reset save UI for new game
+    const ni=document.getElementById('snake-name-input');
+    if(ni){ni.disabled=false;ni.value='';}
+    const sb=document.getElementById('snake-score-saved');
+    if(sb) sb.style.display='none';
+    const sv=document.querySelector('#snake-gameover .sb-save');
+    if(sv) sv.disabled=false;
+    renderSnakeSB();
+  }
   function draw(){
     ctx.fillStyle='#020108';ctx.fillRect(0,0,C.width,C.height);
     if(!snake||!food)return;
@@ -763,6 +837,7 @@ function switchGame(id){
   ];
   const C=document.getElementById('silCanvas'),ctx=C.getContext('2d');
   let round=0,score=0,streak=0,answered=false,chars=[];
+  window.silScore = 0; // exposed for scoreboard
   function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
   window.startSilhouette=function(){round=0;score=0;streak=0;answered=false;chars=shuffle(CHARS);document.getElementById('sil-intro').style.display='none';document.getElementById('sil-result').style.display='none';document.getElementById('sil-game').style.display='block';loadRound();};
   function loadRound(){
@@ -794,6 +869,12 @@ function switchGame(id){
     document.getElementById('sil-final-score').textContent=`Score: ${score} pts — ${Math.round(score/80*100)}% accuracy`;
     const pct=score/80;const[r,m]=pct>=.9?['ANIME GOD 🏆','Perfect. You are a legend.']:pct>=.7?['ELITE OTAKU ⭐','Seriously impressive.']:pct>=.5?['SEASONED FAN 🎌','Solid knowledge!']:pct>=.3?['CASUAL VIEWER 📺','Not bad at all!']:['NEW TO ANIME 🌱','Come learn with us!'];
     document.getElementById('sil-final-rank').textContent=`${r} — ${m}`;
+    // expose score, reset save UI, render leaderboard
+    window.silScore = score;
+    const ni=document.getElementById('sil-name-input');if(ni){ni.disabled=false;ni.value='';}
+    const sb=document.getElementById('sil-score-saved');if(sb)sb.style.display='none';
+    const sv=document.querySelector('#sil-result .sb-save');if(sv)sv.disabled=false;
+    SB.render('silhouette','sil-sb',null,null);
   }
   function drawSilhouette(char){
     ctx.clearRect(0,0,C.width,C.height);ctx.fillStyle='#020108';ctx.fillRect(0,0,C.width,C.height);
@@ -906,6 +987,11 @@ function showResult(){
   else if(qScore>=4){rank='📺 CASUAL VIEWER';msg="Not bad for a casual! Come level up your anime knowledge with us.";}
   else{rank='🌱 NEW TO ANIME';msg="Everyone starts somewhere! Zero gatekeeping — come learn with us.";}
   document.getElementById('res-rank').textContent=rank;document.getElementById('res-msg').textContent=msg;
+  // reset save UI, render leaderboard
+  const ni=document.getElementById('quiz-name-input');if(ni){ni.disabled=false;ni.value='';}
+  const sb=document.getElementById('quiz-score-saved');if(sb)sb.style.display='none';
+  const sv=document.querySelector('#quiz-result .sb-save');if(sv)sv.disabled=false;
+  SB.render('quiz','quiz-sb',null,null);
   res.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function sendResult(){
@@ -1038,7 +1124,254 @@ loadQuestion();
     ctx.globalAlpha=1; // reset after loop
   }
 
-  requestAnimationFrame(animate);
+/* ══════════════════════════════════
+   SHARED SCOREBOARD ENGINE
+   Uses Anthropic API persistent storage
+   so ALL visitors see the same scores
+══════════════════════════════════ */
+const SB = {
+  MAX: 10,
+
+  // ── helpers ──
+  _clean(name) {
+    return (name || 'Anonymous').trim().replace(/[<>"'&]/g,'').slice(0,16) || 'Anonymous';
+  },
+  _medals: ['gold','silver','bronze'],
+  _label(i) { return i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`; },
+
+  // ── loading state in a container ──
+  _setLoading(id, msg='Loading...') {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = `<div class="sb-title">🏆 Leaderboard</div><div class="sb-empty">${msg}</div>`;
+  },
+
+  // ── render scores array into container ──
+  _renderRows(id, scores, highlightName, highlightScore) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!scores || !scores.length) {
+      el.innerHTML = '<div class="sb-title">🏆 Leaderboard</div><div class="sb-empty">No scores yet — be the first!</div>';
+      return;
+    }
+    const rows = scores.map((s,i) => {
+      const isYou = s.name === highlightName && s.score === highlightScore;
+      return `<div class="sb-row">
+        <span class="sb-rank ${this._medals[i]||'other'}">${this._label(i)}</span>
+        <span class="sb-name${isYou?' you':''}">${s.name}${isYou?' <span class="sb-new">YOU</span>':''}</span>
+        <span class="sb-score">${s.score}</span>
+        <span style="font-family:'Orbitron',monospace;font-size:.48rem;color:var(--text3);margin-left:4px;">${s.date||''}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div class="sb-title">🏆 Leaderboard</div>${rows}`;
+  },
+
+  // ── fetch leaderboard from shared storage via Anthropic API ──
+  async load(key, containerId, highlightName, highlightScore) {
+    this._setLoading(containerId);
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `You manage a shared game leaderboard stored as JSON in your responses.
+The leaderboard key is "${key}".
+When asked to GET, respond with ONLY a valid JSON array of up to ${this.MAX} score objects like:
+[{"name":"PlayerName","score":120,"date":"Jan 1"}]
+sorted by score descending. If no scores exist, respond with exactly: []
+Never add any text, markdown, or explanation — only the JSON array.`,
+          messages: [{ role: 'user', content: `GET leaderboard for key: ${key}` }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text?.trim() || '[]';
+      const scores = JSON.parse(text);
+      this._renderRows(containerId, scores, highlightName, highlightScore);
+      return scores;
+    } catch(e) {
+      // Fallback to localStorage if API unavailable
+      try {
+        const scores = JSON.parse(localStorage.getItem('ms_sb_'+key)||'[]');
+        this._renderRows(containerId, scores, highlightName, highlightScore);
+        return scores;
+      } catch(e2) {
+        this._setLoading(containerId, 'Could not load scores.');
+        return [];
+      }
+    }
+  },
+
+  // ── save a score to shared storage via Anthropic API ──
+  async save(key, name, newScore, containerId) {
+    const clean = this._clean(name);
+    const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    this._setLoading(containerId, 'Saving...');
+
+    // First fetch current scores, then add new one and push back
+    try {
+      // GET current
+      const getRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `You manage a shared game leaderboard stored as JSON in your responses.
+The leaderboard key is "${key}".
+When asked to GET, respond with ONLY a valid JSON array sorted by score descending.
+When asked to SET with new data, store it and respond with the updated array ONLY as JSON.
+Never add any text, markdown, or explanation — only the JSON array.`,
+          messages: [{ role: 'user', content: `GET leaderboard for key: ${key}` }]
+        })
+      });
+      const getData = await getRes.json();
+      const existing = JSON.parse(getData.content?.[0]?.text?.trim() || '[]');
+
+      // Merge, sort, trim
+      existing.push({ name: clean, score: newScore, date });
+      existing.sort((a,b) => b.score - a.score);
+      const updated = existing.slice(0, this.MAX);
+
+      // SET updated back
+      const setRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `You manage a shared game leaderboard stored as JSON.
+The leaderboard key is "${key}".
+When asked to SET, store the data and respond with the updated array ONLY as JSON.
+Never add any text, markdown, or explanation — only the JSON array.`,
+          messages: [{ role: 'user', content: `SET leaderboard for key: ${key} with data: ${JSON.stringify(updated)}` }]
+        })
+      });
+      const setData = await setRes.json();
+      const final = JSON.parse(setData.content?.[0]?.text?.trim() || JSON.stringify(updated));
+
+      // Also mirror to localStorage as backup
+      try { localStorage.setItem('ms_sb_'+key, JSON.stringify(final)); } catch(e) {}
+
+      this._renderRows(containerId, final, clean, newScore);
+      return final;
+
+    } catch(e) {
+      // Fallback: save to localStorage only
+      try {
+        const existing = JSON.parse(localStorage.getItem('ms_sb_'+key)||'[]');
+        existing.push({ name: clean, score: newScore, date });
+        existing.sort((a,b) => b.score - a.score);
+        const updated = existing.slice(0, this.MAX);
+        localStorage.setItem('ms_sb_'+key, JSON.stringify(updated));
+        this._renderRows(containerId, updated, clean, newScore);
+        return updated;
+      } catch(e2) {
+        this._setLoading(containerId, 'Could not save score.');
+        return [];
+      }
+    }
+  },
+
+  // ── quick render alias (load from API) ──
+  render(key, containerId, highlightName, highlightScore) {
+    this.load(key, containerId, highlightName, highlightScore);
+  }
+};
+
+// ── Snake Scoreboard ──
+window.saveSnakeScore = async function() {
+  const nameEl = document.getElementById('snake-name-input');
+  const name = nameEl.value.trim() || 'Anonymous';
+  nameEl.disabled = true;
+  document.querySelector('#snake-gameover .sb-save').disabled = true;
+  await SB.save('snake', name, score, 'snake-sb');
+  document.getElementById('snake-score-saved').style.display = 'block';
+};
+
+function renderSnakeSB() {
+  SB.render('snake', 'snake-sb', null, null);
+}
+
+// ── Silhouette Scoreboard ──
+window.saveSilScore = async function() {
+  const nameEl = document.getElementById('sil-name-input');
+  const name = nameEl.value.trim() || 'Anonymous';
+  nameEl.disabled = true;
+  document.querySelector('#sil-result .sb-save').disabled = true;
+  await SB.save('silhouette', name, silScore, 'sil-sb');
+  document.getElementById('sil-score-saved').style.display = 'block';
+};
+
+// ── Quiz Scoreboard ──
+window.saveQuizScore = async function() {
+  const nameEl = document.getElementById('quiz-name-input');
+  const name = nameEl.value.trim() || 'Anonymous';
+  nameEl.disabled = true;
+  document.querySelector('#quiz-result .sb-save').disabled = true;
+  await SB.save('quiz', name, qScore, 'quiz-sb');
+  document.getElementById('quiz-score-saved').style.display = 'block';
+};
+
+/* ══════════════════════════════════
+   REAL-TIME VIEWER TRACKER
+   Each session registers a heartbeat.
+   Sessions expire after 40s of silence.
+   Polls every 20s to stay registered
+   and update the displayed count.
+══════════════════════════════════ */
+(function(){
+  const SESSION_KEY = 'ms_viewer_' + Math.random().toString(36).slice(2,10);
+  const STORAGE_KEY = 'monolith_viewers';
+  const HEARTBEAT_MS = 20000;
+  const TTL_MS = 40000;
+  const countEl = document.getElementById('viewer-count');
+
+  const SYS = `You manage a real-time visitor session store as JSON.
+Key: "${STORAGE_KEY}".
+On GET: respond with ONLY a JSON object mapping sessionId to lastSeen ms timestamp. Example: {"abc":1700000000}
+On SET data JSON: store it and respond with the updated JSON object ONLY.
+Never add text, markdown, or explanation — only raw JSON.`;
+
+  async function apiCall(prompt) {
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 512, system: SYS, messages: [{ role:'user', content: prompt }] })
+      });
+      return (await res.json()).content?.[0]?.text?.trim() || '{}';
+    } catch(e) { return '{}'; }
+  }
+
+  async function heartbeat() {
+    const now = Date.now();
+    const raw = await apiCall(`GET sessions for key: ${STORAGE_KEY}`);
+    let sessions = {};
+    try { sessions = JSON.parse(raw); } catch(e) {}
+    // Prune stale, register self
+    const live = {};
+    for (const [id, ts] of Object.entries(sessions)) {
+      if (now - ts < TTL_MS) live[id] = ts;
+    }
+    live[SESSION_KEY] = now;
+    await apiCall(`SET sessions for key: ${STORAGE_KEY} with data: ${JSON.stringify(live)}`);
+    const count = Object.keys(live).length;
+    if (countEl) countEl.textContent = count;
+  }
+
+  async function deregister() {
+    const raw = await apiCall(`GET sessions for key: ${STORAGE_KEY}`);
+    let sessions = {};
+    try { sessions = JSON.parse(raw); } catch(e) {}
+    delete sessions[SESSION_KEY];
+    await apiCall(`SET sessions for key: ${STORAGE_KEY} with data: ${JSON.stringify(sessions)}`);
+  }
+
+  heartbeat();
+  const interval = setInterval(heartbeat, HEARTBEAT_MS);
+  window.addEventListener('beforeunload', () => { clearInterval(interval); deregister(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) heartbeat(); });
 })();
 </script>
 </body>
