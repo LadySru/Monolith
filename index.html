@@ -124,10 +124,6 @@
     .nav-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--teal); box-shadow: var(--neon-t); }
     .nav-name { font-family: 'Orbitron', monospace; font-weight: 900; font-size: .9rem; color: var(--text); letter-spacing: 2px; text-decoration: none; text-shadow: var(--neon-t); }
     .nav-name span { color: var(--teal); }
-    .nav-pill { display: flex; align-items: center; gap: 6px; background: rgba(57,255,138,.08); border: 1px solid rgba(57,255,138,.3); border-radius: 20px; padding: 3px 10px; font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--green); letter-spacing: 2px; box-shadow: 0 0 10px rgba(57,255,138,.15); }
-    .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
-    .nav-viewers { display: flex; align-items: center; gap: 5px; background: rgba(255,45,107,.08); border: 1px solid rgba(255,45,107,.25); border-radius: 20px; padding: 3px 10px; font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--red); letter-spacing: 1.5px; white-space: nowrap; }
-    .nav-viewers-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); box-shadow: 0 0 6px var(--red); animation: pulse 2s .5s ease-in-out infinite; flex-shrink: 0; }
     .nav-r { display: flex; align-items: center; gap: 16px; }
     .nav-link { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s, text-shadow .2s; }
     .nav-link:hover { color: var(--teal); text-shadow: var(--neon-t); }
@@ -151,9 +147,8 @@
         radial-gradient(ellipse 70% 60% at 20% 40%, rgba(139,47,255,0.28) 0%, transparent 55%),
         radial-gradient(ellipse 55% 50% at 80% 20%, rgba(255,0,170,0.18) 0%, transparent 55%),
         radial-gradient(ellipse 65% 50% at 60% 85%, rgba(0,255,231,0.14) 0%, transparent 55%),
-        url('banner.jpg') center/contain no-repeat, var(--bg);
-      filter: brightness(.10) saturate(.5);
-      /* removed animation — filter keyframes are GPU expensive */
+        url('banner.jpg') center/cover no-repeat, var(--bg);
+      filter: brightness(.32) saturate(.6);
     }
     /* Static grid — no scroll animation */
     .hero-grid {
@@ -166,8 +161,8 @@
     .hero-vignette {
       position: absolute; inset: 0; z-index: 1;
       background:
-        radial-gradient(ellipse 85% 75% at 50% 50%, rgba(2,0,10,.55) 20%, rgba(2,0,10,.88) 100%),
-        linear-gradient(180deg, rgba(2,0,10,.75) 0%, rgba(2,0,10,.4) 35%, rgba(2,0,10,.75) 70%, rgba(2,0,10,.98) 100%);
+        radial-gradient(ellipse 85% 75% at 50% 50%, rgba(2,0,10,.25) 20%, rgba(2,0,10,.65) 100%),
+        linear-gradient(180deg, rgba(2,0,10,.55) 0%, rgba(2,0,10,.15) 35%, rgba(2,0,10,.55) 70%, rgba(2,0,10,.92) 100%);
     }
 
     /* Static blobs — no float animation, still provide atmosphere */
@@ -420,6 +415,22 @@
     .nl-error { display: none; font-family: 'Orbitron', monospace; font-size: .6rem; color: var(--red); letter-spacing: 1px; padding: 6px 0; }
     .nl-perks { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
     .nl-perk { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--text3); letter-spacing: 1.5px; }
+
+    /* Discord feed */
+    .nl-feed { background: var(--card); border: 1px solid var(--border); margin-bottom: 0; }
+    .nl-feed-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .nl-feed-tab { flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent; padding: 10px 8px; font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); letter-spacing: 1px; cursor: pointer; transition: color .2s, border-color .2s; }
+    .nl-feed-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+    .nl-feed-body { padding: 16px; min-height: 120px; }
+    .nl-feed-loading { font-family: 'Orbitron', monospace; font-size: .6rem; color: var(--text3); letter-spacing: 2px; text-align: center; padding: 24px 0; }
+    .nl-post { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .nl-post:last-child { border-bottom: none; }
+    .nl-post-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .nl-post-channel { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--teal); letter-spacing: 1px; }
+    .nl-post-date { font-family: 'Orbitron', monospace; font-size: .48rem; color: var(--text3); letter-spacing: 1px; }
+    .nl-post-text { font-size: .85rem; color: var(--text2); line-height: 1.65; font-weight: 300; }
+    .nl-setup-note { display: flex; align-items: flex-start; gap: 8px; background: rgba(245,200,66,.06); border: 1px solid rgba(245,200,66,.2); padding: 12px 16px; margin-top: 12px; font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--amber); letter-spacing: 1px; line-height: 1.7; }
+    .nl-setup-note code { background: rgba(245,200,66,.1); padding: 1px 5px; border-radius: 3px; }
     @media(max-width:960px){
       nav,#seals,footer { padding-left:20px; padding-right:20px; }
       .nav-link { display:none; }
@@ -478,11 +489,6 @@
       <img src="avatar.jpg" class="nav-av" alt="" onerror="this.style.display='none'"/>
       <span class="nav-name">Monolith <span>Social</span></span>
     </a>
-    <div class="nav-pill"><span class="nav-dot"></span> Live</div>
-    <div class="nav-viewers" id="nav-viewers" title="People viewing right now">
-      <span class="nav-viewers-dot"></span>
-      <span id="viewer-count">—</span> viewing
-    </div>
   </div>
   <div class="nav-r">
     <a href="#features" class="nav-link">Server</a>
@@ -735,46 +741,58 @@
   <div class="wrap" style="padding-top:72px;padding-bottom:72px;">
     <div class="nl-wrap reveal">
 
-      <!-- header -->
       <div class="nl-header">
         <div class="nl-icon">📡</div>
         <div>
           <span class="sec-tag" style="margin-bottom:6px;">◈ Monolith Dispatch</span>
-          <h2 style="font-size:clamp(1.4rem,2.8vw,2rem);margin-bottom:6px;">Stay in the <em>Loop.</em></h2>
-          <p style="font-size:.88rem;color:var(--text2);font-weight:300;line-height:1.7;max-width:400px;">Weekly drops of gaming news, anime picks, community highlights, and server updates — straight to your inbox.</p>
+          <h2 style="font-size:clamp(1.4rem,2.8vw,2rem);margin-bottom:6px;">Latest from the <em>Server.</em></h2>
+          <p style="font-size:.88rem;color:var(--text2);font-weight:300;line-height:1.7;max-width:420px;">Live news from our Discord channels — game drops, anime announcements, and community highlights. Subscribe to get it in your inbox.</p>
         </div>
       </div>
 
-      <!-- interest tags -->
-      <div class="nl-tags">
-        <span class="nl-tag-label">I want:</span>
-        <label class="nl-tag"><input type="checkbox" value="game-news" checked/><span>🎮 Game News</span></label>
-        <label class="nl-tag"><input type="checkbox" value="anime-news" checked/><span>🌸 Anime News</span></label>
-        <label class="nl-tag"><input type="checkbox" value="community" checked/><span>🏆 Community Updates</span></label>
-        <label class="nl-tag"><input type="checkbox" value="events"/><span>🎉 Event Alerts</span></label>
-      </div>
-
-      <!-- form -->
-      <div class="nl-form">
-        <div class="nl-inputs">
-          <input class="nl-input" id="nl-name" type="text" placeholder="Your name (optional)" maxlength="32"/>
-          <input class="nl-input" id="nl-email" type="email" placeholder="your@email.com" required/>
+      <!-- Discord feed preview -->
+      <div class="nl-feed" id="nl-feed">
+        <div class="nl-feed-tabs">
+          <button class="nl-feed-tab active" onclick="switchFeed('game')">🎮 Game News</button>
+          <button class="nl-feed-tab" onclick="switchFeed('anime')">🌸 Anime News</button>
+          <button class="nl-feed-tab" onclick="switchFeed('community')">🏆 Community</button>
         </div>
-        <button class="btn-primary nl-btn" onclick="subscribeNewsletter()">
-          Subscribe →
-        </button>
+        <div class="nl-feed-body" id="nl-feed-body">
+          <div class="nl-feed-loading">Loading latest posts...</div>
+        </div>
       </div>
-      <div class="nl-success" id="nl-success">
-        ✓ You're on the list! First issue drops weekly. Welcome to the Monolith.
-      </div>
-      <div class="nl-error" id="nl-error"></div>
 
-      <!-- perks -->
-      <div class="nl-perks">
-        <span class="nl-perk">✅ No spam, ever</span>
-        <span class="nl-perk">✅ Unsubscribe anytime</span>
-        <span class="nl-perk">✅ Weekly · Every Monday</span>
-        <span class="nl-perk">✅ Community-written</span>
+      <!-- Setup note -->
+      <div class="nl-setup-note" id="nl-setup-note">
+        <span>⚙️</span>
+        <span>To show live Discord posts here, add your Discord channel webhook URLs in the <code>NL_WEBHOOKS</code> config below.</span>
+      </div>
+
+      <!-- Subscribe form -->
+      <div style="margin-top:32px;padding-top:28px;border-top:1px solid var(--border);">
+        <p style="font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-bottom:16px;">📬 Get this in your inbox every Monday</p>
+        <div class="nl-tags">
+          <span class="nl-tag-label">I want:</span>
+          <label class="nl-tag"><input type="checkbox" value="game-news" checked/><span>🎮 Game News</span></label>
+          <label class="nl-tag"><input type="checkbox" value="anime-news" checked/><span>🌸 Anime News</span></label>
+          <label class="nl-tag"><input type="checkbox" value="community" checked/><span>🏆 Community</span></label>
+          <label class="nl-tag"><input type="checkbox" value="events"/><span>🎉 Events</span></label>
+        </div>
+        <div class="nl-form">
+          <div class="nl-inputs">
+            <input class="nl-input" id="nl-name" type="text" placeholder="Your name (optional)" maxlength="32"/>
+            <input class="nl-input" id="nl-email" type="email" placeholder="your@email.com" required/>
+          </div>
+          <button class="btn-primary nl-btn" onclick="subscribeNewsletter()">Subscribe →</button>
+        </div>
+        <div class="nl-success" id="nl-success">✓ You're on the list! Welcome to the Monolith Dispatch.</div>
+        <div class="nl-error" id="nl-error"></div>
+        <div class="nl-perks">
+          <span class="nl-perk">✅ No spam</span>
+          <span class="nl-perk">✅ Unsubscribe anytime</span>
+          <span class="nl-perk">✅ Sourced from Discord</span>
+          <span class="nl-perk">✅ Weekly · Every Monday</span>
+        </div>
       </div>
 
     </div>
@@ -1186,35 +1204,38 @@ loadQuestion();
 })();
 
 /* ══════════════════════════════════
-   SHARED SCOREBOARD ENGINE
-   Uses Anthropic API persistent storage
-   so ALL visitors see the same scores
+   SCOREBOARD ENGINE (localStorage)
 ══════════════════════════════════ */
 const SB = {
   MAX: 10,
-
-  // ── helpers ──
-  _clean(name) {
-    return (name || 'Anonymous').trim().replace(/[<>"'&]/g,'').slice(0,16) || 'Anonymous';
-  },
   _medals: ['gold','silver','bronze'],
   _label(i) { return i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`; },
+  _clean(name) { return (name||'Anonymous').trim().replace(/[<>"'&]/g,'').slice(0,16)||'Anonymous'; },
 
-  // ── loading state in a container ──
-  _setLoading(id, msg='Loading...') {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = `<div class="sb-title">🏆 Leaderboard</div><div class="sb-empty">${msg}</div>`;
+  load(key) {
+    try { return JSON.parse(localStorage.getItem('ms_sb_'+key)||'[]'); } catch(e) { return []; }
   },
 
-  // ── render scores array into container ──
-  _renderRows(id, scores, highlightName, highlightScore) {
-    const el = document.getElementById(id);
+  save(key, name, score) {
+    const clean = this._clean(name);
+    const date  = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const list  = this.load(key);
+    list.push({ name: clean, score, date });
+    list.sort((a,b) => b.score - a.score);
+    const trimmed = list.slice(0, this.MAX);
+    try { localStorage.setItem('ms_sb_'+key, JSON.stringify(trimmed)); } catch(e) {}
+    return trimmed;
+  },
+
+  render(key, containerId, highlightName, highlightScore) {
+    const el = document.getElementById(containerId);
     if (!el) return;
-    if (!scores || !scores.length) {
+    const list = this.load(key);
+    if (!list.length) {
       el.innerHTML = '<div class="sb-title">🏆 Leaderboard</div><div class="sb-empty">No scores yet — be the first!</div>';
       return;
     }
-    const rows = scores.map((s,i) => {
+    const rows = list.map((s,i) => {
       const isYou = s.name === highlightName && s.score === highlightScore;
       return `<div class="sb-row">
         <span class="sb-rank ${this._medals[i]||'other'}">${this._label(i)}</span>
@@ -1224,228 +1245,153 @@ const SB = {
       </div>`;
     }).join('');
     el.innerHTML = `<div class="sb-title">🏆 Leaderboard</div>${rows}`;
-  },
-
-  // ── fetch leaderboard from shared storage via Anthropic API ──
-  async load(key, containerId, highlightName, highlightScore) {
-    this._setLoading(containerId);
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You manage a shared game leaderboard stored as JSON in your responses.
-The leaderboard key is "${key}".
-When asked to GET, respond with ONLY a valid JSON array of up to ${this.MAX} score objects like:
-[{"name":"PlayerName","score":120,"date":"Jan 1"}]
-sorted by score descending. If no scores exist, respond with exactly: []
-Never add any text, markdown, or explanation — only the JSON array.`,
-          messages: [{ role: 'user', content: `GET leaderboard for key: ${key}` }]
-        })
-      });
-      const data = await res.json();
-      const text = data.content?.[0]?.text?.trim() || '[]';
-      const scores = JSON.parse(text);
-      this._renderRows(containerId, scores, highlightName, highlightScore);
-      return scores;
-    } catch(e) {
-      // Fallback to localStorage if API unavailable
-      try {
-        const scores = JSON.parse(localStorage.getItem('ms_sb_'+key)||'[]');
-        this._renderRows(containerId, scores, highlightName, highlightScore);
-        return scores;
-      } catch(e2) {
-        this._setLoading(containerId, 'Could not load scores.');
-        return [];
-      }
-    }
-  },
-
-  // ── save a score to shared storage via Anthropic API ──
-  async save(key, name, newScore, containerId) {
-    const clean = this._clean(name);
-    const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    this._setLoading(containerId, 'Saving...');
-
-    // First fetch current scores, then add new one and push back
-    try {
-      // GET current
-      const getRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You manage a shared game leaderboard stored as JSON in your responses.
-The leaderboard key is "${key}".
-When asked to GET, respond with ONLY a valid JSON array sorted by score descending.
-When asked to SET with new data, store it and respond with the updated array ONLY as JSON.
-Never add any text, markdown, or explanation — only the JSON array.`,
-          messages: [{ role: 'user', content: `GET leaderboard for key: ${key}` }]
-        })
-      });
-      const getData = await getRes.json();
-      const existing = JSON.parse(getData.content?.[0]?.text?.trim() || '[]');
-
-      // Merge, sort, trim
-      existing.push({ name: clean, score: newScore, date });
-      existing.sort((a,b) => b.score - a.score);
-      const updated = existing.slice(0, this.MAX);
-
-      // SET updated back
-      const setRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You manage a shared game leaderboard stored as JSON.
-The leaderboard key is "${key}".
-When asked to SET, store the data and respond with the updated array ONLY as JSON.
-Never add any text, markdown, or explanation — only the JSON array.`,
-          messages: [{ role: 'user', content: `SET leaderboard for key: ${key} with data: ${JSON.stringify(updated)}` }]
-        })
-      });
-      const setData = await setRes.json();
-      const final = JSON.parse(setData.content?.[0]?.text?.trim() || JSON.stringify(updated));
-
-      // Also mirror to localStorage as backup
-      try { localStorage.setItem('ms_sb_'+key, JSON.stringify(final)); } catch(e) {}
-
-      this._renderRows(containerId, final, clean, newScore);
-      return final;
-
-    } catch(e) {
-      // Fallback: save to localStorage only
-      try {
-        const existing = JSON.parse(localStorage.getItem('ms_sb_'+key)||'[]');
-        existing.push({ name: clean, score: newScore, date });
-        existing.sort((a,b) => b.score - a.score);
-        const updated = existing.slice(0, this.MAX);
-        localStorage.setItem('ms_sb_'+key, JSON.stringify(updated));
-        this._renderRows(containerId, updated, clean, newScore);
-        return updated;
-      } catch(e2) {
-        this._setLoading(containerId, 'Could not save score.');
-        return [];
-      }
-    }
-  },
-
-  // ── quick render alias (load from API) ──
-  render(key, containerId, highlightName, highlightScore) {
-    this.load(key, containerId, highlightName, highlightScore);
   }
 };
 
-// ── Snake Scoreboard ──
-window.saveSnakeScore = async function() {
+// ── Snake ──
+window.saveSnakeScore = function() {
   const nameEl = document.getElementById('snake-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
+  SB.save('snake', name, score);
+  SB.render('snake', 'snake-sb', name, score);
+  document.getElementById('snake-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#snake-gameover .sb-save').disabled = true;
-  await SB.save('snake', name, score, 'snake-sb');
-  document.getElementById('snake-score-saved').style.display = 'block';
 };
 
-function renderSnakeSB() {
-  SB.render('snake', 'snake-sb', null, null);
-}
+function renderSnakeSB() { SB.render('snake','snake-sb',null,null); }
 
-// ── Silhouette Scoreboard ──
-window.saveSilScore = async function() {
+// ── Silhouette ──
+window.saveSilScore = function() {
   const nameEl = document.getElementById('sil-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
+  SB.save('silhouette', name, silScore);
+  SB.render('silhouette', 'sil-sb', name, silScore);
+  document.getElementById('sil-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#sil-result .sb-save').disabled = true;
-  await SB.save('silhouette', name, silScore, 'sil-sb');
-  document.getElementById('sil-score-saved').style.display = 'block';
 };
 
-// ── Quiz Scoreboard ──
-window.saveQuizScore = async function() {
+// ── Quiz ──
+window.saveQuizScore = function() {
   const nameEl = document.getElementById('quiz-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
+  SB.save('quiz', name, qScore);
+  SB.render('quiz', 'quiz-sb', name, qScore);
+  document.getElementById('quiz-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#quiz-result .sb-save').disabled = true;
-  await SB.save('quiz', name, qScore, 'quiz-sb');
-  document.getElementById('quiz-score-saved').style.display = 'block';
 };
 
 /* ══════════════════════════════════
-   REAL-TIME VIEWER TRACKER
-   Each session registers a heartbeat.
-   Sessions expire after 40s of silence.
-   Polls every 20s to stay registered
-   and update the displayed count.
+   NEWSLETTER — DISCORD FEED
+   ─────────────────────────────────
+   HOW TO CONNECT YOUR DISCORD:
+   1. In Discord: Server Settings → Integrations → Webhooks
+   2. Create a webhook for each news channel
+   3. Paste the webhook URLs below
+   4. For reading messages, use Discord's public RSS feed:
+      https://discordapp.com/channels/SERVER_ID/CHANNEL_ID.rss
+      OR use a bot like MonitoRSS to forward channel posts to an RSS feed
+   ─────────────────────────────────
+   For a fully automated newsletter pipeline:
+   Use Beehiiv or Mailchimp + Zapier:
+     Discord message posted → Zapier → add to newsletter draft → send Monday
 ══════════════════════════════════ */
-(function(){
-  const SESSION_KEY = 'ms_viewer_' + Math.random().toString(36).slice(2,10);
-  const STORAGE_KEY = 'monolith_viewers';
-  const HEARTBEAT_MS = 20000;
-  const TTL_MS = 40000;
-  const countEl = document.getElementById('viewer-count');
 
-  const SYS = `You manage a real-time visitor session store as JSON.
-Key: "${STORAGE_KEY}".
-On GET: respond with ONLY a JSON object mapping sessionId to lastSeen ms timestamp. Example: {"abc":1700000000}
-On SET data JSON: store it and respond with the updated JSON object ONLY.
-Never add text, markdown, or explanation — only raw JSON.`;
+// ── CONFIG: paste your Discord channel feed URLs here ──
+const NL_WEBHOOKS = {
+  game:      '', // e.g. RSS feed URL for #game-news channel
+  anime:     '', // e.g. RSS feed URL for #anime-news channel
+  community: '', // e.g. RSS feed URL for #community channel
+};
 
-  async function apiCall(prompt) {
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 512, system: SYS, messages: [{ role:'user', content: prompt }] })
-      });
-      return (await res.json()).content?.[0]?.text?.trim() || '{}';
-    } catch(e) { return '{}'; }
+// Sample posts shown when no feed URLs are configured
+const NL_SAMPLE = {
+  game: [
+    { channel: '#game-news', date: 'Today', text: 'Dead by Daylight just dropped a new update — patch notes in #-dbd' },
+    { channel: '#game-news', date: 'Yesterday', text: 'FNF Week 8 fan mod dropping this weekend. Details in #friday-night-funkin' },
+    { channel: '#game-news', date: '2 days ago', text: 'Sonic Racing Crossworlds patch 1.3 is live. New track unlocked!' },
+  ],
+  anime: [
+    { channel: '#otaku-lounge', date: 'Today', text: 'New season chart is up — check the lounge for what we\'re watching this season' },
+    { channel: '#otaku-lounge', date: 'Yesterday', text: 'Manga chapter of the week: Chainsaw Man drops Thursday. Spoiler channel is live.' },
+    { channel: '#otaku-lounge', date: '3 days ago', text: 'Watch party recap: 12 members joined the JJK finale stream 🔥' },
+  ],
+  community: [
+    { channel: '#general-cabinet', date: 'Today', text: 'Game night this Friday — DBD lobby opens at 8PM EST. All welcome.' },
+    { channel: '#general-cabinet', date: '2 days ago', text: 'KitsuneX hit Rank 1 in DBD this week. Community is proud 🏆' },
+    { channel: '#server-mission', date: 'This week', text: 'We hit 263 members! Thank you for building this community with us.' },
+  ]
+};
+
+let activeFeed = 'game';
+
+function switchFeed(type) {
+  activeFeed = type;
+  document.querySelectorAll('.nl-feed-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['game','anime','community'][i] === type);
+  });
+  renderFeed(type);
+}
+
+function renderFeed(type) {
+  const body = document.getElementById('nl-feed-body');
+  const setupNote = document.getElementById('nl-setup-note');
+  const feedUrl = NL_WEBHOOKS[type];
+
+  if (!feedUrl) {
+    // Show sample data with setup note
+    setupNote.style.display = 'flex';
+    const posts = NL_SAMPLE[type] || [];
+    body.innerHTML = posts.map(p => `
+      <div class="nl-post">
+        <div class="nl-post-meta">
+          <span class="nl-post-channel">${p.channel}</span>
+          <span class="nl-post-date">${p.date}</span>
+        </div>
+        <div class="nl-post-text">${p.text}</div>
+      </div>`).join('');
+    return;
   }
 
-  async function heartbeat() {
-    const now = Date.now();
-    const raw = await apiCall(`GET sessions for key: ${STORAGE_KEY}`);
-    let sessions = {};
-    try { sessions = JSON.parse(raw); } catch(e) {}
-    // Prune stale, register self
-    const live = {};
-    for (const [id, ts] of Object.entries(sessions)) {
-      if (now - ts < TTL_MS) live[id] = ts;
-    }
-    live[SESSION_KEY] = now;
-    await apiCall(`SET sessions for key: ${STORAGE_KEY} with data: ${JSON.stringify(live)}`);
-    const count = Object.keys(live).length;
-    if (countEl) countEl.textContent = count;
-  }
+  // If feed URL is set, fetch it
+  setupNote.style.display = 'none';
+  body.innerHTML = '<div class="nl-feed-loading">Fetching latest posts...</div>';
 
-  async function deregister() {
-    const raw = await apiCall(`GET sessions for key: ${STORAGE_KEY}`);
-    let sessions = {};
-    try { sessions = JSON.parse(raw); } catch(e) {}
-    delete sessions[SESSION_KEY];
-    await apiCall(`SET sessions for key: ${STORAGE_KEY} with data: ${JSON.stringify(sessions)}`);
-  }
+  fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`)
+    .then(r => r.json())
+    .then(data => {
+      const items = (data.items || []).slice(0, 3);
+      if (!items.length) { body.innerHTML = '<div class="nl-feed-loading">No posts yet.</div>'; return; }
+      body.innerHTML = items.map(item => `
+        <div class="nl-post">
+          <div class="nl-post-meta">
+            <span class="nl-post-channel">#${type}-news</span>
+            <span class="nl-post-date">${new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+          </div>
+          <div class="nl-post-text">${(item.description||item.title||'').replace(/<[^>]+>/g,'').slice(0,160)}...</div>
+        </div>`).join('');
+    })
+    .catch(() => { body.innerHTML = '<div class="nl-feed-loading">Could not load posts.</div>'; });
+}
 
-  heartbeat();
-  const interval = setInterval(heartbeat, HEARTBEAT_MS);
-  window.addEventListener('beforeunload', () => { clearInterval(interval); deregister(); });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) heartbeat(); });
-})();
+// Init feed on load
+renderFeed('game');
 
 /* ── NEWSLETTER SUBSCRIBE ── */
-async function subscribeNewsletter() {
-  const emailEl = document.getElementById('nl-email');
-  const nameEl  = document.getElementById('nl-name');
+function subscribeNewsletter() {
+  const emailEl   = document.getElementById('nl-email');
   const successEl = document.getElementById('nl-success');
   const errorEl   = document.getElementById('nl-error');
+  const nameEl    = document.getElementById('nl-name');
+  const btn       = document.querySelector('.nl-btn');
 
-  const email = emailEl.value.trim();
-  const name  = nameEl.value.trim() || 'Subscriber';
   errorEl.style.display = 'none';
   successEl.style.display = 'none';
+
+  const email = emailEl.value.trim();
+  const name  = (nameEl.value.trim()) || 'Subscriber';
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errorEl.textContent = '✗ Please enter a valid email address.';
@@ -1455,84 +1401,21 @@ async function subscribeNewsletter() {
     return;
   }
 
-  // Collect selected interest tags
-  const interests = [...document.querySelectorAll('.nl-tag input:checked')]
-    .map(el => el.value);
+  const interests = [...document.querySelectorAll('.nl-tag input:checked')].map(el => el.value);
 
-  // Disable form during save
-  emailEl.disabled = true;
-  nameEl.disabled  = true;
-  document.querySelector('.nl-btn').disabled = true;
-  document.querySelector('.nl-btn').textContent = 'Saving...';
-
+  // Save locally
   try {
-    // Store subscriber via Anthropic API persistent storage
-    const getRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        system: `You manage a newsletter subscriber list as JSON for Monolith Social.
-Key: "monolith_newsletter".
-On GET: respond ONLY with a JSON array of subscriber objects: [{"email":"...","name":"...","interests":[],"date":"..."}]
-On ADD subscriber JSON: add the subscriber to the list (no duplicates by email), and respond with the updated array ONLY.
-Never add text, markdown, or explanation — only raw JSON array.`,
-        messages: [{ role: 'user', content: `GET subscribers for key: monolith_newsletter` }]
-      })
-    });
-    const getData = await getRes.json();
-    let subs = [];
-    try { subs = JSON.parse(getData.content?.[0]?.text?.trim() || '[]'); } catch(e) {}
-
-    // Check for duplicate
-    if (subs.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-      successEl.textContent = '✓ You\'re already subscribed! We\'ll keep sending the good stuff.';
-      successEl.style.display = 'block';
-      return;
-    }
-
-    // Add new subscriber
-    const newSub = { email, name, interests, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) };
-    subs.push(newSub);
-
-    await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        system: `You manage a newsletter subscriber list as JSON. Key: "monolith_newsletter". On ADD: store and respond with updated JSON array only.`,
-        messages: [{ role: 'user', content: `ADD subscriber for key: monolith_newsletter with data: ${JSON.stringify(newSub)} existing list: ${JSON.stringify(subs)}` }]
-      })
-    });
-
-    // Also store locally as backup
-    try {
-      const local = JSON.parse(localStorage.getItem('ms_newsletter') || '[]');
-      local.push(newSub);
+    const local = JSON.parse(localStorage.getItem('ms_newsletter') || '[]');
+    if (!local.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+      local.push({ email, name, interests, date: new Date().toLocaleDateString() });
       localStorage.setItem('ms_newsletter', JSON.stringify(local));
-    } catch(e) {}
+    }
+  } catch(e) {}
 
-    successEl.style.display = 'block';
-    emailEl.value = '';
-    nameEl.value = '';
-
-  } catch(e) {
-    // Fallback: save locally
-    try {
-      const local = JSON.parse(localStorage.getItem('ms_newsletter') || '[]');
-      if (!local.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-        local.push({ email, name, interests, date: new Date().toLocaleDateString() });
-        localStorage.setItem('ms_newsletter', JSON.stringify(local));
-      }
-    } catch(e2) {}
-    successEl.style.display = 'block';
-    emailEl.value = '';
-    nameEl.value = '';
-  } finally {
-    document.querySelector('.nl-btn').textContent = 'Subscribe →';
-  }
+  successEl.style.display = 'block';
+  emailEl.value = '';
+  if (nameEl) nameEl.value = '';
+  if (btn) btn.textContent = '✓ Subscribed';
 }
 </script>
 </body>
