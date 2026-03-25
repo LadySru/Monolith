@@ -1,0 +1,43 @@
+# ⚡ Quick Reference
+
+## Deploy
+```bash
+git push origin main
+```
+
+## Test
+Visit: `https://yoursite.com/reviews.html`
+
+## Files
+- **reviews.html** — Reviews page
+- **arcade.html** — Updated (1 script tag)
+- **README_REVIEWS.md** — Full documentation
+
+## Form Fields
+| Field | Min | Max |
+|-------|-----|-----|
+| Name | 2 | 32 |
+| Review | 10 | 500 |
+| Rating | 1★ | 5★ |
+
+## API
+```
+GET /.netlify/functions/reviews?limit=50
+POST /.netlify/functions/reviews
+```
+
+## Features
+✅ 1-5 star rating  
+✅ Form validation  
+✅ Reviews grid  
+✅ Statistics (avg rating + bars)  
+✅ Mobile responsive  
+✅ Secure (sanitized, no links)  
+✅ Real-time updates  
+✅ Database persistence  
+
+## Help
+👉 Read: **README_REVIEWS.md**
+
+## Status
+✅ Ready to deploy

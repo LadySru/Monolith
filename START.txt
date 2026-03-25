@@ -1,0 +1,34 @@
+# 🚀 DEPLOY
+
+```bash
+git push origin main
+```
+
+**That's it.** Everything is live in 30 seconds.
+
+---
+
+## What's Live After Deploy
+
+✅ 4 games with leaderboards (Snake, Silhouette, Reaction, Quiz)  
+✅ Reviews system  
+✅ Newsletter signup  
+✅ Global navigation  
+✅ Mobile responsive  
+✅ All data in NeonDB  
+
+---
+
+## Visit These URLs
+
+- Home: `/`
+- Arcade (3 games): `/arcade.html`
+- Quiz: `/quiz.html`
+- Reviews: `/reviews.html`
+- Newsletter: `/newsletter.html`
+
+---
+
+## Read This
+
+`README_REVIEWS.md` — Complete documentation
