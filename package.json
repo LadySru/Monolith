@@ -1,0 +1,8 @@
+{
+  "name": "monolith-social",
+  "version": "1.0.0",
+  "description": "Monolith Social",
+  "dependencies": {
+    "@netlify/neon": "^0.1.0"
+  }
+}
