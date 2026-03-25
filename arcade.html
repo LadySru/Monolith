@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Monolith Social Arcade — Play Neon Snake, Anime Guesser and Reaction Rush. Compete on the global leaderboard."/>
+  <title>Arcade — Monolith Social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    /* ── Page hero ── */
+    .page-hero{position:relative;padding:120px 0 60px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,47,255,.18) 0%,transparent 60%);border-bottom:1px solid var(--border);}
+    .page-hero h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(2rem,5vw,3.5rem);color:var(--text);letter-spacing:3px;margin-bottom:10px;}
+    .page-hero h1 span{color:var(--teal);}
+    .page-hero p{color:var(--text2);font-size:1rem;font-weight:300;}
+
+    /* ── Game tabs ── */
+    .game-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .game-tab{padding:14px 28px;font-family:'Orbitron',monospace;font-size:.65rem;color:var(--text3);letter-spacing:2px;cursor:pointer;border:none;background:transparent;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;min-height:48px;}
+    .game-tab:hover{color:var(--text2);}
+    .game-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+    .game-panel{display:none;}
+    .game-panel.active{display:block;}
+
+    /* ── Reaction Rush ── */
+    .reaction-wrap{max-width:480px;margin:0 auto;}
+    .reaction-box{background:var(--card);border:1px solid var(--border);}
+    .reaction-arena{height:300px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;overflow:hidden;background:#020108;-webkit-tap-highlight-color:transparent;}
+    .reaction-target{position:absolute;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;font-family:'Orbitron',monospace;transition:transform .1s;will-change:transform;-webkit-tap-highlight-color:transparent;}
+    .reaction-target:active{transform:scale(.9);}
+    .reaction-msg{font-family:'Orbitron',monospace;font-size:.9rem;letter-spacing:2px;text-align:center;pointer-events:none;}
+    .reaction-msg.wait{color:var(--text3);}
+    .reaction-msg.ready{color:var(--teal);}
+    .reaction-msg.too-soon{color:var(--red);}
+    .reaction-stats{display:flex;gap:0;border-top:1px solid var(--border);}
+    .reaction-stat{flex:1;padding:12px;text-align:center;border-right:1px solid var(--border);}
+    .reaction-stat:last-child{border-right:none;}
+    .reaction-stat-n{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--teal);display:block;}
+    .reaction-stat-l{font-family:'Orbitron',monospace;font-size:.48rem;color:var(--text3);letter-spacing:2px;display:block;margin-top:2px;text-transform:uppercase;}
+    .reaction-history{display:flex;gap:6px;padding:12px 16px;flex-wrap:wrap;border-top:1px solid var(--border);}
+    .reaction-chip{font-family:'Orbitron',monospace;font-size:.55rem;padding:4px 10px;border:1px solid var(--border2);color:var(--text2);letter-spacing:1px;}
+    .reaction-chip.good{border-color:var(--green);color:var(--green);}
+    .reaction-chip.ok{border-color:var(--amber);color:var(--amber);}
+    .reaction-chip.slow{border-color:var(--red);color:var(--red);}
+  </style>
+</head>
+<body>
+<div id="cur"></div>
+<canvas id="seasons-canvas" style="position:fixed;inset:0;z-index:10;pointer-events:none;width:100%;height:100%;"></canvas>
+<div id="season-badge"></div>
+
+<nav>
+  <div class="nav-l">
+    <a href="index.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;">
+      <img src="avatar.jpg" class="nav-av" alt="" onerror="this.style.display='none'"/>
+      <span class="nav-name">Monolith <span>Social</span></span>
+    </a>
+  </div>
+  <div class="nav-r">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="arcade.html" class="nav-link active">Arcade</a>
+    <a href="quiz.html" class="nav-link">Quiz</a>
+    <a href="reviews.html" class="nav-link">Reviews</a>
+    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile" id="nav-mobile">
+  <a href="index.html" class="nav-link">Home</a>
+  <a href="arcade.html" class="nav-link active">Arcade</a>
+  <a href="quiz.html" class="nav-link">Quiz</a>
+  <a href="reviews.html" class="nav-link">Reviews</a>
+  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+</div>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🕹️ <span>Arcade</span></h1>
+    <p>Three games. One global leaderboard. Play on PC or mobile.</p>
+  </div>
+</div>
+
+<section class="section-pad">
+  <div class="wrap">
+
+    <!-- GAME TABS -->
+    <div class="game-tabs">
+      <button class="game-tab active" onclick="switchTab('snake')">🐍 Neon Snake</button>
+      <button class="game-tab" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
+      <button class="game-tab" onclick="switchTab('reaction')">⚡ Reaction Rush</button>
+    </div>
+
+    <div class="arcade-layout">
+
+      <!-- LEFT: game panels -->
+      <div class="arcade-games-col">
+
+        <!-- NEON SNAKE -->
+        <div id="panel-snake" class="game-panel active">
+          <div class="arc-box">
+            <div class="arc-header">
+              <span class="arc-title">🐍 Neon Snake</span>
+              <div class="arc-meta">
+                <span class="arc-score-lbl">Score</span>
+                <span class="arc-score" id="snake-score">0</span>
+                <span class="arc-score-lbl" style="margin-left:12px;">Best</span>
+                <span class="arc-score" id="snake-best" style="color:var(--amber);">0</span>
+              </div>
+            </div>
+            <div class="arc-canvas-wrap">
+              <canvas id="snakeCanvas" width="400" height="400"></canvas>
+              <div class="arc-overlay" id="snake-overlay">
+                <div class="arc-overlay-icon">🐍</div>
+                <div class="arc-overlay-title">Neon Snake</div>
+                <div class="arc-overlay-sub">Arrow keys · WASD · Swipe · D-Pad</div>
+                <button class="btn-primary" onclick="startSnake()">Play →</button>
+              </div>
+              <div class="arc-overlay" id="snake-gameover" style="display:none;">
+                <div class="arc-overlay-icon">💀</div>
+                <div class="arc-overlay-title">Game Over</div>
+                <div class="arc-overlay-sub" id="snake-final-score">Score: 0</div>
+                <div class="sb-entry">
+                  <input class="sb-input" id="snake-name-input" placeholder="Your name..." maxlength="16"/>
+                  <button class="sb-save" onclick="saveSnakeScore()">Save →</button>
+                </div>
+                <div class="sb-saved" id="snake-score-saved">✓ Saved!</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
+                  <button class="btn-primary" onclick="startSnake()">Retry →</button>
+                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
+                </div>
+              </div>
+            </div>
+            <div class="dpad">
+              <button class="dpad-btn dpad-up" onclick="snakeDpad('UP')">▲</button>
+              <button class="dpad-btn dpad-left" onclick="snakeDpad('LEFT')">◀</button>
+              <button class="dpad-btn dpad-right" onclick="snakeDpad('RIGHT')">▶</button>
+              <button class="dpad-btn dpad-down" onclick="snakeDpad('DOWN')">▼</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANIME GUESSER -->
+        <div id="panel-silhouette" class="game-panel">
+          <div class="arc-box">
+            <div class="arc-header">
+              <span class="arc-title">🎌 Anime Guesser</span>
+              <div class="arc-meta">
+                <span class="arc-score-lbl">Round</span>
+                <span class="arc-score" id="sil-round">1/8</span>
+                <span class="arc-score-lbl" style="margin-left:12px;">Score</span>
+                <span class="arc-score" id="sil-score">0</span>
+              </div>
+            </div>
+            <div class="sil-body" id="sil-screen">
+              <div class="sil-intro" id="sil-intro">
+                <div style="font-size:3rem;margin-bottom:12px;">🎌</div>
+                <div class="arc-overlay-title" style="position:static;transform:none;color:var(--text);font-size:1.1rem;margin-bottom:8px;letter-spacing:2px;">Anime Character Guesser</div>
+                <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:20px;">8 rounds — guess the anime from the silhouette.</div>
+                <button class="btn-primary" onclick="startSilhouette()">Start Game →</button>
+              </div>
+              <div id="sil-game" style="display:none;">
+                <div class="sil-hint" id="sil-hint">Hint: ···</div>
+                <div class="sil-canvas-wrap"><canvas id="silCanvas" width="300" height="320"></canvas></div>
+                <div class="sil-streak" id="sil-streak"></div>
+                <div class="sil-options" id="sil-options"></div>
+                <div class="sil-feedback" id="sil-feedback"></div>
+              </div>
+              <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;">
+                <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
+                <div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;">Game Over!</div>
+                <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div>
+                <div style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;margin-bottom:16px;" id="sil-final-rank"></div>
+                <div class="sb-entry" style="justify-content:center;">
+                  <input class="sb-input" id="sil-name-input" placeholder="Your name..." maxlength="16"/>
+                  <button class="sb-save" onclick="saveSilScore()">Save →</button>
+                </div>
+                <div class="sb-saved" id="sil-score-saved">✓ Saved!</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+                  <button class="btn-primary" onclick="startSilhouette()">Play Again →</button>
+                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REACTION RUSH -->
+        <div id="panel-reaction" class="game-panel">
+          <div class="reaction-wrap">
+            <div class="reaction-box">
+              <div class="arc-header">
+                <span class="arc-title">⚡ Reaction Rush</span>
+                <div class="arc-meta">
+                  <span class="arc-score-lbl">Round</span>
+                  <span class="arc-score" id="rr-round">0/5</span>
+                  <span class="arc-score-lbl" style="margin-left:12px;">Avg</span>
+                  <span class="arc-score" id="rr-avg" style="color:var(--amber);">—ms</span>
+                </div>
+              </div>
+              <div class="reaction-arena" id="rr-arena">
+                <div class="reaction-msg wait" id="rr-msg">Tap to Start</div>
+              </div>
+              <div class="reaction-stats">
+                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-best">—</span><span class="reaction-stat-l">Best (ms)</span></div>
+                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-last">—</span><span class="reaction-stat-l">Last (ms)</span></div>
+                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-rank-display">—</span><span class="reaction-stat-l">Rank</span></div>
+              </div>
+              <div class="reaction-history" id="rr-history"></div>
+              <!-- save form, shown after 5 rounds -->
+              <div id="rr-save-wrap" style="display:none;padding:14px 16px;border-top:1px solid var(--border);">
+                <div class="sb-entry">
+                  <input class="sb-input" id="rr-name-input" placeholder="Your name..." maxlength="16"/>
+                  <button class="sb-save" onclick="saveReactionScore()">Save →</button>
+                </div>
+                <div class="sb-saved" id="rr-score-saved">✓ Saved!</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                  <button class="btn-primary" onclick="resetReaction()">Play Again →</button>
+                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: global leaderboard -->
+      <div class="global-sb-col">
+        <div class="global-sb-box">
+          <div class="global-sb-header">
+            <span class="global-sb-title">🏆 Global Leaderboard</span>
+            <div class="global-sb-tabs">
+              <button class="gsb-tab active" onclick="switchSB('snake')">🐍 Snake</button>
+              <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
+              <button class="gsb-tab" onclick="switchSB('reaction')">⚡ Rush</button>
+            </div>
+          </div>
+          <div class="global-sb-body" id="global-sb-body">
+            <div class="sb-empty">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-l">
+    <img src="avatar.jpg" class="footer-av" alt="" onerror="this.style.display='none'"/>
+    <div class="footer-name">Monolith <span>Social</span></div>
+  </div>
+  <p class="footer-copy">© 2026 Monolith Social · discord.gg/pnRCbEAtTk</p>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+/* ── GAME TAB SWITCH ── */
+function switchTab(id) {
+  document.querySelectorAll('.game-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['snake','silhouette','reaction'][i] === id);
+  });
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'snake') snakePause();
+  switchSB(id === 'snake' ? 'snake' : id === 'silhouette' ? 'silhouette' : 'reaction');
+}
+
+/* ── NEON SNAKE ── */
+(function(){
+  const C=document.getElementById('snakeCanvas'), ctx=C.getContext('2d');
+  const COLS=20,ROWS=20,TEAL='#0df2d4',DIM='#0a3a34',RED='#ff4d6d',AMBER='#f5c842';
+  let snake,dir,nextDir,food,bonus,bonusTimer,loop,score,best=0,running=false;
+  window.snakeScore=0;
+  function resize(){const w=Math.min(400,C.parentElement.clientWidth);C.style.width=w+'px';C.style.height=w+'px';}
+  window.addEventListener('resize',resize);resize();
+  function rndCell(){return{x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
+  function spawnFood(){do{food=rndCell();}while(snake.some(s=>s.x===food.x&&s.y===food.y));}
+  function spawnBonus(){if(Math.random()<.3){do{bonus=rndCell();}while(snake.some(s=>s.x===bonus.x&&s.y===bonus.y)||(food.x===bonus.x&&food.y===bonus.y));bonusTimer=60;}}
+  window.startSnake=function(){
+    document.getElementById('snake-overlay').style.display='none';
+    document.getElementById('snake-gameover').style.display='none';
+    const ni=document.getElementById('snake-name-input');if(ni){ni.disabled=false;ni.value='';}
+    const sv=document.getElementById('snake-score-saved');if(sv)sv.style.display='none';
+    const sb=document.querySelector('#snake-gameover .sb-save');if(sb)sb.disabled=false;
+    snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+    dir={x:1,y:0};nextDir={x:1,y:0};score=0;bonus=null;bonusTimer=0;running=true;
+    spawnFood();clearInterval(loop);loop=setInterval(tick,115);updateDisp();
+  };
+  window.snakePause=function(){running=false;clearInterval(loop);};
+  function tick(){
+    if(!running||!snake||!food)return;
+    dir=nextDir;
+    const head={x:(snake[0].x+dir.x+COLS)%COLS,y:(snake[0].y+dir.y+ROWS)%ROWS};
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)){gameOver();return;}
+    snake.unshift(head);
+    if(head.x===food.x&&head.y===food.y){score+=10;spawnFood();if(score%50===0)spawnBonus();}
+    else if(bonus&&head.x===bonus.x&&head.y===bonus.y){score+=25;bonus=null;}
+    else snake.pop();
+    if(bonus&&--bonusTimer<=0)bonus=null;
+    updateDisp();draw();
+  }
+  function updateDisp(){if(score>best)best=score;window.snakeScore=score;document.getElementById('snake-score').textContent=score;document.getElementById('snake-best').textContent=best;}
+  function gameOver(){
+    running=false;clearInterval(loop);
+    document.getElementById('snake-final-score').textContent='Score: '+score+' | Best: '+best;
+    document.getElementById('snake-gameover').style.display='flex';
+    switchSB('snake');
+  }
+  function draw(){
+    ctx.fillStyle='#05050a';ctx.fillRect(0,0,C.width,C.height);
+    if(!snake||!food)return;
+    ctx.strokeStyle='rgba(13,242,212,.05)';ctx.lineWidth=.5;
+    for(let i=0;i<=COLS;i++){ctx.beginPath();ctx.moveTo(i*(C.width/COLS),0);ctx.lineTo(i*(C.width/COLS),C.height);ctx.stroke();}
+    for(let j=0;j<=ROWS;j++){ctx.beginPath();ctx.moveTo(0,j*(C.height/ROWS));ctx.lineTo(C.width,j*(C.height/ROWS));ctx.stroke();}
+    const cw=C.width/COLS,ch=C.height/ROWS;
+    ctx.fillStyle=RED;ctx.shadowColor=RED;ctx.shadowBlur=14;ctx.fillRect(food.x*cw+2,food.y*ch+2,cw-4,ch-4);ctx.shadowBlur=0;
+    if(bonus){ctx.fillStyle=AMBER;ctx.shadowColor=AMBER;ctx.shadowBlur=18;ctx.fillRect(bonus.x*cw+2,bonus.y*ch+2,cw-4,ch-4);ctx.shadowBlur=0;}
+    snake.forEach((s,i)=>{ctx.fillStyle=i===0?TEAL:DIM;ctx.shadowColor=i===0?TEAL:'transparent';ctx.shadowBlur=i===0?16:0;ctx.fillRect(s.x*cw+1,s.y*ch+1,cw-2,ch-2);});
+    ctx.shadowBlur=0;
+  }
+  ctx.fillStyle='#05050a';ctx.fillRect(0,0,C.width,C.height);
+  const DIRS={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0}};
+  document.addEventListener('keydown',e=>{if(!running)return;const d=DIRS[e.key];if(d&&!(d.x===-dir.x&&d.y===-dir.y)){nextDir=d;e.preventDefault();}});
+  let tx=0,ty=0;
+  C.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;e.preventDefault();},{passive:false});
+  C.addEventListener('touchend',e=>{if(!running)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>Math.abs(dy))nextDir=dx>0?{x:1,y:0}:{x:-1,y:0};else nextDir=dy>0?{x:0,y:1}:{x:0,y:-1};},{passive:false});
+  window.snakeDpad=function(k){if(!running)return;const m={UP:{x:0,y:-1},DOWN:{x:0,y:1},LEFT:{x:-1,y:0},RIGHT:{x:1,y:0}};const d=m[k];if(d&&!(d.x===-dir.x&&d.y===-dir.y))nextDir=d;};
+})();
+
+window.saveSnakeScore = async function() {
+  const nameEl=document.getElementById('snake-name-input');
+  const name=nameEl.value.trim()||'Anonymous';
+  nameEl.disabled=true;
+  document.querySelector('#snake-gameover .sb-save').disabled=true;
+  await SB.save('snake', name, window.snakeScore, 'global-sb-body');
+  document.getElementById('snake-score-saved').style.display='block';
+};
+
+/* ── ANIME SILHOUETTE GUESSER ── */
+(function(){
+  const CHARS=[
+    {name:'Naruto Uzumaki',anime:'Naruto',hint:'Ninja with a fox spirit sealed inside him',color:'#ff8c00',shape:'spiky'},
+    {name:'Sailor Moon',anime:'Sailor Moon',hint:'Magical girl warrior of justice and love',color:'#ffd700',shape:'twin'},
+    {name:'Goku',anime:'Dragon Ball Z',hint:'Saiyan warrior with legendary golden hair',color:'#f5c842',shape:'spiky'},
+    {name:'Zero Two',anime:'Darling in the FranXX',hint:'Pink-haired girl with small red horns',color:'#ff4d6d',shape:'horns'},
+    {name:'Levi Ackerman',anime:'Attack on Titan',hint:"Humanity's strongest soldier",color:'#9997a0',shape:'short'},
+    {name:'Rem',anime:'Re:Zero',hint:'Blue-haired demon maid',color:'#4db8ff',shape:'maid'},
+    {name:'Itachi Uchiha',anime:'Naruto',hint:'Elite shinobi with Sharingan eyes',color:'#9b59b6',shape:'long'},
+    {name:'Hatsune Miku',anime:'Vocaloid',hint:'Teal twin-tail virtual idol singer',color:'#0df2d4',shape:'twin'},
+  ];
+  const C=document.getElementById('silCanvas'),ctx=C.getContext('2d');
+  let round=0,score=0,streak=0,answered=false,chars=[];
+  window.silScore=0;
+  function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
+  window.startSilhouette=function(){
+    round=0;score=0;streak=0;answered=false;chars=shuffle(CHARS);
+    document.getElementById('sil-intro').style.display='none';
+    document.getElementById('sil-result').style.display='none';
+    document.getElementById('sil-game').style.display='block';
+    loadRound();
+  };
+  function loadRound(){
+    answered=false;const c=chars[round];
+    document.getElementById('sil-round').textContent=(round+1)+'/8';
+    document.getElementById('sil-score').textContent=score;
+    document.getElementById('sil-hint').textContent='Hint: '+c.hint;
+    document.getElementById('sil-feedback').textContent='';
+    document.getElementById('sil-feedback').className='sil-feedback';
+    document.getElementById('sil-streak').textContent=streak>=2?'🔥 '+streak+' streak!':'';
+    drawSilhouette(c);
+    const wrong=shuffle(CHARS.filter(x=>x.name!==c.name)).slice(0,3).map(x=>x.anime);
+    const opts=shuffle([c.anime,...wrong]);
+    const el=document.getElementById('sil-options');el.innerHTML='';
+    opts.forEach(opt=>{const btn=document.createElement('button');btn.className='sil-opt';btn.textContent=opt;btn.onclick=()=>pick(btn,opt,c.anime);el.appendChild(btn);});
+  }
+  function pick(btn,chosen,correct){
+    if(answered)return;answered=true;
+    document.querySelectorAll('.sil-opt').forEach(b=>b.disabled=true);
+    const fb=document.getElementById('sil-feedback');
+    if(chosen===correct){btn.classList.add('correct');score+=10+(streak*2);streak++;fb.textContent='✓ Correct! +'+(10+(streak-1)*2);fb.className='sil-feedback ok';}
+    else{btn.classList.add('wrong');document.querySelectorAll('.sil-opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');});streak=0;fb.textContent='✗ It was: '+correct;fb.className='sil-feedback bad';}
+    document.getElementById('sil-score').textContent=score;
+    document.getElementById('sil-streak').textContent=streak>=2?'🔥 '+streak+' streak!':'';
+    setTimeout(()=>{round++;if(round>=chars.length)showSilResult();else loadRound();},1400);
+  }
+  function showSilResult(){
+    document.getElementById('sil-game').style.display='none';
+    document.getElementById('sil-result').style.display='block';
+    document.getElementById('sil-final-score').textContent='Score: '+score+' pts — '+Math.round(score/80*100)+'% accuracy';
+    const pct=score/80;
+    const r=pct>=.9?'ANIME GOD 🏆':pct>=.7?'ELITE OTAKU ⭐':pct>=.5?'SEASONED FAN 🎌':pct>=.3?'CASUAL VIEWER 📺':'NEW TO ANIME 🌱';
+    document.getElementById('sil-final-rank').textContent=r;
+    window.silScore=score;
+    const ni=document.getElementById('sil-name-input');if(ni){ni.disabled=false;ni.value='';}
+    const sv=document.getElementById('sil-score-saved');if(sv)sv.style.display='none';
+    const sb=document.querySelector('#sil-result .sb-save');if(sb)sb.disabled=false;
+    switchSB('silhouette');
+  }
+  function drawSilhouette(char){
+    ctx.clearRect(0,0,C.width,C.height);ctx.fillStyle='#020108';ctx.fillRect(0,0,C.width,C.height);
+    const cx=C.width/2,cy=C.height/2+20,s=char.shape;
+    ctx.fillStyle='#1a1a22';ctx.strokeStyle=char.color+'44';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(cx,cy-90,30,0,Math.PI*2);ctx.fill();ctx.stroke();
+    if(s==='spiky'||s==='long'){const pts=s==='spiky'?8:4;for(let i=0;i<pts;i++){const a=-Math.PI/2+(i-(pts-1)/2)*0.28,r=s==='spiky'?52:42;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*28,cy-90+Math.sin(a)*28);ctx.lineTo(cx+Math.cos(a)*r,cy-90+Math.sin(a)*r-10);ctx.lineWidth=8;ctx.strokeStyle='#1a1a22';ctx.stroke();ctx.strokeStyle=char.color+'44';ctx.lineWidth=1.5;}}
+    if(s==='twin'){ctx.beginPath();ctx.ellipse(cx-38,cy-110,10,34,-.4,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(cx+38,cy-110,10,34,.4,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    if(s==='horns'){ctx.beginPath();ctx.moveTo(cx-18,cy-116);ctx.lineTo(cx-12,cy-148);ctx.lineTo(cx-6,cy-116);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(cx+6,cy-116);ctx.lineTo(cx+12,cy-148);ctx.lineTo(cx+18,cy-116);ctx.fill();ctx.stroke();}
+    if(s==='maid'){ctx.beginPath();ctx.ellipse(cx,cy-122,36,8,0,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    ctx.beginPath();ctx.moveTo(cx-22,cy-62);ctx.bezierCurveTo(cx-28,cy-20,cx-24,cy+20,cx-20,cy+60);ctx.lineTo(cx+20,cy+60);ctx.bezierCurveTo(cx+24,cy+20,cx+28,cy-20,cx+22,cy-62);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx-22,cy-50);ctx.quadraticCurveTo(cx-55,cy-10,cx-44,cy+40);ctx.lineWidth=12;ctx.strokeStyle='#1a1a22';ctx.stroke();ctx.lineWidth=1.5;ctx.strokeStyle=char.color+'44';
+    ctx.beginPath();ctx.moveTo(cx+22,cy-50);ctx.quadraticCurveTo(cx+55,cy-10,cx+44,cy+40);ctx.lineWidth=12;ctx.strokeStyle='#1a1a22';ctx.stroke();ctx.lineWidth=1.5;ctx.strokeStyle=char.color+'44';
+    ctx.beginPath();ctx.moveTo(cx-10,cy+60);ctx.quadraticCurveTo(cx-16,cy+100,cx-14,cy+140);ctx.lineWidth=14;ctx.strokeStyle='#1a1a22';ctx.stroke();ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx+10,cy+60);ctx.quadraticCurveTo(cx+16,cy+100,cx+14,cy+140);ctx.lineWidth=14;ctx.strokeStyle='#1a1a22';ctx.stroke();ctx.lineWidth=1.5;
+    ctx.font='bold 48px Orbitron,serif';ctx.fillStyle=char.color+'cc';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',cx,cy-90);
+  }
+})();
+
+window.saveSilScore = async function() {
+  const nameEl=document.getElementById('sil-name-input');
+  const name=nameEl.value.trim()||'Anonymous';
+  nameEl.disabled=true;
+  document.querySelector('#sil-result .sb-save').disabled=true;
+  await SB.save('silhouette', name, window.silScore, 'global-sb-body');
+  document.getElementById('sil-score-saved').style.display='block';
+};
+
+/* ── REACTION RUSH ── */
+(function(){
+  const arena=document.getElementById('rr-arena');
+  const msg=document.getElementById('rr-msg');
+  let state='idle', waitTimer=null, startTime=0;
+  let rounds=[], best=Infinity, maxRounds=5;
+  window.rrScore=0;
+
+  const colors=['#00ffe7','#ff2d6b','#ffd200','#8b2fff','#39ff8a'];
+
+  function getRank(ms){
+    if(ms<180)return{label:'⚡ CYBER',cls:'good'};
+    if(ms<250)return{label:'🎯 SHARP',cls:'good'};
+    if(ms<350)return{label:'✅ SOLID',cls:'ok'};
+    if(ms<500)return{label:'🐢 SLOW',cls:'slow'};
+    return{label:'💤 ASLEEP',cls:'slow'};
+  }
+
+  function updateStats(){
+    const n=rounds.length;
+    const avg=n?Math.round(rounds.reduce((a,b)=>a+b,0)/n):null;
+    const b=n?Math.min(...rounds):null;
+    document.getElementById('rr-round').textContent=n+'/'+maxRounds;
+    document.getElementById('rr-avg').textContent=avg?avg+'ms':'—ms';
+    document.getElementById('rr-best').textContent=b?b:'—';
+    document.getElementById('rr-last').textContent=n?rounds[n-1]:'—';
+    if(b){const r=getRank(b);document.getElementById('rr-rank-display').textContent=r.label;}
+    // history chips
+    const hist=document.getElementById('rr-history');
+    hist.innerHTML=rounds.map(t=>{const r=getRank(t);return'<span class="reaction-chip '+r.cls+'">'+t+'ms</span>';}).join('');
+  }
+
+  function spawnTarget(){
+    // Remove any existing target
+    const old=arena.querySelector('.reaction-target');
+    if(old)old.remove();
+    const size=Math.min(80,Math.max(56,window.innerWidth*.12));
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const arenaRect=arena.getBoundingClientRect();
+    const maxX=arenaRect.width-size-10, maxY=arenaRect.height-size-10;
+    const x=10+Math.random()*maxX, y=10+Math.random()*maxY;
+    const t=document.createElement('div');
+    t.className='reaction-target';
+    t.style.cssText='width:'+size+'px;height:'+size+'px;left:'+x+'px;top:'+y+'px;background:'+color+';box-shadow:0 0 20px '+color+',0 0 40px '+color+'44;';
+    t.textContent='TAP';
+    t.style.color='#02000a';
+    t.addEventListener('click',hitTarget);
+    t.addEventListener('touchstart',e=>{e.preventDefault();hitTarget();},{passive:false});
+    arena.appendChild(t);
+    startTime=performance.now();
+    state='waiting';
+    msg.style.display='none';
+  }
+
+  function hitTarget(){
+    if(state!=='waiting')return;
+    const ms=Math.round(performance.now()-startTime);
+    state='done';
+    rounds.push(ms);
+    const t=arena.querySelector('.reaction-target');
+    if(t)t.remove();
+    msg.style.display='';
+    const r=getRank(ms);
+    msg.className='reaction-msg '+r.cls;
+    msg.textContent=ms+'ms — '+r.label;
+    updateStats();
+    if(rounds.length>=maxRounds){
+      // finished
+      const avg=Math.round(rounds.reduce((a,b)=>a+b,0)/rounds.length);
+      window.rrScore=avg;
+      msg.textContent='Done! Avg: '+avg+'ms';
+      document.getElementById('rr-save-wrap').style.display='block';
+      document.getElementById('rr-name-input').disabled=false;
+      document.getElementById('rr-name-input').value='';
+      document.getElementById('rr-score-saved').style.display='none';
+      document.querySelector('#rr-save-wrap .sb-save').disabled=false;
+      switchSB('reaction');
+      state='idle';
+      return;
+    }
+    setTimeout(()=>startCountdown(),800);
+  }
+
+  function startCountdown(){
+    state='countdown';
+    const t=arena.querySelector('.reaction-target');if(t)t.remove();
+    msg.style.display='';
+    msg.className='reaction-msg wait';
+    msg.textContent='Get ready...';
+    const delay=800+Math.random()*2200;
+    waitTimer=setTimeout(()=>spawnTarget(),delay);
+  }
+
+  function tooSoon(){
+    clearTimeout(waitTimer);
+    state='idle';
+    const t=arena.querySelector('.reaction-target');if(t)t.remove();
+    msg.className='reaction-msg too-soon';
+    msg.textContent='Too soon! Wait for the target.';
+    setTimeout(()=>{msg.className='reaction-msg wait';msg.textContent='Tap to try again';},1500);
+  }
+
+  arena.addEventListener('click',()=>{
+    if(state==='idle'){
+      if(rounds.length>=maxRounds)return;
+      startCountdown();
+    } else if(state==='countdown'){
+      tooSoon();
+    }
+  });
+  arena.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(state==='idle'){if(rounds.length>=maxRounds)return;startCountdown();}
+    else if(state==='countdown'){tooSoon();}
+  },{passive:false});
+
+  window.resetReaction=function(){
+    rounds=[];state='idle';clearTimeout(waitTimer);
+    const t=arena.querySelector('.reaction-target');if(t)t.remove();
+    msg.style.display='';msg.className='reaction-msg wait';msg.textContent='Tap to Start';
+    document.getElementById('rr-save-wrap').style.display='none';
+    updateStats();
+  };
+})();
+
+window.saveReactionScore = async function() {
+  const nameEl=document.getElementById('rr-name-input');
+  const name=nameEl.value.trim()||'Anonymous';
+  nameEl.disabled=true;
+  document.querySelector('#rr-save-wrap .sb-save').disabled=true;
+  // Lower ms = better, so we store as negative for sorting (or invert)
+  // Store as 10000 - avg so higher = better in leaderboard
+  const displayScore = window.rrScore;
+  const sortScore = Math.max(0, 5000 - displayScore); // faster = higher score
+  await SB.save('reaction', name, sortScore, 'global-sb-body');
+  document.getElementById('rr-score-saved').style.display='block';
+};
+
+// Init leaderboard
+switchSB('snake');
+</script>
+</body>
+</html>
