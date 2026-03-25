@@ -43,7 +43,7 @@ const SB={
 SB.render=function(dataOrKey,containerId,highlightName,highlightScore){
   const el=document.getElementById(containerId); if(!el) return;
   const list=(Array.isArray(dataOrKey)?dataOrKey:this._local(dataOrKey)).map(this._map).sort((a,b)=>b.score-a.score).slice(0,this.MAX);
-  if(!list.length){el.innerHTML="<div class=\"sb-empty\">No scores yet — be the first!</div>";return;}
+  if(!list.length){el.innerHTML="<div class=\"sb-empty\">No scores yet - be the first!</div>";return;}
   const medal=["gold","silver","bronze"];
   el.innerHTML=list.map((s,i)=>{const you=s.name===highlightName&&Number(s.score)===Number(highlightScore);const rank=i===0?"#1":i===1?"#2":i===2?"#3":"#"+(i+1);const dt=s.date?new Date(s.date):null;const ds=dt&& !isNaN(dt)?dt.toLocaleDateString("en-US",{month:"short",day:"numeric"}):"";return `<div class="sb-row"><span class="sb-rank ${medal[i]||"other"}">${rank}</span><span class="sb-name${you?" you":""}">${s.name}${you?" <span class=\"sb-new\">YOU</span>":""}</span><span class="sb-score">${s.score}</span><span style="font-family:Orbitron,monospace;font-size:.46rem;color:var(--text3);margin-left:4px;">${ds}</span></div>`;}).join("");
 };
@@ -67,8 +67,10 @@ window.SB=SB;
 window.switchSB=function(key){
   document.querySelectorAll(".gsb-tab").forEach(t=>{
     const x=t.textContent||"";
-    t.classList.toggle("active",(key==="snake"&&x.includes("Snake"))||(key==="silhouette"&&x.includes("Guesser"))||(key==="quiz"&&x.includes("Quiz"))||(key==="reaction"&&x.includes("Rush")));
+    t.classList.toggle("active",(key==="snake"&&x.includes("Snake"))||(key==="silhouette"&&x.includes("Guesser"))||(key==="quiz"&&x.includes("Quiz")));
   });
   ["global-sb-body","global-sb-body-quiz"].forEach(id=>{if(document.getElementById(id))SB.load(key,id);});
 };
+
+
 

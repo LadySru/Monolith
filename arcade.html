@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social Arcade — Play Neon Snake, Anime Guesser and Reaction Rush. Compete on the global leaderboard."/>
+  <meta name="description" content="Monolith Social Arcade — Play Neon Snake and Anime Guesser. Compete on the global leaderboard."/>
   <title>Arcade — Monolith Social</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -23,26 +23,6 @@
     .game-panel{display:none;}
     .game-panel.active{display:block;}
 
-    /* ── Reaction Rush ── */
-    .reaction-wrap{max-width:480px;margin:0 auto;}
-    .reaction-box{background:var(--card);border:1px solid var(--border);}
-    .reaction-arena{height:300px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;overflow:hidden;background:#020108;-webkit-tap-highlight-color:transparent;}
-    .reaction-target{position:absolute;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;font-family:'Orbitron',monospace;transition:transform .1s;will-change:transform;-webkit-tap-highlight-color:transparent;}
-    .reaction-target:active{transform:scale(.9);}
-    .reaction-msg{font-family:'Orbitron',monospace;font-size:.9rem;letter-spacing:2px;text-align:center;pointer-events:none;}
-    .reaction-msg.wait{color:var(--text3);}
-    .reaction-msg.ready{color:var(--teal);}
-    .reaction-msg.too-soon{color:var(--red);}
-    .reaction-stats{display:flex;gap:0;border-top:1px solid var(--border);}
-    .reaction-stat{flex:1;padding:12px;text-align:center;border-right:1px solid var(--border);}
-    .reaction-stat:last-child{border-right:none;}
-    .reaction-stat-n{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--teal);display:block;}
-    .reaction-stat-l{font-family:'Orbitron',monospace;font-size:.48rem;color:var(--text3);letter-spacing:2px;display:block;margin-top:2px;text-transform:uppercase;}
-    .reaction-history{display:flex;gap:6px;padding:12px 16px;flex-wrap:wrap;border-top:1px solid var(--border);}
-    .reaction-chip{font-family:'Orbitron',monospace;font-size:.55rem;padding:4px 10px;border:1px solid var(--border2);color:var(--text2);letter-spacing:1px;}
-    .reaction-chip.good{border-color:var(--green);color:var(--green);}
-    .reaction-chip.ok{border-color:var(--amber);color:var(--amber);}
-    .reaction-chip.slow{border-color:var(--red);color:var(--red);}
   </style>
 </head>
 <body>
@@ -81,7 +61,7 @@
 <div class="page-hero">
   <div class="wrap">
     <h1>🕹️ <span>Arcade</span></h1>
-    <p>Three games. One global leaderboard. Play on PC or mobile.</p>
+    <p>Two games. One global leaderboard. Play on PC or mobile.</p>
   </div>
 </div>
 
@@ -92,7 +72,6 @@
     <div class="game-tabs">
       <button class="game-tab active" onclick="switchTab('snake')">🐍 Neon Snake</button>
       <button class="game-tab" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
-      <button class="game-tab" onclick="switchTab('reaction')">⚡ Reaction Rush</button>
     </div>
 
     <div class="arcade-layout">
@@ -189,44 +168,6 @@
           </div>
         </div>
 
-        <!-- REACTION RUSH -->
-        <div id="panel-reaction" class="game-panel">
-          <div class="reaction-wrap">
-            <div class="reaction-box">
-              <div class="arc-header">
-                <span class="arc-title">⚡ Reaction Rush</span>
-                <div class="arc-meta">
-                  <span class="arc-score-lbl">Round</span>
-                  <span class="arc-score" id="rr-round">0/5</span>
-                  <span class="arc-score-lbl" style="margin-left:12px;">Avg</span>
-                  <span class="arc-score" id="rr-avg" style="color:var(--amber);">—ms</span>
-                </div>
-              </div>
-              <div class="reaction-arena" id="rr-arena">
-                <div class="reaction-msg wait" id="rr-msg">Tap to Start</div>
-              </div>
-              <div class="reaction-stats">
-                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-best">—</span><span class="reaction-stat-l">Best (ms)</span></div>
-                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-last">—</span><span class="reaction-stat-l">Last (ms)</span></div>
-                <div class="reaction-stat"><span class="reaction-stat-n" id="rr-rank-display">—</span><span class="reaction-stat-l">Rank</span></div>
-              </div>
-              <div class="reaction-history" id="rr-history"></div>
-              <!-- save form, shown after 5 rounds -->
-              <div id="rr-save-wrap" style="display:none;padding:14px 16px;border-top:1px solid var(--border);">
-                <div class="sb-entry">
-                  <input class="sb-input" id="rr-name-input" placeholder="Your name..." maxlength="16"/>
-                  <button class="sb-save" onclick="saveReactionScore()">Save →</button>
-                </div>
-                <div class="sb-saved" id="rr-score-saved">✓ Saved!</div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-                  <button class="btn-primary" onclick="resetReaction()">Play Again →</button>
-                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- RIGHT: global leaderboard -->
@@ -237,7 +178,6 @@
             <div class="global-sb-tabs">
               <button class="gsb-tab active" onclick="switchSB('snake')">🐍 Snake</button>
               <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
-              <button class="gsb-tab" onclick="switchSB('reaction')">⚡ Rush</button>
             </div>
           </div>
           <div class="global-sb-body" id="global-sb-body">
@@ -264,12 +204,12 @@
 /* ── GAME TAB SWITCH ── */
 function switchTab(id) {
   document.querySelectorAll('.game-tab').forEach((t,i) => {
-    t.classList.toggle('active', ['snake','silhouette','reaction'][i] === id);
+    t.classList.toggle('active', ['snake','silhouette'][i] === id);
   });
   document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   if (id === 'snake') snakePause();
-  switchSB(id === 'snake' ? 'snake' : id === 'silhouette' ? 'silhouette' : 'reaction');
+  switchSB(id === 'snake' ? 'snake' : 'silhouette');
 }
 
 /* ── NEON SNAKE ── */
@@ -430,146 +370,16 @@ window.saveSilScore = async function() {
   document.getElementById('sil-score-saved').style.display='block';
 };
 
-/* ── REACTION RUSH ── */
-(function(){
-  const arena=document.getElementById('rr-arena');
-  const msg=document.getElementById('rr-msg');
-  let state='idle', waitTimer=null, startTime=0;
-  let rounds=[], best=Infinity, maxRounds=5;
-  window.rrScore=0;
-
-  const colors=['#00ffe7','#ff2d6b','#ffd200','#8b2fff','#39ff8a'];
-
-  function getRank(ms){
-    if(ms<180)return{label:'⚡ CYBER',cls:'good'};
-    if(ms<250)return{label:'🎯 SHARP',cls:'good'};
-    if(ms<350)return{label:'✅ SOLID',cls:'ok'};
-    if(ms<500)return{label:'🐢 SLOW',cls:'slow'};
-    return{label:'💤 ASLEEP',cls:'slow'};
-  }
-
-  function updateStats(){
-    const n=rounds.length;
-    const avg=n?Math.round(rounds.reduce((a,b)=>a+b,0)/n):null;
-    const b=n?Math.min(...rounds):null;
-    document.getElementById('rr-round').textContent=n+'/'+maxRounds;
-    document.getElementById('rr-avg').textContent=avg?avg+'ms':'—ms';
-    document.getElementById('rr-best').textContent=b?b:'—';
-    document.getElementById('rr-last').textContent=n?rounds[n-1]:'—';
-    if(b){const r=getRank(b);document.getElementById('rr-rank-display').textContent=r.label;}
-    // history chips
-    const hist=document.getElementById('rr-history');
-    hist.innerHTML=rounds.map(t=>{const r=getRank(t);return'<span class="reaction-chip '+r.cls+'">'+t+'ms</span>';}).join('');
-  }
-
-  function spawnTarget(){
-    // Remove any existing target
-    const old=arena.querySelector('.reaction-target');
-    if(old)old.remove();
-    const size=Math.min(80,Math.max(56,window.innerWidth*.12));
-    const color=colors[Math.floor(Math.random()*colors.length)];
-    const arenaRect=arena.getBoundingClientRect();
-    const maxX=arenaRect.width-size-10, maxY=arenaRect.height-size-10;
-    const x=10+Math.random()*maxX, y=10+Math.random()*maxY;
-    const t=document.createElement('div');
-    t.className='reaction-target';
-    t.style.cssText='width:'+size+'px;height:'+size+'px;left:'+x+'px;top:'+y+'px;background:'+color+';box-shadow:0 0 20px '+color+',0 0 40px '+color+'44;';
-    t.textContent='TAP';
-    t.style.color='#02000a';
-    t.addEventListener('click',hitTarget);
-    t.addEventListener('touchstart',e=>{e.preventDefault();hitTarget();},{passive:false});
-    arena.appendChild(t);
-    startTime=performance.now();
-    state='waiting';
-    msg.style.display='none';
-  }
-
-  function hitTarget(){
-    if(state!=='waiting')return;
-    const ms=Math.round(performance.now()-startTime);
-    state='done';
-    rounds.push(ms);
-    const t=arena.querySelector('.reaction-target');
-    if(t)t.remove();
-    msg.style.display='';
-    const r=getRank(ms);
-    msg.className='reaction-msg '+r.cls;
-    msg.textContent=ms+'ms — '+r.label;
-    updateStats();
-    if(rounds.length>=maxRounds){
-      // finished
-      const avg=Math.round(rounds.reduce((a,b)=>a+b,0)/rounds.length);
-      window.rrScore=avg;
-      msg.textContent='Done! Avg: '+avg+'ms';
-      document.getElementById('rr-save-wrap').style.display='block';
-      document.getElementById('rr-name-input').disabled=false;
-      document.getElementById('rr-name-input').value='';
-      document.getElementById('rr-score-saved').style.display='none';
-      document.querySelector('#rr-save-wrap .sb-save').disabled=false;
-      switchSB('reaction');
-      state='idle';
-      return;
-    }
-    setTimeout(()=>startCountdown(),800);
-  }
-
-  function startCountdown(){
-    state='countdown';
-    const t=arena.querySelector('.reaction-target');if(t)t.remove();
-    msg.style.display='';
-    msg.className='reaction-msg wait';
-    msg.textContent='Get ready...';
-    const delay=800+Math.random()*2200;
-    waitTimer=setTimeout(()=>spawnTarget(),delay);
-  }
-
-  function tooSoon(){
-    clearTimeout(waitTimer);
-    state='idle';
-    const t=arena.querySelector('.reaction-target');if(t)t.remove();
-    msg.className='reaction-msg too-soon';
-    msg.textContent='Too soon! Wait for the target.';
-    setTimeout(()=>{msg.className='reaction-msg wait';msg.textContent='Tap to try again';},1500);
-  }
-
-  arena.addEventListener('click',()=>{
-    if(state==='idle'){
-      if(rounds.length>=maxRounds)return;
-      startCountdown();
-    } else if(state==='countdown'){
-      tooSoon();
-    }
-  });
-  arena.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    if(state==='idle'){if(rounds.length>=maxRounds)return;startCountdown();}
-    else if(state==='countdown'){tooSoon();}
-  },{passive:false});
-
-  window.resetReaction=function(){
-    rounds=[];state='idle';clearTimeout(waitTimer);
-    const t=arena.querySelector('.reaction-target');if(t)t.remove();
-    msg.style.display='';msg.className='reaction-msg wait';msg.textContent='Tap to Start';
-    document.getElementById('rr-save-wrap').style.display='none';
-    updateStats();
-  };
-})();
-
-window.saveReactionScore = async function() {
-  const nameEl=document.getElementById('rr-name-input');
-  const name=nameEl.value.trim()||'Anonymous';
-  nameEl.disabled=true;
-  document.querySelector('#rr-save-wrap .sb-save').disabled=true;
-  // Lower ms = better, so we store as negative for sorting (or invert)
-  // Store as 10000 - avg so higher = better in leaderboard
-  const displayScore = window.rrScore;
-  const sortScore = Math.max(0, 5000 - displayScore); // faster = higher score
-  await SB.save('reaction', name, sortScore, 'global-sb-body');
-  document.getElementById('rr-score-saved').style.display='block';
-};
-
 // Init leaderboard
 switchSB('snake');
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
