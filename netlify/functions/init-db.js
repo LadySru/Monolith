@@ -20,10 +20,10 @@ exports.handler = async (event, context) => {
         player_name VARCHAR(50) NOT NULL,
         score INTEGER NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE INDEX IF NOT EXISTS idx_game_scores_game_type ON game_scores(game_type);
-      CREATE INDEX IF NOT EXISTS idx_game_scores_created_at ON game_scores(created_at DESC);
+      )
     `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_game_scores_game_type ON game_scores(game_type)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_game_scores_created_at ON game_scores(created_at DESC)`;
 
     // Create reviews table
     await sql`
@@ -33,10 +33,10 @@ exports.handler = async (event, context) => {
         rating INTEGER CHECK (rating >= 1 AND rating <= 5),
         review_text TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating);
+      )
     `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating)`;
 
     // Create newsletter_subscribers table
     await sql`
@@ -47,10 +47,10 @@ exports.handler = async (event, context) => {
         interests TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_active BOOLEAN DEFAULT true
-      );
-      CREATE INDEX IF NOT EXISTS idx_subscribers_email ON newsletter_subscribers(email);
-      CREATE INDEX IF NOT EXISTS idx_subscribers_active ON newsletter_subscribers(is_active);
+      )
     `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_subscribers_email ON newsletter_subscribers(email)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_subscribers_active ON newsletter_subscribers(is_active)`;
 
     return {
       statusCode: 200,
