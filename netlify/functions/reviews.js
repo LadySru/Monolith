@@ -37,7 +37,7 @@ exports.handler = async (event, context) => {
 
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
         body: JSON.stringify({
           reviews,
           stats: stats[0] || { total_reviews: 0, avg_rating: 0 }

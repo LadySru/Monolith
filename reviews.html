@@ -151,7 +151,7 @@
     </div>
 
     <!-- Reviews Grid -->
-    <div id="reviews-grid-container">
+    <div id="reviews-grid-container" class="reviews-grid">
       <div class="reviews-empty">
         <div>⏳</div>
         <p>Loading reviews...</p>
@@ -316,7 +316,7 @@ async function submitReview() {
 // Load and display reviews
 async function loadReviews() {
   try {
-    const response = await fetch('/.netlify/functions/reviews?limit=50');
+    const response = await fetch(`/.netlify/functions/reviews?limit=50&t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('Failed to fetch reviews');
 
     const data = await response.json();
@@ -324,21 +324,30 @@ async function loadReviews() {
 
     // Update summary
     const summaryEl = document.getElementById('reviews-summary');
-    if (stats.total_reviews > 0) {
+    const total = parseInt(stats.total_reviews, 10) || 0;
+
+    if (total > 0) {
       summaryEl.style.display = 'grid';
-      
-      const avg = stats.avg_rating || 0;
+
+      const avg = parseFloat(stats.avg_rating) || 0;
       document.getElementById('avg-rating').textContent = avg.toFixed(1);
-      
+
       const stars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
       document.getElementById('star-display').textContent = stars;
-      
-      document.getElementById('total-count').textContent = stats.total_reviews + ' review' + (stats.total_reviews !== 1 ? 's' : '');
+
+      document.getElementById('total-count').textContent = total + ' review' + (total !== 1 ? 's' : '');
 
       // Update bars
-      const total = stats.total_reviews;
+      const starKeyMap = {
+        5: 'five_star',
+        4: 'four_star',
+        3: 'three_star',
+        2: 'two_star',
+        1: 'one_star'
+      };
+
       [5, 4, 3, 2, 1].forEach(star => {
-        const count = stats[`${star}_star`] || 0;
+        const count = parseInt(stats[starKeyMap[star]], 10) || 0;
         const pct = total > 0 ? (count / total) * 100 : 0;
         document.getElementById(`bar-${star}`).style.width = pct + '%';
         document.getElementById(`count-${star}`).textContent = count;
@@ -358,7 +367,7 @@ async function loadReviews() {
       const date = new Date(review.created_at);
       const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-      
+
       return `
         <div class="review-card">
           <div class="review-header">
@@ -372,7 +381,7 @@ async function loadReviews() {
     }).join('');
   } catch (error) {
     console.error('Load reviews error:', error);
-    document.getElementById('reviews-grid-container').innerHTML = 
+    document.getElementById('reviews-grid-container').innerHTML =
       '<div class="reviews-empty"><div>⚠️</div><p>Failed to load reviews. Please try again later.</p></div>';
   }
 }
