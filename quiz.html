@@ -283,10 +283,8 @@ window.saveQuizScore = async function() {
   nameEl.disabled = true;
   document.querySelector('.sb-save').disabled = true;
   try {
-    await DB.saveGameScore('quiz', name, window.qScore || 0);
+    await SB.save('quiz', name, window.qScore || 0, 'global-sb-body-quiz');
     document.getElementById('quiz-score-saved').classList.add('show');
-    const scores = await DB.getGameScores('quiz', 10);
-    SB.render(scores, 'global-sb-body-quiz', name, window.qScore || 0);
   } catch (error) {
     console.error('Failed to save score:', error);
     alert('Error saving score');
@@ -320,3 +318,4 @@ setTimeout(() => SB.load('quiz', 'global-sb-body-quiz'), 500);
 </script>
 </body>
 </html>
+

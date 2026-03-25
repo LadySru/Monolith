@@ -88,9 +88,8 @@
       background: rgba(0,255,231,0.1); color: var(--teal);
       border: 1px solid var(--teal);
       font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 700;
-      letter-spacing: 2px; padding: 13px 28px; text-decoration: none; border: none; cursor: pointer;
+      letter-spacing: 2px; padding: 13px 28px; text-decoration: none; cursor: pointer;
       clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-      border: 1px solid var(--teal); color: var(--teal);
       transition: box-shadow .25s, transform .2s, background .2s;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 16px rgba(0,255,231,.35); background: rgba(0,255,231,0.18); }
@@ -454,7 +453,6 @@
       nav{padding:0 16px;}
       .nav-r .nav-link,.nav-r .nav-cta{display:none;}
       .nav-hamburger{display:flex;}
-    }
       nav,#seals,footer { padding-left:20px; padding-right:20px; }
       .nav-link { display:none; }
       .wrap { padding:0 20px; }
@@ -1226,6 +1224,9 @@ function submitReview(){
   list.push(review);
   saveReviews(list);
 
+  // Also save to backend
+  if (window.DB) DB.submitReview(name, selectedStars, text).catch(function(){});
+
   // Render the new card at top
   const card=buildReviewCard(review);
   document.getElementById('reviews-grid').prepend(card);
@@ -1492,7 +1493,7 @@ const SB = {
         <span class="sb-score">${s.score}</span>
         <span style="font-family:'Orbitron',monospace;font-size:.46rem;color:var(--text3);margin-left:4px;">${s.date||''}</span>
       </div>`;
-    }).join(''');
+    }).join('');
     el.innerHTML = rows;
   },
 
@@ -1528,6 +1529,7 @@ window.saveSnakeScore = function() {
   const name = nameEl.value.trim() || 'Anonymous';
   const s = window.snakeScore || 0;
   SB.save('snake', name, s);
+  if (window.DB) DB.saveScore('snake', name, s).catch(function(){});
   switchSB('snake'); // refresh global panel
   document.getElementById('snake-score-saved').style.display = 'block';
   nameEl.disabled = true;
@@ -1541,6 +1543,7 @@ window.saveSilScore = function() {
   const nameEl = document.getElementById('sil-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
   SB.save('silhouette', name, silScore);
+  if (window.DB) DB.saveScore('silhouette', name, silScore).catch(function(){});
   switchSB('silhouette');
   document.getElementById('sil-score-saved').style.display = 'block';
   nameEl.disabled = true;
@@ -1552,6 +1555,7 @@ window.saveQuizScore = function() {
   const nameEl = document.getElementById('quiz-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
   SB.save('quiz', name, qScore);
+  if (window.DB) DB.saveScore('quiz', name, qScore).catch(function(){});
   switchSB('quiz');
   document.getElementById('quiz-score-saved').style.display = 'block';
   nameEl.disabled = true;
@@ -1689,6 +1693,9 @@ function subscribeNewsletter() {
       localStorage.setItem('ms_newsletter', JSON.stringify(local));
     }
   } catch(e) {}
+
+  // Also save to backend
+  if (window.DB) DB.subscribe(email, name, interests).catch(function(){});
 
   successEl.style.display = 'block';
   emailEl.value = '';
