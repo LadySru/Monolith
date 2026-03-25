@@ -839,27 +839,19 @@
         <div class="nl-feed-tabs">
           <button class="nl-feed-tab active" onclick="switchFeed('game')">🎮 Game News</button>
           <button class="nl-feed-tab" onclick="switchFeed('anime')">🌸 Anime News</button>
-<<<<<<< HEAD
           <button class="nl-feed-tab" onclick="switchFeed('community')">🏆 Community</button>
-=======
-          <button class="nl-feed-tab" onclick="switchFeed('community')">📡 Media bar</button>
->>>>>>> 484ac86 (Add Netlify DB integration for game scores, reviews, and newsletters)
         </div>
         <div class="nl-feed-body" id="nl-feed-body">
           <div class="nl-feed-loading">Loading latest posts...</div>
         </div>
       </div>
 
-<<<<<<< HEAD
       <!-- Setup note -->
       <div class="nl-setup-note" id="nl-setup-note">
         <span>⚙️</span>
         <span>To show live Discord posts here, add your Discord channel webhook URLs in the <code>NL_WEBHOOKS</code> config below.</span>
       </div>
 
-=======
-      
->>>>>>> 484ac86 (Add Netlify DB integration for game scores, reviews, and newsletters)
       <!-- Subscribe form -->
       <div style="margin-top:32px;padding-top:28px;border-top:1px solid var(--border);">
         <p style="font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-bottom:16px;">📬 Get this in your inbox every Monday</p>
@@ -900,9 +892,6 @@
   <p class="footer-copy">© 2026 Monolith Social · discord.gg/pnRCbEAtTk · Not affiliated with Discord Inc.</p>
 </footer>
 
-<<<<<<< HEAD
-<script>
-=======
 <script src="/db-integration.js"></script>
 
 <script>
@@ -1005,7 +994,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
->>>>>>> 484ac86 (Add Netlify DB integration for game scores, reviews, and newsletters)
 /* ── HAMBURGER ── */
 const hamburger = document.getElementById('nav-hamburger');
 const mobileNav = document.getElementById('nav-mobile');
@@ -1504,7 +1492,7 @@ const SB = {
         <span class="sb-score">${s.score}</span>
         <span style="font-family:'Orbitron',monospace;font-size:.46rem;color:var(--text3);margin-left:4px;">${s.date||''}</span>
       </div>`;
-    }).join('');
+    }).join(''');
     el.innerHTML = rows;
   },
 
@@ -1592,13 +1580,8 @@ switchSB('snake');
 // ── CONFIG: paste your Discord channel feed URLs here ──
 const NL_WEBHOOKS = {
   game:      '', // e.g. RSS feed URL for #game-news channel
-<<<<<<< HEAD
   anime:     '', // e.g. RSS feed URL for #anime-news channel
   community: '', // e.g. RSS feed URL for #community channel
-=======
-  anime:     'https://discord.com/api/webhooks/1486383304688271460/krzWsGNByGhaKXG9wY-EwhE5gG_fG8vSh6lcBGIgNPhbJMVCkvPNPSlXg2zdL1Jlka5F', // Otaku lounge webhook
-  community: 'https://discord.com/api/webhooks/1486381817316774008/2M3OBLkvvhnfRx3wjqJdDMFM6vUexCZ7qTMQqGt2yAS_mpg83VQOwB3sYNnQmyyD0ZY2', // Media bar webhook
->>>>>>> 484ac86 (Add Netlify DB integration for game scores, reviews, and newsletters)
 };
 
 // Sample posts shown when no feed URLs are configured
