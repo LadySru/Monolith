@@ -428,6 +428,22 @@
     .nl-post-text { font-size: .85rem; color: var(--text2); line-height: 1.65; font-weight: 300; }
     .nl-setup-note { display: flex; align-items: flex-start; gap: 8px; background: rgba(245,200,66,.06); border: 1px solid rgba(245,200,66,.2); padding: 12px 16px; margin-top: 12px; font-family: 'Orbitron', monospace; font-size: .55rem; color: var(--amber); letter-spacing: 1px; line-height: 1.7; }
     .nl-setup-note code { background: rgba(245,200,66,.1); padding: 1px 5px; border-radius: 3px; }
+
+    /* ═══════ ARCADE LAYOUT (game + leaderboard side by side) ═══════ */
+    .arcade-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+    .arcade-games-col { min-width: 0; }
+    .arc-panel { max-width: 100%; margin: 0; }
+    .global-sb-col { position: sticky; top: 80px; }
+    .global-sb-box { background: var(--card); border: 1px solid var(--border2); overflow: hidden; }
+    .global-sb-header { padding: 14px 16px 0; background: rgba(0,255,231,.04); border-bottom: 1px solid var(--border); }
+    .global-sb-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .72rem; color: var(--text); letter-spacing: 2px; display: block; margin-bottom: 10px; }
+    .global-sb-tabs { display: flex; border-top: 1px solid var(--border); }
+    .gsb-tab { flex: 1; background: transparent; border: none; border-top: 2px solid transparent; padding: 8px 4px; font-family: 'Orbitron', monospace; font-size: .5rem; color: var(--text3); letter-spacing: 1px; cursor: pointer; transition: color .2s, border-color .2s; text-transform: uppercase; }
+    .gsb-tab:hover { color: var(--text2); }
+    .gsb-tab.active { color: var(--teal); border-top-color: var(--teal); }
+    .global-sb-body { padding: 12px 16px; min-height: 200px; max-height: 460px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+    .global-sb-body::-webkit-scrollbar { width: 4px; }
+    .global-sb-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
     @media(max-width:960px){
       nav,#seals,footer { padding-left:20px; padding-right:20px; }
       .nav-link { display:none; }
@@ -442,6 +458,8 @@
       footer { flex-direction:column; align-items:flex-start; }
     }
     @media(max-width:480px){
+      .arcade-layout { grid-template-columns: 1fr; }
+      .global-sb-col { position: static; }
       .section-pad { padding:48px 0; }
       .wrap { padding:0 16px; }
       nav { padding:0 14px; height:54px; }
@@ -603,65 +621,88 @@
       <h2 style="text-align:center;">Play While You <em>Hang Around.</em></h2>
       <p class="sec-sub" style="max-width:460px;margin:0 auto;">Two games built for the community. Post your scores in the server.</p>
     </div>
-    <div class="arcade-tabs reveal">
-      <button class="arc-tab active" onclick="switchGame('snake')">🐍 Neon Snake</button>
-      <button class="arc-tab" onclick="switchGame('silhouette')">🎌 Anime Guesser</button>
-    </div>
-    <div id="game-snake" class="arc-panel reveal">
-      <div class="arc-box">
-        <div class="arc-header">
-          <span class="arc-title">🐍 Neon Snake</span>
-          <div class="arc-meta"><span class="arc-score-lbl">Score</span><span class="arc-score" id="snake-score">0</span><span class="arc-score-lbl" style="margin-left:12px;">Best</span><span class="arc-score" id="snake-best" style="color:var(--amber);">0</span></div>
+
+    <div class="arcade-layout">
+
+      <!-- LEFT: games -->
+      <div class="arcade-games-col">
+        <div class="arcade-tabs reveal">
+          <button class="arc-tab active" onclick="switchGame('snake')">🐍 Neon Snake</button>
+          <button class="arc-tab" onclick="switchGame('silhouette')">🎌 Anime Guesser</button>
         </div>
-        <div class="arc-canvas-wrap">
-          <canvas id="snakeCanvas" width="400" height="400"></canvas>
-          <div class="arc-overlay" id="snake-overlay"><div class="arc-overlay-icon">🐍</div><div class="arc-overlay-title">Neon Snake</div><div class="arc-overlay-sub">Arrow keys · WASD · Swipe</div><button class="btn-primary" onclick="startSnake()">Play →</button></div>
-          <div class="arc-overlay" id="snake-gameover" style="display:none;">
-            <div class="arc-overlay-icon">💀</div>
-            <div class="arc-overlay-title">Game Over</div>
-            <div class="arc-overlay-sub" id="snake-final-score">Score: 0</div>
-            <div class="sb-entry">
-              <input class="sb-input" id="snake-name-input" placeholder="Your name..." maxlength="16"/>
-              <button class="sb-save" onclick="saveSnakeScore()">Save →</button>
+
+        <div id="game-snake" class="arc-panel reveal">
+          <div class="arc-box">
+            <div class="arc-header">
+              <span class="arc-title">🐍 Neon Snake</span>
+              <div class="arc-meta"><span class="arc-score-lbl">Score</span><span class="arc-score" id="snake-score">0</span><span class="arc-score-lbl" style="margin-left:12px;">Best</span><span class="arc-score" id="snake-best" style="color:var(--amber);">0</span></div>
             </div>
-            <div class="sb-saved" id="snake-score-saved">✓ Saved to leaderboard!</div>
-            <div class="sb-wrap" id="snake-sb"></div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
-              <button class="btn-primary" onclick="startSnake()">Retry →</button>
-              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
+            <div class="arc-canvas-wrap">
+              <canvas id="snakeCanvas" width="400" height="400"></canvas>
+              <div class="arc-overlay" id="snake-overlay"><div class="arc-overlay-icon">🐍</div><div class="arc-overlay-title">Neon Snake</div><div class="arc-overlay-sub">Arrow keys · WASD · Swipe</div><button class="btn-primary" onclick="startSnake()">Play →</button></div>
+              <div class="arc-overlay" id="snake-gameover" style="display:none;">
+                <div class="arc-overlay-icon">💀</div>
+                <div class="arc-overlay-title">Game Over</div>
+                <div class="arc-overlay-sub" id="snake-final-score">Score: 0</div>
+                <div class="sb-entry">
+                  <input class="sb-input" id="snake-name-input" placeholder="Your name..." maxlength="16"/>
+                  <button class="sb-save" onclick="saveSnakeScore()">Save →</button>
+                </div>
+                <div class="sb-saved" id="snake-score-saved">✓ Saved!</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
+                  <button class="btn-primary" onclick="startSnake()">Retry →</button>
+                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Post Score</a>
+                </div>
+              </div>
+            </div>
+            <div class="dpad"><button class="dpad-btn dpad-up" onclick="snakeDpad('UP')">▲</button><button class="dpad-btn dpad-left" onclick="snakeDpad('LEFT')">◀</button><button class="dpad-btn dpad-right" onclick="snakeDpad('RIGHT')">▶</button><button class="dpad-btn dpad-down" onclick="snakeDpad('DOWN')">▼</button></div>
+          </div>
+        </div>
+
+        <div id="game-silhouette" class="arc-panel reveal" style="display:none;">
+          <div class="arc-box">
+            <div class="arc-header">
+              <span class="arc-title">🎌 Anime Guesser</span>
+              <div class="arc-meta"><span class="arc-score-lbl">Round</span><span class="arc-score" id="sil-round">1/8</span><span class="arc-score-lbl" style="margin-left:12px;">Score</span><span class="arc-score" id="sil-score">0</span></div>
+            </div>
+            <div class="sil-body" id="sil-screen">
+              <div class="sil-intro" id="sil-intro"><div style="font-size:3rem;margin-bottom:12px;">🎌</div><div class="arc-overlay-title" style="position:static;transform:none;color:var(--text);font-size:1.1rem;margin-bottom:8px;letter-spacing:2px;">Anime Character Guesser</div><div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:20px;">8 rounds — guess the anime from the silhouette.</div><button class="btn-primary" onclick="startSilhouette()">Start Game →</button></div>
+              <div id="sil-game" style="display:none;"><div class="sil-hint" id="sil-hint">Hint: ···</div><div class="sil-canvas-wrap"><canvas id="silCanvas" width="300" height="320"></canvas></div><div class="sil-streak" id="sil-streak"></div><div class="sil-options" id="sil-options"></div><div class="sil-feedback" id="sil-feedback"></div></div>
+              <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;">
+                <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
+                <div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;">Game Over!</div>
+                <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div>
+                <div style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;margin-bottom:16px;" id="sil-final-rank"></div>
+                <div class="sb-entry" style="justify-content:center;">
+                  <input class="sb-input" id="sil-name-input" placeholder="Your name..." maxlength="16"/>
+                  <button class="sb-save" onclick="saveSilScore()">Save →</button>
+                </div>
+                <div class="sb-saved" id="sil-score-saved">✓ Saved!</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+                  <button class="btn-primary" onclick="startSilhouette()">Play Again →</button>
+                  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="dpad"><button class="dpad-btn dpad-up" onclick="snakeDpad('UP')">▲</button><button class="dpad-btn dpad-left" onclick="snakeDpad('LEFT')">◀</button><button class="dpad-btn dpad-right" onclick="snakeDpad('RIGHT')">▶</button><button class="dpad-btn dpad-down" onclick="snakeDpad('DOWN')">▼</button></div>
       </div>
-    </div>
-    <div id="game-silhouette" class="arc-panel reveal" style="display:none;">
-      <div class="arc-box">
-        <div class="arc-header">
-          <span class="arc-title">🎌 Anime Guesser</span>
-          <div class="arc-meta"><span class="arc-score-lbl">Round</span><span class="arc-score" id="sil-round">1/8</span><span class="arc-score-lbl" style="margin-left:12px;">Score</span><span class="arc-score" id="sil-score">0</span></div>
-        </div>
-        <div class="sil-body" id="sil-screen">
-          <div class="sil-intro" id="sil-intro"><div style="font-size:3rem;margin-bottom:12px;">🎌</div><div class="arc-overlay-title" style="position:static;transform:none;color:var(--text);font-size:1.1rem;margin-bottom:8px;letter-spacing:2px;">Anime Character Guesser</div><div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:20px;">8 rounds — guess the anime from the silhouette.</div><button class="btn-primary" onclick="startSilhouette()">Start Game →</button></div>
-          <div id="sil-game" style="display:none;"><div class="sil-hint" id="sil-hint">Hint: ···</div><div class="sil-canvas-wrap"><canvas id="silCanvas" width="300" height="320"></canvas></div><div class="sil-streak" id="sil-streak"></div><div class="sil-options" id="sil-options"></div><div class="sil-feedback" id="sil-feedback"></div></div>
-          <div id="sil-result" style="display:none;text-align:center;padding:32px 20px;">
-            <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
-            <div class="arc-overlay-title" style="position:static;transform:none;color:var(--teal);font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;">Game Over!</div>
-            <div class="arc-overlay-sub" style="position:static;transform:none;margin-bottom:4px;" id="sil-final-score">Score: 0/8</div>
-            <div style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;margin-bottom:16px;" id="sil-final-rank"></div>
-            <div class="sb-entry" style="justify-content:center;">
-              <input class="sb-input" id="sil-name-input" placeholder="Your name..." maxlength="16"/>
-              <button class="sb-save" onclick="saveSilScore()">Save →</button>
-            </div>
-            <div class="sb-saved" id="sil-score-saved">✓ Saved to leaderboard!</div>
-            <div class="sb-wrap" id="sil-sb"></div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
-              <button class="btn-primary" onclick="startSilhouette()">Play Again →</button>
-              <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline">Share in Discord</a>
+
+      <!-- RIGHT: global leaderboard panel -->
+      <div class="global-sb-col reveal">
+        <div class="global-sb-box">
+          <div class="global-sb-header">
+            <span class="global-sb-title">🏆 Global Leaderboard</span>
+            <div class="global-sb-tabs">
+              <button class="gsb-tab active" onclick="switchSB('snake')">🐍 Snake</button>
+              <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
+              <button class="gsb-tab" onclick="switchSB('quiz')">🎌 Quiz</button>
             </div>
           </div>
+          <div class="global-sb-body" id="global-sb-body"></div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -672,36 +713,58 @@
     <div class="reveal" style="text-align:center;margin-bottom:36px;">
       <span class="sec-tag" style="display:block;text-align:center;">◈ Community Game</span>
       <h2 style="text-align:center;">How Well Do You <em>Know Anime?</em></h2>
-      <p class="sec-sub" style="max-width:440px;margin:0 auto;">10 questions. Prove your rank. Get your result delivered to your inbox.</p>
+      <p class="sec-sub" style="max-width:440px;margin:0 auto;">10 questions. Prove your rank.</p>
     </div>
-    <div class="quiz-wrap reveal">
-      <div class="quiz-box">
-        <div id="quiz-screen">
-          <div class="quiz-header"><span class="quiz-title-sm">🎌 Anime IQ Test</span><div style="display:flex;align-items:center;gap:10px;"><span class="quiz-score-sm" id="q-score-hdr">0 / 10</span><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="q-bar" style="width:0%"></div></div></div></div>
-          <div class="quiz-body"><div class="quiz-q-num" id="q-num">Question 1 of 10</div><div class="quiz-question" id="q-text">Loading...</div><div class="quiz-options" id="q-opts"></div><div class="quiz-feedback" id="q-feedback"></div></div>
-          <div class="quiz-footer"><span class="quiz-score-sm" id="q-score-foot">Score: 0</span><button class="btn-primary" id="q-next" onclick="nextQuestion()" style="display:none;">Next →</button></div>
-        </div>
-          <div class="quiz-result" id="quiz-result">
-          <h3>Quiz Complete!</h3>
-          <div class="score-big" id="res-score">0<span>/10</span></div>
-          <div class="rank-label" id="res-rank"></div>
-          <p id="res-msg" style="font-size:.9rem;color:var(--text2);margin-bottom:16px;font-weight:300;"></p>
-          <div class="sb-entry" style="justify-content:center;margin-bottom:4px;">
-            <input class="sb-input" id="quiz-name-input" placeholder="Your name..." maxlength="16"/>
-            <button class="sb-save" onclick="saveQuizScore()">Save →</button>
-          </div>
-          <div class="sb-saved" id="quiz-score-saved">✓ Saved to leaderboard!</div>
-          <div class="sb-wrap" id="quiz-sb" style="max-width:420px;margin:0 auto 16px;"></div>
-          <p style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text2);letter-spacing:2px;margin-bottom:14px;">Get your result + server news to your inbox:</p>
-          <div class="email-form"><input type="email" class="email-input" id="quiz-email" placeholder="your@email.com"/><button class="btn-primary" onclick="sendResult()" style="white-space:nowrap;">Send →</button></div>
-          <div class="email-sent" id="email-sent">✓ Sent! Check your inbox. Welcome to the newsletter 🎌</div>
-          <p class="email-note">No spam. Unsubscribe anytime.</p>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
-            <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-primary">Join the Community →</a>
-            <button class="btn-outline" onclick="restartQuiz()">Retry Quiz</button>
+
+    <div class="arcade-layout">
+
+      <!-- LEFT: quiz -->
+      <div class="arcade-games-col">
+        <div class="quiz-wrap reveal">
+          <div class="quiz-box">
+            <div id="quiz-screen">
+              <div class="quiz-header"><span class="quiz-title-sm">🎌 Anime IQ Test</span><div style="display:flex;align-items:center;gap:10px;"><span class="quiz-score-sm" id="q-score-hdr">0 / 10</span><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="q-bar" style="width:0%"></div></div></div></div>
+              <div class="quiz-body"><div class="quiz-q-num" id="q-num">Question 1 of 10</div><div class="quiz-question" id="q-text">Loading...</div><div class="quiz-options" id="q-opts"></div><div class="quiz-feedback" id="q-feedback"></div></div>
+              <div class="quiz-footer"><span class="quiz-score-sm" id="q-score-foot">Score: 0</span><button class="btn-primary" id="q-next" onclick="nextQuestion()" style="display:none;">Next →</button></div>
+            </div>
+            <div class="quiz-result" id="quiz-result">
+              <h3>Quiz Complete!</h3>
+              <div class="score-big" id="res-score">0<span>/10</span></div>
+              <div class="rank-label" id="res-rank"></div>
+              <p id="res-msg" style="font-size:.9rem;color:var(--text2);margin-bottom:16px;font-weight:300;"></p>
+              <div class="sb-entry" style="justify-content:center;margin-bottom:4px;">
+                <input class="sb-input" id="quiz-name-input" placeholder="Your name..." maxlength="16"/>
+                <button class="sb-save" onclick="saveQuizScore()">Save →</button>
+              </div>
+              <div class="sb-saved" id="quiz-score-saved">✓ Saved!</div>
+              <p style="font-family:'Orbitron',monospace;font-size:.58rem;color:var(--text2);letter-spacing:2px;margin:14px 0 8px;">Get your result to your inbox:</p>
+              <div class="email-form"><input type="email" class="email-input" id="quiz-email" placeholder="your@email.com"/><button class="btn-primary" onclick="sendResult()" style="white-space:nowrap;">Send →</button></div>
+              <div class="email-sent" id="email-sent">✓ Sent! Welcome to the newsletter 🎌</div>
+              <p class="email-note">No spam. Unsubscribe anytime.</p>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+                <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-primary">Join the Community →</a>
+                <button class="btn-outline" onclick="restartQuiz()">Retry Quiz</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- RIGHT: global leaderboard (quiz tab pre-selected) -->
+      <div class="global-sb-col reveal">
+        <div class="global-sb-box">
+          <div class="global-sb-header">
+            <span class="global-sb-title">🏆 Global Leaderboard</span>
+            <div class="global-sb-tabs">
+              <button class="gsb-tab" onclick="switchSB('snake')">🐍 Snake</button>
+              <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
+              <button class="gsb-tab active" onclick="switchSB('quiz')">📋 Quiz</button>
+            </div>
+          </div>
+          <div class="global-sb-body" id="global-sb-body-quiz"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -948,7 +1011,7 @@ function switchGame(id){
     const ni=document.getElementById('sil-name-input');if(ni){ni.disabled=false;ni.value='';}
     const sb=document.getElementById('sil-score-saved');if(sb)sb.style.display='none';
     const sv=document.querySelector('#sil-result .sb-save');if(sv)sv.disabled=false;
-    SB.render('silhouette','sil-sb',null,null);
+    switchSB('silhouette');
   }
   function drawSilhouette(char){
     ctx.clearRect(0,0,C.width,C.height);ctx.fillStyle='#020108';ctx.fillRect(0,0,C.width,C.height);
@@ -978,7 +1041,38 @@ document.querySelectorAll('.star-btn').forEach(btn=>{
   btn.addEventListener('mouseleave',()=>{document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<selectedStars));});
 });
 function sanitize(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-const reviewData=[];
+
+/* ── REVIEWS: load from localStorage ── */
+const REVIEWS_KEY = 'ms_reviews';
+
+function loadReviews(){
+  try { return JSON.parse(localStorage.getItem(REVIEWS_KEY)||'[]'); } catch(e) { return []; }
+}
+function saveReviews(list){
+  try { localStorage.setItem(REVIEWS_KEY, JSON.stringify(list)); } catch(e) {}
+}
+
+function buildReviewCard(r){
+  const card=document.createElement('div');
+  card.className='review-card';
+  const stars='★'.repeat(r.stars)+'☆'.repeat(5-r.stars);
+  const colors=['#0df2d4','#f5c842','#ff4d6d','#3ddc84','#9997a0'];
+  const color=colors[r.name.charCodeAt(0)%colors.length];
+  card.innerHTML=`<div class="review-top"><div class="review-av" style="background:var(--card2);color:${color};">${sanitize(r.name[0].toUpperCase())}</div><div><div class="review-name">${sanitize(r.name)}</div><div class="review-date">${r.date}</div></div></div><div class="review-stars" style="color:var(--star);">${stars}</div><div class="review-text">${sanitize(r.text)}</div>`;
+  return card;
+}
+
+function renderAllReviews(){
+  const grid=document.getElementById('reviews-grid');
+  grid.innerHTML='';
+  const list=loadReviews();
+  // newest first
+  list.slice().reverse().forEach(r=>{
+    grid.appendChild(buildReviewCard(r));
+  });
+  updateReviewSummary(list.map(r=>r.stars));
+}
+
 function submitReview(){
   const nameEl=document.getElementById('rv-name'),textEl=document.getElementById('rv-text');
   const nameErr=document.getElementById('rv-name-err'),textErr=document.getElementById('rv-text-err'),success=document.getElementById('rv-success');
@@ -988,22 +1082,40 @@ function submitReview(){
   if(!text||URL_PATTERN.test(text)||text.length<10){textErr.textContent=text.length<10?'Please write at least 10 characters.':'Links not allowed.';textErr.style.display='block';valid=false;}
   if(selectedStars===0){alert('Please select a star rating.');valid=false;}
   if(!valid)return;
-  const stars='★'.repeat(selectedStars)+'☆'.repeat(5-selectedStars);
-  const colors=['#0df2d4','#f5c842','#ff4d6d','#3ddc84','#9997a0'];
-  const color=colors[name.charCodeAt(0)%colors.length];
+
   const now=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const card=document.createElement('div');card.className='review-card';
-  card.innerHTML=`<div class="review-top"><div class="review-av" style="background:var(--card2);color:${color};">${sanitize(name[0].toUpperCase())}</div><div><div class="review-name">${sanitize(name)}</div><div class="review-date">${now}</div></div></div><div class="review-stars" style="color:var(--star);">${stars}</div><div class="review-text">${sanitize(text)}</div>`;
+  const review={name,text,stars:selectedStars,date:now};
+
+  // Save to localStorage
+  const list=loadReviews();
+  list.push(review);
+  saveReviews(list);
+
+  // Render the new card at top
+  const card=buildReviewCard(review);
   document.getElementById('reviews-grid').prepend(card);
-  reviewData.push(selectedStars);updateReviewSummary();
+  updateReviewSummary(list.map(r=>r.stars));
+
   nameEl.value='';textEl.value='';selectedStars=0;
   document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
-  success.style.display='block';card.scrollIntoView({behavior:'smooth',block:'center'});
+  success.style.display='block';
+  card.scrollIntoView({behavior:'smooth',block:'center'});
 }
-function updateReviewSummary(){
-  const total=reviewData.length;if(!total)return;
-  const avg=(reviewData.reduce((a,b)=>a+b,0)/total).toFixed(1);
-  const counts=[0,0,0,0,0];reviewData.forEach(r=>counts[r-1]++);
+
+function updateReviewSummary(starsArr){
+  const total=starsArr.length;
+  // Reset to empty state if no reviews
+  if(!total){
+    document.querySelector('.reviews-big').textContent='—';
+    document.querySelector('.reviews-stars').textContent='★★★★★';
+    document.querySelector('.reviews-stars').style.color='var(--border2)';
+    document.querySelector('.reviews-count').textContent='Be the First';
+    document.querySelectorAll('.bar-fill').forEach(f=>f.style.width='0%');
+    document.querySelectorAll('.bar-num').forEach(n=>n.textContent='0');
+    return;
+  }
+  const avg=(starsArr.reduce((a,b)=>a+b,0)/total).toFixed(1);
+  const counts=[0,0,0,0,0];starsArr.forEach(r=>counts[r-1]++);
   document.querySelector('.reviews-big').textContent=avg;
   const filled=Math.round(parseFloat(avg));
   document.querySelector('.reviews-stars').textContent='★'.repeat(filled)+'☆'.repeat(5-filled);
@@ -1012,6 +1124,9 @@ function updateReviewSummary(){
   const fills=document.querySelectorAll('.bar-fill'),nums=document.querySelectorAll('.bar-num');
   for(let i=0;i<5;i++){const idx=4-i;const pct=Math.round((counts[idx]/total)*100);fills[i].style.width=pct+'%';nums[i].textContent=counts[idx];}
 }
+
+// Load reviews on page load
+renderAllReviews();
 
 /* ── QUIZ ── */
 const QUESTIONS=[
@@ -1065,7 +1180,7 @@ function showResult(){
   const ni=document.getElementById('quiz-name-input');if(ni){ni.disabled=false;ni.value='';}
   const sb=document.getElementById('quiz-score-saved');if(sb)sb.style.display='none';
   const sv=document.querySelector('#quiz-result .sb-save');if(sv)sv.disabled=false;
-  SB.render('quiz','quiz-sb',null,null);
+  switchSB('quiz');
   res.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function sendResult(){
@@ -1225,12 +1340,13 @@ const SB = {
     return trimmed;
   },
 
+  // Render into any container by id
   render(key, containerId, highlightName, highlightScore) {
     const el = document.getElementById(containerId);
     if (!el) return;
     const list = this.load(key);
     if (!list.length) {
-      el.innerHTML = '<div class="sb-title">🏆 Leaderboard</div><div class="sb-empty">No scores yet — be the first!</div>';
+      el.innerHTML = '<div class="sb-empty" style="padding:16px 0;text-align:center;">No scores yet — be the first!</div>';
       return;
     }
     const rows = list.map((s,i) => {
@@ -1239,12 +1355,37 @@ const SB = {
         <span class="sb-rank ${this._medals[i]||'other'}">${this._label(i)}</span>
         <span class="sb-name${isYou?' you':''}">${s.name}${isYou?' <span class="sb-new">YOU</span>':''}</span>
         <span class="sb-score">${s.score}</span>
-        <span style="font-family:'Orbitron',monospace;font-size:.48rem;color:var(--text3);margin-left:4px;">${s.date||''}</span>
+        <span style="font-family:'Orbitron',monospace;font-size:.46rem;color:var(--text3);margin-left:4px;">${s.date||''}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div class="sb-title">🏆 Leaderboard</div>${rows}`;
+    el.innerHTML = rows;
+  },
+
+  // Refresh global panel
+  renderGlobal(key) {
+    const body = document.getElementById('global-sb-body') || document.getElementById('global-sb-body-quiz');
+    if (body) this.render(key, body.id, null, null);
+    // Also refresh the other instance if both exist
+    const body2 = document.getElementById('global-sb-body-quiz');
+    if (body2 && body2 !== body) this.render(key, 'global-sb-body-quiz', null, null);
   }
 };
+
+// ── Global leaderboard tab switcher ──
+let activeSBKey = 'snake';
+function switchSB(key) {
+  activeSBKey = key;
+  // Update all gsb-tab buttons on the page
+  document.querySelectorAll('.gsb-tab').forEach(t => {
+    t.classList.toggle('active',
+      (key==='snake'&&t.textContent.includes('Snake')) ||
+      (key==='silhouette'&&t.textContent.includes('Guesser')) ||
+      (key==='quiz'&&t.textContent.includes('Quiz'))
+    );
+  });
+  // Render into whichever global body containers exist
+  ['global-sb-body','global-sb-body-quiz'].forEach(id => SB.render(key, id, null, null));
+}
 
 // ── Snake ──
 window.saveSnakeScore = function() {
@@ -1252,20 +1393,20 @@ window.saveSnakeScore = function() {
   const name = nameEl.value.trim() || 'Anonymous';
   const s = window.snakeScore || 0;
   SB.save('snake', name, s);
-  SB.render('snake', 'snake-sb', name, s);
+  switchSB('snake'); // refresh global panel
   document.getElementById('snake-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#snake-gameover .sb-save').disabled = true;
 };
 
-function renderSnakeSB() { SB.render('snake','snake-sb',null,null); }
+function renderSnakeSB() { switchSB('snake'); }
 
 // ── Silhouette ──
 window.saveSilScore = function() {
   const nameEl = document.getElementById('sil-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
   SB.save('silhouette', name, silScore);
-  SB.render('silhouette', 'sil-sb', name, silScore);
+  switchSB('silhouette');
   document.getElementById('sil-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#sil-result .sb-save').disabled = true;
@@ -1276,11 +1417,14 @@ window.saveQuizScore = function() {
   const nameEl = document.getElementById('quiz-name-input');
   const name = nameEl.value.trim() || 'Anonymous';
   SB.save('quiz', name, qScore);
-  SB.render('quiz', 'quiz-sb', name, qScore);
+  switchSB('quiz');
   document.getElementById('quiz-score-saved').style.display = 'block';
   nameEl.disabled = true;
   document.querySelector('#quiz-result .sb-save').disabled = true;
 };
+
+// Init global leaderboard on page load
+switchSB('snake');
 
 /* ══════════════════════════════════
    NEWSLETTER — DISCORD FEED
