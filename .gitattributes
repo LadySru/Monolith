@@ -1,0 +1,17 @@
+# Normalize line endings to LF on check-in, convert to native on checkout
+* text=auto
+
+# Explicitly declare text files to always use LF
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+
+# Binary files - no line-ending conversion
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.gif  binary
+*.ico  binary
+*.svg  text eol=lf
