@@ -265,7 +265,7 @@
     .dpad { display: none; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; padding: 14px; background: rgba(0,0,0,.4); justify-items: center; }
     .dpad-btn { width: 52px; height: 52px; background: var(--card2); border: 1px solid var(--border2); font-size: 1.1rem; color: var(--teal); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; user-select: none; }
     .dpad-btn:active { background: var(--teal-dim); }
-    .dpad-up{grid-column:2;grid-row:1;} .dpad-left{grid-column:1;grid-row:2;} .dpad-right{grid-column:3;grid-row:2;} .dpad-down{grid-column:2;grid-row:2;}
+    .dpad-up{grid-column:2;grid-row:1;} .dpad-left{grid-column:1;grid-row:2;} .dpad-right{grid-column:3;grid-row=2;} .dpad-down{grid-column:2;grid-row:2;}
     @media(hover:none){.dpad{display:grid;}}
     .sil-body { padding: 24px 20px; min-height: 420px; }
     .sil-intro { text-align: center; padding: 32px 0; }
@@ -1010,7 +1010,7 @@ function switchGame(id){
   if(id==='snake') snakePause();
 }
 
-/* ── NEON SNAKE ── */
+/* ══ NEON SNAKE ══ */
 (function(){
   const C=document.getElementById('snakeCanvas'), ctx=C.getContext('2d');
   const COLS=20,ROWS=20,TEAL='#0df2d4',DIM='#0a3a34',RED='#ff4d6d',AMBER='#f5c842';
@@ -1156,40 +1156,81 @@ document.querySelectorAll('.star-btn').forEach(btn=>{
   btn.addEventListener('mouseover',()=>{const v=parseInt(btn.dataset.v);document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<v));});
   btn.addEventListener('mouseleave',()=>{document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<selectedStars));});
 });
-function sanitize(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-/* ── REVIEWS: load from localStorage ── */
-const REVIEWS_KEY = 'ms_reviews';
-
-function loadReviews(){
-  try { return JSON.parse(localStorage.getItem(REVIEWS_KEY)||'[]'); } catch(e) { return []; }
-}
-function saveReviews(list){
-  try { localStorage.setItem(REVIEWS_KEY, JSON.stringify(list)); } catch(e) {}
-}
+function sanitize(s){return String(s||'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
 
 function buildReviewCard(r){
   const card=document.createElement('div');
   card.className='review-card';
   const stars='★'.repeat(r.stars)+'☆'.repeat(5-r.stars);
   const colors=['#0df2d4','#f5c842','#ff4d6d','#3ddc84','#9997a0'];
-  const color=colors[r.name.charCodeAt(0)%colors.length];
-  card.innerHTML=`<div class="review-top"><div class="review-av" style="background:var(--card2);color:${color};">${sanitize(r.name[0].toUpperCase())}</div><div><div class="review-name">${sanitize(r.name)}</div><div class="review-date">${r.date}</div></div></div><div class="review-stars" style="color:var(--star);">${stars}</div><div class="review-text">${sanitize(r.text)}</div>`;
+  const first=(r.name||'A').charAt(0).toUpperCase();
+  const color=colors[first.charCodeAt(0)%colors.length];
+  card.innerHTML=`<div class="review-top"><div class="review-av" style="background:var(--card2);color:${color};">${sanitize(first)}</div><div><div class="review-name">${sanitize(r.name)}</div><div class="review-date">${r.date}</div></div></div><div class="review-stars" style="color:var(--star);">${stars}</div><div class="review-text">${sanitize(r.text)}</div>`;
   return card;
 }
 
-function renderAllReviews(){
-  const grid=document.getElementById('reviews-grid');
-  grid.innerHTML='';
-  const list=loadReviews();
-  // newest first
-  list.slice().reverse().forEach(r=>{
-    grid.appendChild(buildReviewCard(r));
+function updateReviewSummaryFromStats(stats){
+  const total=parseInt(stats.total_reviews,10)||0;
+  const summaryStars=document.querySelector('.reviews-summary .reviews-stars');
+  if(!total){
+    document.querySelector('.reviews-big').textContent='—';
+    summaryStars.textContent='★★★★★';
+    summaryStars.style.color='var(--border2)';
+    document.querySelector('.reviews-count').textContent='Be the First';
+    document.querySelectorAll('.reviews-summary .bar-fill').forEach(f=>f.style.width='0%');
+    document.querySelectorAll('.reviews-summary .bar-num').forEach(n=>n.textContent='0');
+    return;
+  }
+
+  const avg=parseFloat(stats.avg_rating)||0;
+  document.querySelector('.reviews-big').textContent=avg.toFixed(1);
+  const filled=Math.round(avg);
+  summaryStars.textContent='★'.repeat(filled)+'☆'.repeat(5-filled);
+  summaryStars.style.color='var(--star)';
+  document.querySelector('.reviews-count').textContent=total+(total===1?' REVIEW':' REVIEWS');
+
+  const keyByStar={5:'five_star',4:'four_star',3:'three_star',2:'two_star',1:'one_star'};
+  const fills=document.querySelectorAll('.reviews-summary .bar-fill');
+  const nums=document.querySelectorAll('.reviews-summary .bar-num');
+  [5,4,3,2,1].forEach((star,i)=>{
+    const count=parseInt(stats[keyByStar[star]],10)||0;
+    const pct=total>0?Math.round((count/total)*100):0;
+    fills[i].style.width=pct+'%';
+    nums[i].textContent=String(count);
   });
-  updateReviewSummary(list.map(r=>r.stars));
 }
 
-function submitReview(){
+async function renderAllReviews(){
+  const grid=document.getElementById('reviews-grid');
+  try{
+    const res=await fetch(`/.netlify/functions/reviews?limit=6&t=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok) throw new Error('Failed to fetch reviews');
+
+    const data=await res.json();
+    const reviews=Array.isArray(data.reviews)?data.reviews:[];
+    const stats=data.stats||{};
+
+    grid.innerHTML='';
+    reviews.forEach(rv=>{
+      const dateObj=new Date(rv.created_at);
+      const ui={
+        name:rv.player_name,
+        text:rv.review_text,
+        stars:parseInt(rv.rating,10)||0,
+        date:dateObj.toLocaleDateString('en-US',{month:'long',year:'numeric'})
+      };
+      grid.appendChild(buildReviewCard(ui));
+    });
+
+    updateReviewSummaryFromStats(stats);
+  }catch(e){
+    console.error('Reviews load error:',e);
+    grid.innerHTML='<div class="reviews-empty" style="grid-column:1/-1;text-align:center;color:var(--text3);">Failed to load reviews.</div>';
+    updateReviewSummaryFromStats({ total_reviews: 0 });
+  }
+}
+
+async function submitReview(){
   const nameEl=document.getElementById('rv-name'),textEl=document.getElementById('rv-text');
   const nameErr=document.getElementById('rv-name-err'),textErr=document.getElementById('rv-text-err'),success=document.getElementById('rv-success');
   let valid=true;nameErr.style.display='none';textErr.style.display='none';success.style.display='none';
@@ -1199,241 +1240,32 @@ function submitReview(){
   if(selectedStars===0){alert('Please select a star rating.');valid=false;}
   if(!valid)return;
 
-  const now=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const review={name,text,stars:selectedStars,date:now};
+  try{
+    const response=await fetch('/.netlify/functions/reviews',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({player_name:name,rating:selectedStars,review_text:text})
+    });
 
-  // Save to localStorage
-  const list=loadReviews();
-  list.push(review);
-  saveReviews(list);
+    if(!response.ok){
+      const error=await response.json().catch(()=>({}));
+      throw new Error(error.error||'Failed to submit review');
+    }
 
-  // Also save to backend
-  if (window.DB) DB.submitReview(name, selectedStars, text).catch(function(){});
+    nameEl.value='';textEl.value='';selectedStars=0;
+    document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
+    success.style.display='block';
 
-  // Render the new card at top
-  const card=buildReviewCard(review);
-  document.getElementById('reviews-grid').prepend(card);
-  updateReviewSummary(list.map(r=>r.stars));
-
-  nameEl.value='';textEl.value='';selectedStars=0;
-  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
-  success.style.display='block';
-  card.scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-function updateReviewSummary(starsArr){
-  const total=starsArr.length;
-  // Reset to empty state if no reviews
-  if(!total){
-    document.querySelector('.reviews-big').textContent='—';
-    document.querySelector('.reviews-stars').textContent='★★★★★';
-    document.querySelector('.reviews-stars').style.color='var(--border2)';
-    document.querySelector('.reviews-count').textContent='Be the First';
-    document.querySelectorAll('.bar-fill').forEach(f=>f.style.width='0%');
-    document.querySelectorAll('.bar-num').forEach(n=>n.textContent='0');
-    return;
+    await renderAllReviews();
+    document.getElementById('reviews-grid').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){
+    console.error('Review submit error:',e);
+    alert('Error: '+e.message);
   }
-  const avg=(starsArr.reduce((a,b)=>a+b,0)/total).toFixed(1);
-  const counts=[0,0,0,0,0];starsArr.forEach(r=>counts[r-1]++);
-  document.querySelector('.reviews-big').textContent=avg;
-  const filled=Math.round(parseFloat(avg));
-  document.querySelector('.reviews-stars').textContent='★'.repeat(filled)+'☆'.repeat(5-filled);
-  document.querySelector('.reviews-stars').style.color='var(--star)';
-  document.querySelector('.reviews-count').textContent=total+(total===1?' REVIEW':' REVIEWS');
-  const fills=document.querySelectorAll('.bar-fill'),nums=document.querySelectorAll('.bar-num');
-  for(let i=0;i<5;i++){const idx=4-i;const pct=Math.round((counts[idx]/total)*100);fills[i].style.width=pct+'%';nums[i].textContent=counts[idx];}
 }
 
 // Load reviews on page load
 renderAllReviews();
-
-/* ── QUIZ ── */
-const QUESTIONS=[
-  {q:"Which studio animated Attack on Titan (final arcs)?",opts:["Ufotable","MAPPA","Bones","Shaft"],ans:1},
-  {q:"What is the real name of 'Light Yagami' in Death Note?",opts:["Kira","Light Yagami","L","Ryuk"],ans:1},
-  {q:"Which anime features the Straw Hat Pirates?",opts:["Fairy Tail","Bleach","One Piece","Naruto"],ans:2},
-  {q:"What is Guts' iconic weapon in Berserk?",opts:["A katana","Dragonslayer","Rebellion","Muramasa"],ans:1},
-  {q:"Which genre is 'Slice of Life' closest to?",opts:["Mecha","Isekai","Everyday drama","Shonen"],ans:2},
-  {q:"'Fullmetal Alchemist Brotherhood' aired in which decade?",opts:["1990s","2000s","2010s","2020s"],ans:1},
-  {q:"In Hunter x Hunter, what is Gon's Nen type?",opts:["Emitter","Enhancer","Transmuter","Manipulator"],ans:1},
-  {q:"Which show popularised the modern 'isekai' genre?",opts:["Sword Art Online","Cowboy Bebop","Evangelion","Trigun"],ans:0},
-  {q:"What does 'Senpai' mean?",opts:["Teacher","Senior/upperclassman","Friend","Boss"],ans:1},
-  {q:"'Hatsune Miku' is a character from which franchise?",opts:["Love Live","Vocaloid","Idolmaster","BanG Dream"],ans:1}
-];
-let qIndex=0,qScore=0,qAnswered=false;
-function loadQuestion(){
-  const q=QUESTIONS[qIndex];
-  document.getElementById('q-num').textContent=`Question ${qIndex+1} of ${QUESTIONS.length}`;
-  document.getElementById('q-text').textContent=q.q;
-  document.getElementById('q-bar').style.width=(qIndex/QUESTIONS.length*100)+'%';
-  document.getElementById('q-score-hdr').textContent=`${qScore} / ${QUESTIONS.length}`;
-  document.getElementById('q-score-foot').textContent=`Score: ${qScore}`;
-  document.getElementById('q-feedback').textContent='';document.getElementById('q-feedback').className='quiz-feedback';
-  document.getElementById('q-next').style.display='none';qAnswered=false;
-  const el=document.getElementById('q-opts');el.innerHTML='';
-  q.opts.forEach((opt,i)=>{const btn=document.createElement('button');btn.className='quiz-opt';btn.textContent=opt;btn.onclick=()=>selectAnswer(i);el.appendChild(btn);});
-}
-function selectAnswer(i){
-  if(qAnswered)return;qAnswered=true;
-  const q=QUESTIONS[qIndex];const btns=document.querySelectorAll('.quiz-opt');
-  btns.forEach(b=>b.disabled=true);const fb=document.getElementById('q-feedback');
-  if(i===q.ans){qScore++;btns[i].classList.add('correct');fb.textContent='✓ Correct!';fb.className='quiz-feedback ok';}
-  else{btns[i].classList.add('wrong');btns[q.ans].classList.add('correct');fb.textContent=`✗ The answer was: ${q.opts[q.ans]}`;fb.className='quiz-feedback bad';}
-  document.getElementById('q-score-hdr').textContent=`${qScore} / ${QUESTIONS.length}`;
-  document.getElementById('q-score-foot').textContent=`Score: ${qScore}`;
-  document.getElementById('q-next').style.display='inline-flex';
-}
-function nextQuestion(){qIndex++;if(qIndex>=QUESTIONS.length)showResult();else loadQuestion();}
-function showResult(){
-  document.getElementById('quiz-screen').style.display='none';
-  const res=document.getElementById('quiz-result');res.style.display='block';
-  document.getElementById('res-score').innerHTML=`${qScore}<span>/${QUESTIONS.length}</span>`;
-  let rank,msg;
-  if(qScore===10){rank='🏆 ANIME GOD';msg='Perfect score. You are a certified legend. The server needs someone like you.';}
-  else if(qScore>=8){rank='⭐ ELITE OTAKU';msg='Seriously impressive. Come share that knowledge in the otaku-lounge.';}
-  else if(qScore>=6){rank='🎌 SEASONED FAN';msg="Solid knowledge! You're exactly who we're building this community for.";}
-  else if(qScore>=4){rank='📺 CASUAL VIEWER';msg="Not bad for a casual! Come level up your anime knowledge with us.";}
-  else{rank='🌱 NEW TO ANIME';msg="Everyone starts somewhere! Zero gatekeeping — come learn with us.";}
-  document.getElementById('res-rank').textContent=rank;document.getElementById('res-msg').textContent=msg;
-  // reset save UI, render leaderboard
-  const ni=document.getElementById('quiz-name-input');if(ni){ni.disabled=false;ni.value='';}
-  const sb=document.getElementById('quiz-score-saved');if(sb)sb.style.display='none';
-  const sv=document.querySelector('#quiz-result .sb-save');if(sv)sv.disabled=false;
-  switchSB('quiz');
-  res.scrollIntoView({behavior:'smooth',block:'center'});
-}
-function sendResult(){
-  const emailEl=document.getElementById('quiz-email');const email=emailEl.value.trim();const sentEl=document.getElementById('email-sent');
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){emailEl.style.borderColor='var(--red)';setTimeout(()=>emailEl.style.borderColor='',1500);return;}
-  console.log(`Newsletter signup: ${email} | Score: ${qScore}/10`);
-  sentEl.style.display='block';emailEl.disabled=true;document.querySelector('.email-form button').disabled=true;
-}
-function restartQuiz(){
-  qIndex=0;qScore=0;qAnswered=false;
-  document.getElementById('quiz-result').style.display='none';document.getElementById('quiz-screen').style.display='block';
-  document.getElementById('email-sent').style.display='none';
-  const e=document.getElementById('quiz-email');e.value='';e.disabled=false;
-  loadQuestion();
-}
-loadQuestion();
-
-/* ── SEASONAL PARTICLES (GPU-optimised) ── */
-(function(){
-  const canvas=document.getElementById('seasons-canvas'),ctx=canvas.getContext('2d'),badge=document.getElementById('season-badge');
-
-  // Use offscreen size — no need to match full devicePixelRatio
-  const month=new Date().getMonth();
-  const SEASON=month>=2&&month<=4?'spring':month>=5&&month<=7?'summer':month>=8&&month<=10?'autumn':'winter';
-
-  // ↓ Reduced counts significantly — enough for visual effect, not GPU murder
-  const CONFIGS={
-    spring:{label:'🌸 Spring',count:28,color:['#ffb7c5','#ff8fab','#ffd6e0','#ff6b9d']},
-    summer:{label:'✨ Summer',count:30,color:['#ffd700','#fff9c4','#0df2d4','#ffffff']},
-    autumn:{label:'🍂 Autumn',count:22,color:['#e8651a','#c0392b','#f39c12','#d4a017']},
-    winter:{label:'❄️ Winter',count:32,color:['#e0f7ff','#b3e5fc','#ffffff','#cce5ff']},
-  };
-  const cfg=CONFIGS[SEASON];badge.innerHTML=cfg.label;
-
-  // Use logical pixels only — no devicePixelRatio scaling
-  let W=window.innerWidth,H=window.innerHeight,particles=[];
-  let hidden=false;
-
-  function resize(){
-    W=canvas.width=window.innerWidth;
-    H=canvas.height=window.innerHeight;
-  }
-  // Debounce resize
-  let resizeTimer;
-  window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,200);});
-  resize();
-
-  // Pause when tab is not visible
-  document.addEventListener('visibilitychange',()=>{ hidden=document.hidden; });
-
-  function makeParticle(){
-    const color=cfg.color[Math.floor(Math.random()*cfg.color.length)];
-    const base={
-      x:Math.random()*W, y:-20-Math.random()*80, color,
-      alpha:0.3+Math.random()*0.45,
-      size:2+Math.random()*4,
-      speedY:0.5+Math.random()*1.0,
-      speedX:(Math.random()-.5)*0.5,
-      wobble:Math.random()*Math.PI*2,
-      wobbleSpeed:0.015+Math.random()*0.02,
-      rotation:Math.random()*Math.PI*2,
-      rotSpeed:(Math.random()-.5)*0.03,
-    };
-    if(SEASON==='summer'){base.size=1.5+Math.random()*2;base.speedY=-0.08-Math.random()*0.3;base.y=Math.random()*H;base.pulse=Math.random()*Math.PI*2;base.pulseSpeed=0.04+Math.random()*0.04;}
-    if(SEASON==='winter'){base.size=1.5+Math.random()*3;base.speedY=0.5+Math.random()*1.2;}
-    if(SEASON==='spring'){base.size=3+Math.random()*4;}
-    if(SEASON==='autumn'){base.size=4+Math.random()*5;base.speedX=(Math.random()-.5)*0.9;}
-    return base;
-  }
-
-  for(let i=0;i<cfg.count;i++){const p=makeParticle();p.y=Math.random()*H;particles.push(p);}
-
-  // Simple draw functions — no ctx.save/restore loops, minimal state changes
-  function drawPetal(p){
-    ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
-    ctx.beginPath();ctx.ellipse(p.x,p.y,p.size,p.size*0.5,p.rotation,0,Math.PI*2);ctx.fill();
-  }
-  function drawLeaf(p){
-    ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
-    ctx.beginPath();ctx.ellipse(p.x,p.y,p.size*0.5,p.size,p.rotation+0.4,0,Math.PI*2);ctx.fill();
-  }
-  function drawSnowflake(p){
-    ctx.globalAlpha=p.alpha*0.85;ctx.strokeStyle=p.color;ctx.lineWidth=0.8;
-    // Draw as simple cross — much cheaper than 6-arm loop
-    ctx.beginPath();
-    ctx.moveTo(p.x-p.size,p.y);ctx.lineTo(p.x+p.size,p.y);
-    ctx.moveTo(p.x,p.y-p.size);ctx.lineTo(p.x,p.y+p.size);
-    ctx.stroke();
-  }
-  function drawFirefly(p){
-    p.pulse+=p.pulseSpeed;
-    const a=0.25+Math.sin(p.pulse)*0.25;
-    ctx.globalAlpha=a;ctx.fillStyle=p.color;
-    ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
-  }
-
-  // Throttle to ~30fps — halves GPU load vs 60fps
-  let lastTime=0;
-  const INTERVAL=1000/30;
-
-  function animate(ts){
-    requestAnimationFrame(animate);
-    if(hidden)return;
-    if(ts-lastTime<INTERVAL)return;
-    lastTime=ts;
-
-    ctx.clearRect(0,0,W,H);
-    ctx.globalAlpha=1; // reset once at top
-
-    for(let i=0;i<particles.length;i++){
-      const p=particles[i];
-      p.wobble+=p.wobbleSpeed;
-      p.rotation+=p.rotSpeed;
-      p.x+=p.speedX+Math.sin(p.wobble)*0.4;
-      p.y+=p.speedY;
-
-      if(SEASON==='summer'){if(p.y<-20){p.y=H+10;p.x=Math.random()*W;}}
-      else{
-        if(p.y>H+20){Object.assign(p,makeParticle());p.y=-10;}
-        if(p.x<-20)p.x=W+20;
-        if(p.x>W+20)p.x=-20;
-      }
-
-      if(SEASON==='spring')drawPetal(p);
-      else if(SEASON==='summer')drawFirefly(p);
-      else if(SEASON==='autumn')drawLeaf(p);
-      else drawSnowflake(p);
-    }
-
-    ctx.globalAlpha=1; // reset after loop
-  }
-
-  requestAnimationFrame(animate);
-})();
 
 /* ══════════════════════════════════
    SCOREBOARD ENGINE (localStorage)
@@ -1465,7 +1297,7 @@ const SB = {
     if (!el) return;
     const list = this.load(key);
     if (!list.length) {
-      el.innerHTML = '<div class="sb-empty" style="padding:16px 0;text-align:center;">No scores yet — be the first!</div>';
+      el.innerHTML = '<div class="sb-empty" style="padding:16px 0;text-align:center;color:var(--text3);">No scores yet — be the first!</div>';
       return;
     }
     const rows = list.map((s,i) => {
