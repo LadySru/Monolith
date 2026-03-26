@@ -43,10 +43,9 @@
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: none; }
 
-    /* ═══════ CURSOR ═══════ */
-    #cur { width: 12px; height: 12px; background: var(--teal); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .15s, height .15s; mix-blend-mode: screen; will-change: transform; }
+    /* ═══════ CURSOR (seal) ═══════ */
+    #cur { width: 32px; height: 32px; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); will-change: transform; transition: opacity .15s; }
     body:not(:hover) #cur { opacity: 0; }
-    #cur.big { width: 36px; height: 36px; background: transparent; border: 1.5px solid var(--teal); }
     @media(hover:none) { #cur { display: none; } body { cursor: auto; } }
 
     /* ═══════ SCANLINES ═══════ */
@@ -244,6 +243,12 @@
     .game-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .65rem; color: var(--text); line-height: 1.3; letter-spacing: 1px; }
     .game-genre { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--teal); letter-spacing: 2px; margin-top: 3px; }
 
+    /* Game tail banner (date range) */
+    .game-tail { position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; background: rgba(139,47,255,0.85); backdrop-filter: blur(6px); font-family: 'Orbitron', monospace; font-size: .5rem; font-weight: 700; letter-spacing: 1.5px; color: #fff; text-transform: uppercase; text-align: center; line-height: 1.4; }
+    .game-tail-arrow { color: var(--teal); font-size: .7rem; }
+    .game-tail-bottom { position: absolute; bottom: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: rgba(255,45,107,0.85); backdrop-filter: blur(6px); font-family: 'Orbitron', monospace; font-size: .52rem; font-weight: 700; letter-spacing: 2px; color: #fff; text-transform: uppercase; text-align: center; }
+    .game-tail-bottom .game-tail-label { font-size: .45rem; color: rgba(255,255,255,.7); letter-spacing: 3px; margin-right: 4px; }
+
     /* ═══════ ARCADE ═══════ */
     #arcade { background: var(--bg2); border-top: 1px solid var(--border); }
     .arcade-tabs { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
@@ -265,7 +270,7 @@
     .dpad { display: none; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; padding: 14px; background: rgba(0,0,0,.4); justify-items: center; }
     .dpad-btn { width: 52px; height: 52px; background: var(--card2); border: 1px solid var(--border2); font-size: 1.1rem; color: var(--teal); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; user-select: none; }
     .dpad-btn:active { background: var(--teal-dim); }
-    .dpad-up{grid-column:2;grid-row:1;} .dpad-left{grid-column:1;grid-row:2;} .dpad-right{grid-column:3;grid-row=2;} .dpad-down{grid-column:2;grid-row:2;}
+    .dpad-up{grid-column:2;grid-row:1;} .dpad-left{grid-column:1;grid-row:2;} .dpad-right{grid-column:3;grid-row:2;} .dpad-down{grid-column:2;grid-row:2;}
     @media(hover:none){.dpad{display:grid;}}
     .sil-body { padding: 24px 20px; min-height: 420px; }
     .sil-intro { text-align: center; padding: 32px 0; }
@@ -308,7 +313,7 @@
     .review-form-wrap h3 { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 6px; letter-spacing: 2px; }
     .review-form-wrap p { font-size: .88rem; color: var(--text2); margin-bottom: 20px; font-weight: 300; }
     .star-picker { display: flex; gap: 6px; margin-bottom: 16px; }
-    .star-btn { font-size: 1.6rem; background: none; border: none, cursor: pointer; color: var(--border2); transition: color .15s, transform .15s; padding: 0; line-height: 1; }
+    .star-btn { font-size: 1.6rem; background: none; border: none; cursor: pointer; color: var(--border2); transition: color .15s, transform .15s; padding: 0; line-height: 1; }
     .star-btn:hover, .star-btn.active { color: var(--star); transform: scale(1.18); }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-family: 'Orbitron', monospace; font-size: .55rem; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
@@ -426,8 +431,33 @@
   </style>
 </head>
 <body>
-  <!-- CURSOR -->
-  <div id="cur"></div>
+  <!-- CURSOR (seal) -->
+  <div id="cur">
+    <svg viewBox="0 0 64 64" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="32" cy="36" rx="22" ry="18" fill="#8a8a8a"/>
+      <ellipse cx="32" cy="36" rx="22" ry="18" fill="url(#sealGrad)"/>
+      <circle cx="32" cy="24" r="16" fill="#9a9a9a"/>
+      <circle cx="32" cy="24" r="16" fill="url(#sealHeadGrad)"/>
+      <ellipse cx="22" cy="20" rx="3" ry="3.5" fill="#1a1a2e"/>
+      <ellipse cx="42" cy="20" rx="3" ry="3.5" fill="#1a1a2e"/>
+      <circle cx="23" cy="19" r="1" fill="#fff"/>
+      <circle cx="43" cy="19" r="1" fill="#fff"/>
+      <ellipse cx="32" cy="26" rx="4" ry="2.5" fill="#2a2a3e"/>
+      <ellipse cx="29" cy="25" rx="0.6" ry="0.6" fill="#555"/>
+      <ellipse cx="35" cy="25" rx="0.6" ry="0.6" fill="#555"/>
+      <line x1="18" y1="24" x2="10" y2="22" stroke="#bbb" stroke-width="0.8" stroke-linecap="round"/>
+      <line x1="18" y1="26" x2="10" y2="27" stroke="#bbb" stroke-width="0.8" stroke-linecap="round"/>
+      <line x1="46" y1="24" x2="54" y2="22" stroke="#bbb" stroke-width="0.8" stroke-linecap="round"/>
+      <line x1="46" y1="26" x2="54" y2="27" stroke="#bbb" stroke-width="0.8" stroke-linecap="round"/>
+      <ellipse cx="18" cy="40" rx="8" ry="5" fill="#7a7a7a" transform="rotate(-20 18 40)"/>
+      <ellipse cx="46" cy="40" rx="8" ry="5" fill="#7a7a7a" transform="rotate(20 46 40)"/>
+      <path d="M30 28 Q32 31 34 28" stroke="#666" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+      <defs>
+        <radialGradient id="sealGrad"><stop offset="0%" stop-color="#aaa" stop-opacity="0.3"/><stop offset="100%" stop-color="#666" stop-opacity="0.2"/></radialGradient>
+        <radialGradient id="sealHeadGrad"><stop offset="0%" stop-color="#bbb" stop-opacity="0.3"/><stop offset="100%" stop-color="#777" stop-opacity="0.2"/></radialGradient>
+      </defs>
+    </svg>
+  </div>
 
   <!-- NAVIGATION -->
   <nav>
@@ -478,7 +508,7 @@
       <span class="eyebrow reveal">The Last Anime & Gaming Community</span>
       <h1 class="reveal"><span class="line1">Monolith Social</span> <span class="line2">Awaits You.</span></h1>
       <p class="hero-hook reveal">Join a community of passionate gamers and anime lovers. Dive into the action, connect with friends, and explore endless adventures.</p>
-      <p class="hero-tagline reveal">Est. 2021 - Over 10,000 members strong</p>
+      <p class="hero-tagline reveal">Est. Jul 2021 - 322 members strong</p>
 
       <div class="hero-cta reveal">
         <a href="https://discord.gg/monolith" target="_blank" class="btn-primary">Join Us Now</a>
@@ -487,7 +517,7 @@
 
       <div class="hero-stats reveal">
         <div class="stat">
-          <span class="stat-n teal">10k+</span>
+          <span class="stat-n teal">322</span>
           <span class="stat-l">Members</span>
         </div>
         <div class="stat">
@@ -601,69 +631,82 @@
       <p class="sec-sub">Dive into a world of fun and excitement with our handpicked games.</p>
 
       <div class="games-grid">
-        <div class="game-card">
-          <img src="game1.jpg" alt="Game" class="game-img">
+        <div class="game-card g1">
+          <div class="game-fb">🔥</div>
           <div class="game-label">
-            <div class="game-title">Game One</div>
-            <div class="game-genre">Action, Adventure</div>
+            <div class="game-title">Hotline Miami 2</div>
+            <div class="game-genre">Action</div>
           </div>
           <div class="game-hover-overlay">
-            <div class="game-hover-badge">New</div>
-            <div class="game-hover-date">Releasing on Jan 1</div>
+            <div class="game-hover-badge beta">PLAY</div>
             <div class="game-hover-divider"></div>
-            <a href="#!" class="btn-primary">Play Now</a>
+            <div class="game-hover-date">Classic</div>
           </div>
         </div>
-        <div class="game-card">
-          <img src="game2.jpg" alt="Game" class="game-img">
+        <div class="game-card g2">
+          <div class="game-fb">💀</div>
           <div class="game-label">
-            <div class="game-title">Game Two</div>
-            <div class="game-genre">Puzzle, Strategy</div>
+            <div class="game-title">Dead by Daylight</div>
+            <div class="game-genre">Survival Horror</div>
           </div>
           <div class="game-hover-overlay">
-            <div class="game-hover-badge">Beta</div>
-            <div class="game-hover-date">Coming on Feb 14</div>
+            <div class="game-hover-badge release">POPULAR</div>
             <div class="game-hover-divider"></div>
-            <a href="#!" class="btn-primary">Sign Up for Beta</a>
+            <div class="game-hover-date">2016</div>
           </div>
         </div>
-        <div class="game-card">
-          <img src="game3.jpg" alt="Game" class="game-img">
+        <div class="game-card" style="background-image:url('miku_cover.png');background-size:cover;background-position:center;">
           <div class="game-label">
-            <div class="game-title">Game Three</div>
-            <div class="game-genre">MMORPG</div>
+            <div class="game-title">Hatsune Miku Logic Paint</div>
+            <div class="game-genre">Puzzle / Rhythm</div>
           </div>
           <div class="game-hover-overlay">
-            <div class="game-hover-badge">Hot</div>
-            <div class="game-hover-date">Limited Access</div>
+            <div class="game-hover-badge release">HOT</div>
             <div class="game-hover-divider"></div>
-            <a href="#!" class="btn-primary">Request Access</a>
+            <div class="game-hover-date">2024</div>
           </div>
         </div>
-        <div class="game-card">
-          <img src="game4.jpg" alt="Game" class="game-img">
+        <div class="game-card" style="background-image:url('saya_cover.png');background-size:cover;background-position:center;">
           <div class="game-label">
-            <div class="game-title">Game Four</div>
-            <div class="game-genre">Simulation</div>
+            <div class="game-title">The Song of Saya</div>
+            <div class="game-genre">Visual Novel</div>
           </div>
           <div class="game-hover-overlay">
-            <div class="game-hover-badge">New</div>
-            <div class="game-hover-date">Releasing on Mar 20</div>
+            <div class="game-hover-badge beta">INDIE</div>
             <div class="game-hover-divider"></div>
-            <a href="#!" class="btn-primary">Play Demo</a>
+            <div class="game-hover-date">2003</div>
           </div>
         </div>
-        <div class="game-card">
-          <img src="game5.jpg" alt="Game" class="game-img">
+        <div class="game-card g5">
+          <div class="game-fb">⚡</div>
           <div class="game-label">
-            <div class="game-title">Game Five</div>
-            <div class="game-genre">Arcade</div>
+            <div class="game-title">Death Stranding</div>
+            <div class="game-genre">Action Adventure</div>
           </div>
           <div class="game-hover-overlay">
-            <div class="game-hover-badge">Free</div>
-            <div class="game-hover-date">Just Launched</div>
+            <div class="game-hover-badge release">PLAY</div>
             <div class="game-hover-divider"></div>
-            <a href="#!" class="btn-primary">Play Now</a>
+            <div class="game-hover-date">2019</div>
+          </div>
+        </div>
+        <div class="game-card" style="background-image:url('invincible_vs.png');background-size:cover;background-position:center;">
+          <div class="game-label">
+            <div class="game-title">Invincible vs</div>
+            <div class="game-genre">Fighting Game</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-badge beta">PLAYTEST</div>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">Apr 9 – 11</div>
+          </div>
+          <div class="game-tail">
+            <span>April 9th 10 AM PT</span>
+            <span class="game-tail-arrow">»</span>
+            <span>April 11th 9 PM PT</span>
+          </div>
+          <div class="game-tail-bottom">
+            <span class="game-tail-label">Release:</span>
+            <span>April 30th</span>
           </div>
         </div>
       </div>
@@ -675,78 +718,55 @@
     <div class="wrap">
       <span class="sec-tag">Arcade</span>
       <h2 class="sec-title">Play and Compete</h2>
-      <p class="sec-sub">Enjoy classic and new games, and challenge your friends to beat your scores.</p>
+      <p class="sec-sub">Play snake and compete for the highest score! Your scores are saved to the leaderboard.</p>
 
-      <div class="arcade-tabs">
-        <button class="arc-tab active" data-tab="snake">🐍 Snake</button>
-        <button class="arc-tab" data-tab="pong">🏓 Pong</button>
-        <button class="arc-tab" data-tab="tetris">🧱 Tetris</button>
-      </div>
-
-      <div class="arc-panel" id="snake">
-        <div class="arc-header">
-          <div>
-            <div class="arc-title">Snake Game</div>
-            <div class="arc-meta">
-              <span class="arc-score-lbl">Score:</span>
-              <span class="arc-score" id="snakeScore">0</span>
+      <div id="arcade-layout">
+        <div id="arcade-content">
+          <div class="arc-panel" id="snake">
+            <div class="arc-header">
+              <div>
+                <div class="arc-title">🐍 Snake</div>
+              </div>
+              <div class="arc-meta">
+                <span class="arc-score-lbl">Score:</span>
+                <span class="arc-score" id="snakeScore">0</span>
+              </div>
+            </div>
+            <div class="arc-canvas-wrap">
+              <canvas id="snakeCanvas" width="400" height="400"></canvas>
+              <div class="arc-overlay" id="snakeOverlay">
+                <div class="arc-overlay-icon">🐍</div>
+                <div class="arc-overlay-title" id="snakeOverlayTitle">Snake</div>
+                <div class="arc-overlay-sub" id="snakeOverlaySub">Use arrow keys or WASD to move</div>
+                <div class="sb-entry" id="snakeNameEntry" style="display:none;">
+                  <input class="sb-input" id="snakeNameInput" placeholder="Your name" maxlength="20"/>
+                  <button class="sb-save" id="snakeNameSave">Save Score</button>
+                </div>
+                <div class="sb-saved" id="snakeSaved">✓ Score saved!</div>
+                <button class="btn-primary" id="snakeStart">Start Game</button>
+              </div>
+            </div>
+            <div class="dpad">
+              <button class="dpad-btn dpad-up" data-dir="up">↑</button>
+              <button class="dpad-btn dpad-left" data-dir="left">←</button>
+              <button class="dpad-btn dpad-right" data-dir="right">→</button>
+              <button class="dpad-btn dpad-down" data-dir="down">↓</button>
             </div>
           </div>
         </div>
-        <div class="arc-canvas-wrap">
-          <canvas id="snakeCanvas"></canvas>
-        </div>
-        <div class="arc-overlay">
-          <div class="arc-overlay-icon">🎮</div>
-          <div class="arc-overlay-title">Join the Race!</div>
-          <div class="arc-overlay-sub">Compete for the highest score and win amazing prizes.</div>
-          <button class="btn-primary" id="snakeStart">Start Game</button>
-        </div>
-      </div>
 
-      <div class="arc-panel hidden" id="pong">
-        <div class="arc-header">
-          <div>
-            <div class="arc-title">Pong Game</div>
-            <div class="arc-meta">
-              <span class="arc-score-lbl">Player 1:</span>
-              <span class="arc-score" id="pongScore1">0</span>
+        <div id="arcade-leaderboard">
+          <div class="arc-box">
+            <div class="arc-header">
+              <div class="arc-title">🏆 Leaderboard</div>
             </div>
-            <div class="arc-meta">
-              <span class="arc-score-lbl">Player 2:</span>
-              <span class="arc-score" id="pongScore2">0</span>
+            <div style="padding:16px;">
+              <div class="sb-wrap" id="snakeScoreboard">
+                <div class="sb-title">Top Scores</div>
+                <div class="sb-empty" id="sbLoading">Loading scores…</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="arc-canvas-wrap">
-          <canvas id="pongCanvas"></canvas>
-        </div>
-        <div class="arc-overlay">
-          <div class="arc-overlay-icon">🏆</div>
-          <div class="arc-overlay-title">Challenge a Friend!</div>
-          <div class="arc-overlay-sub">Who will score more points?</div>
-          <button class="btn-primary" id="pongStart">Start Game</button>
-        </div>
-      </div>
-
-      <div class="arc-panel hidden" id="tetris">
-        <div class="arc-header">
-          <div>
-            <div class="arc-title">Tetris Game</div>
-            <div class="arc-meta">
-              <span class="arc-score-lbl">Lines:</span>
-              <span class="arc-score" id="tetrisScore">0</span>
-            </div>
-          </div>
-        </div>
-        <div class="arc-canvas-wrap">
-          <canvas id="tetrisCanvas"></canvas>
-        </div>
-        <div class="arc-overlay">
-          <div class="arc-overlay-icon">🧩</div>
-          <div class="arc-overlay-title">Fit the Blocks!</div>
-          <div class="arc-overlay-sub">How many lines can you clear?</div>
-          <button class="btn-primary" id="tetrisStart">Start Game</button>
         </div>
       </div>
     </div>
@@ -759,73 +779,23 @@
       <h2 class="sec-title">What Our Members Say</h2>
       <p class="sec-sub">Read the latest reviews and testimonials from our community.</p>
 
-      <div class="reviews-summary">
+      <div class="reviews-summary" id="reviewsSummary">
         <div class="reviews-avg">
-          <span class="reviews-big">4.8</span>
-          <div class="reviews-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
-          </div>
-          <div class="reviews-count">Based on   120 reviews</div>
+          <span class="reviews-big" id="reviewsAvg">—</span>
+          <div class="reviews-stars" id="reviewsAvgStars"></div>
+          <div class="reviews-count" id="reviewsCount">Loading reviews…</div>
         </div>
-        <div class="reviews-bars">
-          <div class="bar-row">
-            <div class="bar-label">5★</div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: 80%;"></div>
-            </div>
-            <div class="bar-num">96</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">4★</div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: 15%;"></div>
-            </div>
-            <div class="bar-num">18</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">3★</div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width: 5%;"></div>
-            </div>
-            <div class="bar-num">6</div>
-          </div>
+        <div class="reviews-bars" id="reviewsBars">
+          <div class="bar-row"><div class="bar-label">5★</div><div class="bar-track"><div class="bar-fill" id="bar5" style="width:0%"></div></div><div class="bar-num" id="num5">0</div></div>
+          <div class="bar-row"><div class="bar-label">4★</div><div class="bar-track"><div class="bar-fill" id="bar4" style="width:0%"></div></div><div class="bar-num" id="num4">0</div></div>
+          <div class="bar-row"><div class="bar-label">3★</div><div class="bar-track"><div class="bar-fill" id="bar3" style="width:0%"></div></div><div class="bar-num" id="num3">0</div></div>
+          <div class="bar-row"><div class="bar-label">2★</div><div class="bar-track"><div class="bar-fill" id="bar2" style="width:0%"></div></div><div class="bar-num" id="num2">0</div></div>
+          <div class="bar-row"><div class="bar-label">1★</div><div class="bar-track"><div class="bar-fill" id="bar1" style="width:0%"></div></div><div class="bar-num" id="num1">0</div></div>
         </div>
       </div>
 
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-top">
-            <div class="review-av">AB</div>
-            <div>
-              <div class="review-name">Alice Brown</div>
-              <div class="review-date">2 days ago</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Monolith Social has completely changed my online social life. The community is incredibly welcoming and the features are top-notch!"</div>
-        </div>
-        <div class="review-card">
-          <div class="review-top">
-            <div class="review-av">CD</div>
-            <div>
-              <div class="review-name">Charlie Doe</div>
-              <div class="review-date">5 days ago</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★☆</div>
-          <div class="review-text">"Great platform for gamers and anime fans. I've connected with so many cool people!"</div>
-        </div>
-        <div class="review-card">
-          <div class="review-top">
-            <div class="review-av">EF</div>
-            <div>
-              <div class="review-name">Ella Fitzgerald</div>
-              <div class="review-date">1 week ago</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I love the exclusives and the community events are a blast. Highly recommend!"</div>
-        </div>
+      <div class="reviews-grid" id="reviewsGrid">
+        <div style="grid-column:1/-1;text-align:center;font-family:'Orbitron',monospace;font-size:.6rem;color:var(--text3);letter-spacing:2px;padding:40px 0;">Loading reviews from database…</div>
       </div>
 
       <div class="review-form-wrap">
@@ -866,16 +836,16 @@
 
         <div class="online-row">
           <div class="dot-live"></div>
-          <div class="online-txt">100+ members online now</div>
+          <div class="online-txt">50+ members online now</div>
         </div>
 
         <div class="cta-meta">
           <span>Est. 2021</span>
           <span>•</span>
-          <span>10,000+ members</span>
+          <span>322 members</span>
           <span>•</span>
           <span>Active community</span>
-        </div }
+        </div>
       </div>
     </div>
   </section>
