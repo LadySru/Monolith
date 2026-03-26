@@ -4,5 +4,8 @@
   "description": "Monolith Social",
   "dependencies": {
     "@netlify/neon": "^0.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^10.1.0"
   }
 }
