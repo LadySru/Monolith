@@ -68,7 +68,7 @@
       91%{text-shadow:-4px 0 var(--red),4px 0 var(--teal2);transform:skewX(-2deg) translateX(2px);}
       92%{text-shadow:4px 0 var(--pink),-4px 0 var(--teal);transform:skewX(2deg) translateX(-2px);}
       93%{text-shadow:none;transform:none;}
-      94%{text-shadow:-2px 0 var(--teal2),2px 0 var(--red);transform:skewX(1deg);}
+      94%{text-shadow:-2px 0 var(--teal2),2px 0 var(--red);transform:skewX(1deg) translateX(2px);}
       95%{text-shadow:none;transform:none;}
     }
     @keyframes scrollBob{ 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(6px);} }
@@ -244,7 +244,294 @@
     .game-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .65rem; color: var(--text); line-height: 1.3; letter-spacing: 1px; }
     .game-genre { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--teal); letter-spacing: 2px; margin-top: 3px; }
 
-    /* ══════
+    @media(max-width:1200px) { .games-grid { grid-template-columns: repeat(4,1fr); } }
+    @media(max-width:900px) { .games-grid { grid-template-columns: repeat(3,1fr); } .feat-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:640px) { nav { padding: 0 24px; } .nav-r { display: none; } .nav-hamburger { display: flex; } .nav-mobile { display: none; } .games-grid { grid-template-columns: repeat(2,1fr); } .feat-grid { grid-template-columns: 1fr; } .inside-grid { grid-template-columns: 1fr; } .wrap { padding: 0 24px; } }
+  </style>
+</head>
+<body>
+  <div id="cur"></div>
+
+  <nav>
+    <div class="nav-l">
+      <a href="#" class="nav-name"><span>⚡</span>MONOLITH</a>
+    </div>
+    <div class="nav-r">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#games" class="nav-link">Games</a>
+      <a href="#inside" class="nav-link">Inside</a>
+      <a href="https://discord.gg/monolith" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-vignette"></div>
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+    
+    <div class="hero-inner">
+      <div class="hero-av-wrap">
+        <img src="avatar.jpg" alt="Monolith" class="hero-av"/>
+        <div class="hero-av-live"></div>
+      </div>
+      <div class="eyebrow">━━ Welcome to ━━</div>
+      <h1>
+        <span class="line1">MONOLITH</span>
+        <span class="line2">SOCIAL</span>
+      </h1>
+      <p class="hero-hook">⚡ ANIME × GAMING × COMMUNITY ⚡</p>
+      <p class="hero-tagline">Join an elite Discord community for anime and gaming enthusiasts. We're all about good vibes, great games, and even better people.</p>
+      <div class="hero-cta">
+        <a href="https://discord.gg/monolith" class="btn-primary">→ Join Discord</a>
+        <a href="#inside" class="btn-outline">Learn More</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-n green">9K+</span>
+          <span class="stat-l">Members</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n teal">500+</span>
+          <span class="stat-l">Daily Active</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n green">24/7</span>
+          <span class="stat-l">Voice Channels</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="scroll-cue">Scroll to explore</div>
+  </section>
+
+  <div id="seals">
+    <div class="seals-row">
+      <div class="seal">✓ Verified Community</div>
+      <div class="seal">✓ Anime & Gaming</div>
+      <div class="seal">✓ 24/7 Active</div>
+      <div class="seal">✓ Moderated</div>
+      <div class="seal">✓ English-Friendly</div>
+    </div>
+  </div>
+
+  <section id="features" class="section-pad">
+    <div class="wrap">
+      <span class="sec-tag">━━ Why Join ━━</span>
+      <h2>Premium <em>Features</em></h2>
+      <p class="sec-sub">Everything you need for anime and gaming with friends.</p>
+      
+      <div class="feat-grid">
+        <div class="feat">
+          <span class="feat-icon">🎮</span>
+          <h3 class="feat-title">Gaming Hub</h3>
+          <p class="feat-body">Co-op games, tournaments, and dedicated gaming channels.</p>
+          <div class="feat-footnote">Always Active</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">📺</span>
+          <h3 class="feat-title">Anime Discussions</h3>
+          <p class="feat-body">Latest episodes, recommendations, and fan theories.</p>
+          <div class="feat-footnote">Daily Updates</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">👥</span>
+          <h3 class="feat-title">Active Community</h3>
+          <p class="feat-body">Welcoming members from around the world.</p>
+          <div class="feat-footnote">9K+ Members</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">🎤</span>
+          <h3 class="feat-title">Voice Events</h3>
+          <p class="feat-body">Weekly watch parties and gaming sessions.</p>
+          <div class="feat-footnote">Every Week</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">🛡️</span>
+          <h3 class="feat-title">Safe Space</h3>
+          <p class="feat-body">Moderated and inclusive community for everyone.</p>
+          <div class="feat-footnote">Strict Rules</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">🎁</span>
+          <h3 class="feat-title">Perks & Roles</h3>
+          <p class="feat-body">Level up and unlock exclusive member benefits.</p>
+          <div class="feat-footnote">Earn Status</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="inside" class="section-pad">
+    <div class="wrap">
+      <span class="sec-tag">━━ Inside Monolith ━━</span>
+      <h2>What You'll <em>Experience</em></h2>
+      
+      <div class="inside-grid">
+        <div class="inside-card">
+          <div class="inside-icon">💬</div>
+          <div>
+            <h3 class="inside-title">Active Chats</h3>
+            <p class="inside-body">Multiple channels for different anime, games, and general chat.</p>
+          </div>
+        </div>
+        <div class="inside-card">
+          <div class="inside-icon">🎯</div>
+          <div>
+            <h3 class="inside-title">Organized Events</h3>
+            <p class="inside-body">Regular tournaments, watch parties, and community challenges.</p>
+          </div>
+        </div>
+        <div class="inside-card">
+          <div class="inside-icon">🌐</div>
+          <div>
+            <h3 class="inside-title">Global Audience</h3>
+            <p class="inside-body">Members from US, EU, Asia, and more timezones covered.</p>
+          </div>
+        </div>
+        <div class="inside-card">
+          <div class="inside-icon">⭐</div>
+          <div>
+            <h3 class="inside-title">Quality Moderation <span class="badge b-hot">HOT</span></h3>
+            <p class="inside-body">Friendly mods ensuring everyone has a great experience.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="games" class="section-pad">
+    <div class="wrap">
+      <div class="games-hdr">
+        <div>
+          <span class="sec-tag">━━ Popular Games ━━</span>
+          <h2>What We <em>Play</em></h2>
+        </div>
+      </div>
+      
+      <div class="games-grid">
+        <div class="game-card g1">
+          <div class="game-fb">🔥</div>
+          <div class="game-hover-overlay">
+            <span class="game-hover-badge beta">BETA</span>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">2024</div>
+          </div>
+          <div class="game-label">
+            <div class="game-title">Helldivers 2</div>
+            <div class="game-genre">Co-op Tactical</div>
+          </div>
+        </div>
+        <div class="game-card g2">
+          <div class="game-fb">⚔️</div>
+          <div class="game-hover-overlay">
+            <span class="game-hover-badge release">HOT</span>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">2023</div>
+          </div>
+          <div class="game-label">
+            <div class="game-title">Elden Ring</div>
+            <div class="game-genre">Action RPG</div>
+          </div>
+        </div>
+        <div class="game-card g3">
+          <div class="game-fb">🌊</div>
+          <div class="game-hover-overlay">
+            <span class="game-hover-badge release">PLAY</span>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">2023</div>
+          </div>
+          <div class="game-label">
+            <div class="game-title">Palworld</div>
+            <div class="game-genre">Adventure</div>
+          </div>
+        </div>
+        <div class="game-card g4">
+          <div class="game-fb">🎮</div>
+          <div class="game-hover-overlay">
+            <span class="game-hover-badge beta">COMP</span>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">2023</div>
+          </div>
+          <div class="game-label">
+            <div class="game-title">Valorant</div>
+            <div class="game-genre">FPS Tactical</div>
+          </div>
+        </div>
+        <div class="game-card g5">
+          <div class="game-fb">🎪</div>
+          <div class="game-hover-overlay">
+            <span class="game-hover-badge release">NEW</span>
+            <div class="game-hover-divider"></div>
+            <div class="game-hover-date">2024</div>
+          </div>
+          <div class="game-label">
+            <div class="game-title">Stray Gods</div>
+            <div class="game-genre">Music Adventure</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const hamburger = document.querySelector('.nav-hamburger');
+    const navMobile = document.querySelector('.nav-mobile');
+    const cur = document.getElementById('cur');
+    
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        if (navMobile && navMobile.classList) {
+          navMobile.classList.toggle('open');
+        }
+      });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if (cur) {
+        cur.style.left = e.clientX + 'px';
+        cur.style.top = e.clientY + 'px';
+      }
+    });
+
+    document.addEventListener('mouseenter', () => {
+      if (cur) cur.style.opacity = '1';
+    });
+
+    document.addEventListener('mouseleave', () => {
+      if (cur) cur.style.opacity = '0';
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
 
 
 
