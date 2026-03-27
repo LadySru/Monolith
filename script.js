@@ -232,7 +232,46 @@ const observer = new IntersectionObserver((entries) => {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize seasonal particles
   new SeasonalParticles();
-  
-  // Initialize scroll reveals
+
+  // Custom cursor
+  document.addEventListener('mousemove', (e) => {
+    let cur = document.getElementById('cur');
+    if (!cur) {
+      cur = document.createElement('div');
+      cur.id = 'cur';
+      document.body.appendChild(cur);
+    }
+    cur.style.left = `${e.clientX}px`;
+    cur.style.top = `${e.clientY}px`;
+  });
+
+  document.addEventListener('mousedown', () => {
+    const cur = document.getElementById('cur');
+    if (cur) cur.classList.add('big');
+  });
+
+  document.addEventListener('mouseup', () => {
+    const cur = document.getElementById('cur');
+    if (cur) cur.classList.remove('big');
+  });
+
+  // Mobile menu
+  const hamburger = document.querySelector('.nav-hamburger');
+  const navMobile = document.querySelector('.nav-mobile');
+  if (hamburger && navMobile) {
+    hamburger.addEventListener('click', () => {
+      navMobile.classList.toggle('open');
+      hamburger.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.nav-mobile a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navMobile.classList.remove('open');
+        hamburger.classList.remove('active');
+      });
+    });
+  }
+
+  // Scroll reveals
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 });

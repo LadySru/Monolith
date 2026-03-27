@@ -54,6 +54,7 @@
 
     /* ═══════ NOISE ═══════ */
     body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .55; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
+    #seasonal-particles { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .95; }
 
     /* ═══════ LAYOUT ═══════ */
     section { position: relative; z-index: 1; contain: layout style; }
@@ -678,54 +679,6 @@
 
   <!-- JS LIBRARIES (if any) -->
   <script src="script.js" defer="defer"></script>
-  <script>
-    // ═══════ CUSTOM CURSOR ═══════
-    document.addEventListener('mousemove', (e) => {
-      let cur = document.getElementById('cur');
-      if (!cur) {
-        cur = document.createElement('div');
-        cur.id = 'cur';
-        document.body.appendChild(cur);
-      }
-      cur.style.left = e.clientX + 'px';
-      cur.style.top = e.clientY + 'px';
-    });
-
-    document.addEventListener('mousedown', () => {
-      const cur = document.getElementById('cur');
-      if (cur) cur.classList.add('big');
-    });
-
-    document.addEventListener('mouseup', () => {
-      const cur = document.getElementById('cur');
-      if (cur) cur.classList.remove('big');
-    });
-
-    // ═══════ MOBILE HAMBURGER ═══════
-    const hamburger = document.querySelector('.nav-hamburger');
-    const navMobile = document.querySelector('.nav-mobile');
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        navMobile.classList.toggle('open');
-        hamburger.classList.toggle('active');
-      });
-      document.querySelectorAll('.nav-mobile a').forEach(link => {
-        link.addEventListener('click', () => {
-          navMobile.classList.remove('open');
-          hamburger.classList.remove('active');
-        });
-      });
-    }
-
-    // ═══════ SCROLL REVEAL OBSERVER ═══════
-    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('in');
-      });
-    }, observerOptions);
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  </script>
 </body>
 </html>
 
