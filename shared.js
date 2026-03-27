@@ -67,7 +67,12 @@ window.SB=SB;
 window.switchSB=function(key){
   document.querySelectorAll(".gsb-tab").forEach(t=>{
     const x=t.textContent||"";
-    t.classList.toggle("active",(key==="snake"&&x.includes("Snake"))||(key==="silhouette"&&x.includes("Guesser"))||(key==="quiz"&&x.includes("Quiz")));
+    t.classList.toggle("active",
+      (key==="snake"&&x.includes("Snake"))||
+      (key==="silhouette"&&x.includes("Guesser"))||
+      (key==="quiz"&&x.includes("Quiz"))||
+      (key==="tap"&&x.includes("Tap"))
+    );
   });
   ["global-sb-body","global-sb-body-quiz"].forEach(id=>{if(document.getElementById(id))SB.load(key,id);});
 };

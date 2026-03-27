@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social Arcade — Play Neon Snake and Anime Guesser. Compete on the global leaderboard."/>
+  <meta name="description" content="Monolith Social Arcade — Play Neon Snake, Anime Guesser, and Tap Rush. Compete on the global leaderboard."/>
   <title>Arcade — Monolith Social</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -22,6 +22,15 @@
     .game-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
     .game-panel{display:none;}
     .game-panel.active{display:block;}
+
+    /* ── TAP RUSH ── */
+    .tap-body{padding:18px 14px 14px;}
+    .tap-stats{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+    .tap-stats b{color:var(--teal);font-size:.8rem;}
+    .tap-arena{position:relative;height:360px;background:radial-gradient(circle at 50% 40%,rgba(13,242,212,.06),rgba(5,5,10,.92));border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+    .tap-target{position:absolute;width:54px;height:54px;border-radius:50%;border:2px solid var(--teal);background:rgba(13,242,212,.12);box-shadow:0 0 18px rgba(13,242,212,.45);color:var(--teal);font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .08s ease;}
+    .tap-target:hover{transform:scale(1.06);}
+    .tap-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:10px;background:rgba(5,5,10,.78);}
 
   </style>
 </head>
@@ -61,7 +70,7 @@
 <div class="page-hero">
   <div class="wrap">
     <h1>🕹️ <span>Arcade</span></h1>
-    <p>Two games. One global leaderboard. Play on PC or mobile.</p>
+    <p>Three games. One global leaderboard. Play on PC or mobile.</p>
   </div>
 </div>
 
@@ -70,8 +79,9 @@
 
     <!-- GAME TABS -->
     <div class="game-tabs">
-      <button class="game-tab active" onclick="switchTab('snake')">🐍 Neon Snake</button>
-      <button class="game-tab" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
+      <button class="game-tab active" data-game="snake" onclick="switchTab('snake')">🐍 Neon Snake</button>
+      <button class="game-tab" data-game="silhouette" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
+      <button class="game-tab" data-game="tap" onclick="switchTab('tap')">⚡ Tap Rush</button>
     </div>
 
     <div class="arcade-layout">
@@ -168,6 +178,47 @@
           </div>
         </div>
 
+        <!-- TAP RUSH -->
+        <div id="panel-tap" class="game-panel">
+          <div class="arc-box">
+            <div class="arc-header">
+              <span class="arc-title">⚡ Cyber Tap Rush</span>
+              <div class="arc-meta">
+                <span class="arc-score-lbl">Time</span>
+                <span class="arc-score" id="tap-time">15</span>
+                <span class="arc-score-lbl" style="margin-left:12px;">Score</span>
+                <span class="arc-score" id="tap-score">0</span>
+              </div>
+            </div>
+            <div class="tap-body">
+              <div class="tap-stats">
+                <span>Best combo: <b id="tap-combo">0</b></span>
+                <span>Goal: <b>40+</b></span>
+              </div>
+              <div class="tap-arena" id="tap-arena">
+                <button class="tap-target" id="tap-target" onclick="tapHit()" style="display:none;">⚡</button>
+                <div class="tap-overlay" id="tap-overlay">
+                  <div class="arc-overlay-icon">⚡</div>
+                  <div class="arc-overlay-title">Cyber Tap Rush</div>
+                  <div class="arc-overlay-sub">Tap the moving target for 15 seconds.</div>
+                  <button class="btn-primary" onclick="startTapGame()">Start →</button>
+                </div>
+                <div class="tap-overlay" id="tap-result" style="display:none;">
+                  <div class="arc-overlay-icon">🏁</div>
+                  <div class="arc-overlay-title">Time Up</div>
+                  <div class="arc-overlay-sub" id="tap-final-score">Score: 0</div>
+                  <div class="sb-entry" style="justify-content:center;">
+                    <input class="sb-input" id="tap-name-input" placeholder="Your name..." maxlength="16"/>
+                    <button class="sb-save" onclick="saveTapScore()">Save →</button>
+                  </div>
+                  <div class="sb-saved" id="tap-score-saved">✓ Saved!</div>
+                  <button class="btn-primary" onclick="startTapGame()">Play Again →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- RIGHT: global leaderboard -->
@@ -178,6 +229,7 @@
             <div class="global-sb-tabs">
               <button class="gsb-tab active" onclick="switchSB('snake')">🐍 Snake</button>
               <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
+              <button class="gsb-tab" onclick="switchSB('tap')">⚡ Tap</button>
             </div>
           </div>
           <div class="global-sb-body" id="global-sb-body">
@@ -203,13 +255,14 @@
 <script>
 /* ── GAME TAB SWITCH ── */
 function switchTab(id) {
-  document.querySelectorAll('.game-tab').forEach((t,i) => {
-    t.classList.toggle('active', ['snake','silhouette'][i] === id);
+  document.querySelectorAll('.game-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.game === id);
   });
   document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  if (id === 'snake') snakePause();
-  switchSB(id === 'snake' ? 'snake' : 'silhouette');
+  if (id !== 'snake' && window.snakePause) snakePause();
+  if (id !== 'tap' && window.stopTapGame) stopTapGame();
+  switchSB(id);
 }
 
 /* ── NEON SNAKE ── */
@@ -370,11 +423,116 @@ window.saveSilScore = async function() {
   document.getElementById('sil-score-saved').style.display='block';
 };
 
+/* ── CYBER TAP RUSH ── */
+(function(){
+  const arena=document.getElementById('tap-arena');
+  const target=document.getElementById('tap-target');
+  let timer=null,timeLeft=15,score=0,bestCombo=0,combo=0,running=false;
+  window.tapScore=0;
+
+  function moveTarget(){
+    const pad=6;
+    const maxX=Math.max(0,arena.clientWidth-target.offsetWidth-pad*2);
+    const maxY=Math.max(0,arena.clientHeight-target.offsetHeight-pad*2);
+    target.style.left=(pad+Math.random()*maxX)+'px';
+    target.style.top=(pad+Math.random()*maxY)+'px';
+  }
+
+  function updateTapHud(){
+    document.getElementById('tap-time').textContent=timeLeft;
+    document.getElementById('tap-score').textContent=score;
+    document.getElementById('tap-combo').textContent=bestCombo;
+  }
+
+  function finishTap(){
+    running=false;
+    clearInterval(timer);
+    timer=null;
+    target.style.display='none';
+    window.tapScore=score;
+    document.getElementById('tap-final-score').textContent='Score: '+score+' taps';
+    document.getElementById('tap-result').style.display='flex';
+    const ni=document.getElementById('tap-name-input');if(ni){ni.disabled=false;ni.value='';}
+    const sv=document.getElementById('tap-score-saved');if(sv)sv.style.display='none';
+    const sb=document.querySelector('#tap-result .sb-save');if(sb)sb.disabled=false;
+    switchSB('tap');
+  }
+
+  window.startTapGame=function(){
+    timeLeft=15;score=0;combo=0;bestCombo=0;running=true;
+    document.getElementById('tap-overlay').style.display='none';
+    document.getElementById('tap-result').style.display='none';
+    target.style.display='flex';
+    updateTapHud();
+    moveTarget();
+    clearInterval(timer);
+    timer=setInterval(()=>{
+      if(!running)return;
+      timeLeft--;
+      combo=0;
+      if(timeLeft<=0){timeLeft=0;updateTapHud();finishTap();return;}
+      updateTapHud();
+      moveTarget();
+    },1000);
+  };
+
+  window.tapHit=function(){
+    if(!running)return;
+    score++;
+    combo++;
+    if(combo>bestCombo)bestCombo=combo;
+    updateTapHud();
+    moveTarget();
+  };
+
+  window.stopTapGame=function(){
+    if(timer){
+      clearInterval(timer);
+      timer=null;
+    }
+    running=false;
+    target.style.display='none';
+    document.getElementById('tap-result').style.display='none';
+    document.getElementById('tap-overlay').style.display='flex';
+    timeLeft=15;
+    score=0;
+    combo=0;
+    bestCombo=0;
+    updateTapHud();
+  };
+})();
+window.saveTapScore = async function() {
+  const nameEl=document.getElementById('tap-name-input');
+  const name=nameEl.value.trim()||'Anonymous';
+  nameEl.disabled=true;
+  document.querySelector('#tap-result .sb-save').disabled=true;
+  await SB.save('tap', name, window.tapScore || 0, 'global-sb-body');
+  document.getElementById('tap-score-saved').style.display='block';
+};
+
 // Init leaderboard
 switchSB('snake');
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

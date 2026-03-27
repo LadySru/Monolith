@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
         };
       }
 
-      if (!['snake', 'silhouette', 'quiz'].includes(game_type)) {
+      if (!['snake', 'silhouette', 'quiz', 'tap'].includes(game_type)) {
         return {
           statusCode: 400,
           body: JSON.stringify({ error: 'Invalid game_type' })
