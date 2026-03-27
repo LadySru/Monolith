@@ -14,8 +14,8 @@ exports.handler = async (event, context) => {
       const limit = Math.min(parseInt(event.queryStringParameters?.limit || '10'), 100);
 
       const scores = await sql`
-        SELECT id, player_name, score, created_at 
-        FROM game_scores 
+        SELECT id, player_name, score, created_at
+        FROM game_scores
         WHERE game_type = ${game}
         ORDER BY score DESC, created_at ASC
         LIMIT ${limit}

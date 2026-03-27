@@ -76,6 +76,3 @@ window.switchSB=function(key){
   });
   ["global-sb-body","global-sb-body-quiz"].forEach(id=>{if(document.getElementById(id))SB.load(key,id);});
 };
-
-
-
