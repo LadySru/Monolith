@@ -42,14 +42,11 @@
     /* ═══════ RESET ═══════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-jp); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: none; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-jp); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: auto; }
     body * { font-family: var(--font-jp) !important; }
 
     /* ═══════ CURSOR ═══════ */
-    #cur { width: 12px; height: 12px; background: var(--teal); border-radius: 50%; position: fixed, pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .15s, height .15s; mix-blend-mode: screen; will-change: transform; }
-    body:not(:hover) #cur { opacity: 0; }
-    #cur.big { width: 36px; height: 36px; background: transparent; border: 1.5px solid var(--teal); }
-    @media(hover:none) { #cur { display: none; } body { cursor: auto; } }
+    #cur { display: none; }
 
     /* ═══════ SCANLINES ═══════ */
     body::after { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 3px); }
