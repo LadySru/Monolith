@@ -51,7 +51,7 @@
     <a href="arcade.html" class="nav-link active">Arcade</a>
     <a href="quiz.html" class="nav-link">Quiz</a>
     <a href="reviews.html" class="nav-link">Reviews</a>
-    <a href="newsletter.html" class="nav-link">Newsletter</a>
+    <a href="https://monolithsocial.netlify.app/#features" class="nav-link">Features</a>
     <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
@@ -63,7 +63,7 @@
   <a href="arcade.html" class="nav-link active">Arcade</a>
   <a href="quiz.html" class="nav-link">Quiz</a>
   <a href="reviews.html" class="nav-link">Reviews</a>
-  <a href="newsletter.html" class="nav-link">Newsletter</a>
+  <a href="https://monolithsocial.netlify.app/#features" class="nav-link">Features</a>
   <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
 </div>
 
@@ -275,7 +275,13 @@ function switchTab(id) {
   window.addEventListener('resize',resize);resize();
   function rndCell(){return{x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
   function spawnFood(){do{food=rndCell();}while(snake.some(s=>s.x===food.x&&s.y===food.y));}
-  function spawnBonus(){if(Math.random()<.3){do{bonus=rndCell();}while(snake.some(s=>s.x===bonus.x&&s.y===bonus.y)||(food.x===bonus.x&&food.y===bonus.y));bonusTimer=60;}}
+  function spawnBonus(){
+    if(Math.random()<.3){
+      do{bonus=rndCell();}
+      while(snake.some(s=>s.x===bonus.x&&s.y===bonus.y) || (food.x===bonus.x&&food.y===bonus.y));
+      bonusTimer=60;
+    }
+  }
   window.startSnake=function(){
     document.getElementById('snake-overlay').style.display='none';
     document.getElementById('snake-gameover').style.display='none';
@@ -515,6 +521,30 @@ switchSB('snake');
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

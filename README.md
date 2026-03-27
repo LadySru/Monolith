@@ -12,7 +12,6 @@ Cyberpunk-themed community site for indie game discovery.
 - `arcade.html` – arcade features
 - `quiz.html` – quiz page
 - `reviews.html` – reviews page
-- `newsletter.html` – newsletter page
 
 ## Scripts
 - `script.js` – seasonal particles + UI behavior (cursor/menu/reveal)
