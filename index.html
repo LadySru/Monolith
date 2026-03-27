@@ -255,6 +255,90 @@
     .game-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg,rgba(5,3,15,.97) 0%,transparent 100%); padding: 16px 10px 10px; }
     .game-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .65rem; color: var(--text); line-height: 1.2; letter-spacing: .5px; }
     .game-genre { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--teal); letter-spacing: 1px; margin-top: 2px; }
+    .game-status-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .game-status-tag {
+      font-family: 'Orbitron', monospace;
+      font-size: .45rem;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 2px;
+      border: 1px solid transparent;
+    }
+    .game-status-tag.open { color: var(--teal); background: rgba(0,255,231,.12); border-color: rgba(0,255,231,.28); }
+    .game-status-tag.closed { color: #cbbfff; background: rgba(139,47,255,.14); border-color: rgba(139,47,255,.3); }
+    .game-ribbons {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .game-ribbon {
+      position: relative;
+      font-family: 'Orbitron', monospace;
+      font-size: .46rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 8px 4px 10px;
+      border: 1px solid transparent;
+      background: rgba(2,0,10,.86);
+      backdrop-filter: blur(1px);
+    }
+    .game-ribbon::after {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-top: 11px solid transparent;
+      border-bottom: 11px solid transparent;
+      border-left: 8px solid currentColor;
+      opacity: .28;
+    }
+    .game-ribbon.open {
+      color: var(--teal);
+      border-color: rgba(0,255,231,.28);
+      background: rgba(0,255,231,.1);
+    }
+    .game-ribbon.closed {
+      color: #d5c8ff;
+      border-color: rgba(139,47,255,.35);
+      background: rgba(139,47,255,.16);
+    }
+    .game-card.invincible-card .game-ribbons {
+      top: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid rgba(139,47,255,.35);
+    }
+    .game-card.invincible-card .game-ribbon {
+      padding: 6px 6px;
+      text-align: center;
+      border: 0;
+      border-radius: 0;
+      backdrop-filter: none;
+      background: rgba(139,47,255,.92);
+    }
+    .game-card.invincible-card .game-ribbon::after {
+      display: none;
+    }
+    .game-card.invincible-card .game-ribbon.open {
+      color: #f2e9ff;
+      border-right: 1px solid rgba(255,255,255,.16);
+      background: rgba(139,47,255,.95);
+    }
+    .game-card.invincible-card .game-ribbon.closed {
+      color: #f2e9ff;
+      background: rgba(116,36,170,.95);
+    }
 
     /* ═══════ MOBILE RESPONSIVE ═══════ */
     @media (max-width: 1024px) {
@@ -331,20 +415,6 @@
             Explore Niches
           </a>
           <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Monolith Social Discord">Join Us</a>
-        </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <span class="stat-n green" data-count="1500">0</span>
-            <span class="stat-l">Explorers</span>
-          </div>
-          <div class="stat">
-            <span class="stat-n teal" data-count="250">0</span>
-            <span class="stat-l">Game Niches</span>
-          </div>
-          <div class="stat">
-            <span class="stat-n amber" data-count="330">0</span>
-            <span class="stat-l">Hidden Gems</span>
-          </div>
         </div>
         <div class="server-info">
           <div class="server-stat">
@@ -581,9 +651,13 @@
             </div>
           </div>
         </div>
-        <div class="game-card reveal">
+        <div class="game-card reveal invincible-card">
           <a href="#" class="game-link" aria-label="Invincible vs - Action Fighting">
             <div class="game-img" style="background-image:url('invincible_vs.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
+            <div class="game-ribbons" aria-hidden="true">
+              <span class="game-ribbon open">Open Beta</span>
+              <span class="game-ribbon closed">Closed Beta</span>
+            </div>
             <div class="game-label">
               <div class="game-title">Invincible vs</div>
               <div class="game-genre">Action / Fighting</div>
@@ -619,12 +693,12 @@
 
     document.addEventListener('mousedown', () => {
       const cur = document.getElementById('cur');
-      if (cur) cur.classList.add('big');
+      if cur) cur.classList.add('big');
     });
 
     document.addEventListener('mouseup', () => {
       const cur = document.getElementById('cur');
-      if (cur) cur.classList.remove('big');
+      if cur) cur.classList.remove('big');
     });
 
     // ═══════ MOBILE HAMBURGER ═══════
