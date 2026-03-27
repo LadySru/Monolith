@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Alternative Input — A home for curious gamers exploring indie, international, and hidden gem games. Low-pressure Discord community."/>
-  <meta property="og:title" content="Alternative Input — Indie Game Discovery"/>
+  <meta name="description" content="Monolith Social — A home for curious gamers exploring indie, international, and hidden gem games. Low-pressure Discord community."/>
+  <meta property="og:title" content="Monolith Social — Indie Game Discovery"/>
   <meta property="og:description" content="Find your niche. Discover indie games. Share what no one knows."/>
   <meta property="og:image" content="banner.jpg"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <title>Alternative Input — Indie Game Discovery</title>
+  <title>Monolith Social — Indie Game Discovery</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet"/>
   <style>
@@ -44,7 +44,7 @@
     body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: none; }
 
     /* ═══════ CURSOR ═══════ */
-    #cur { width: 12px; height: 12px; background: var(--teal); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .15s, height .15s; mix-blend-mode: screen; will-change: transform; }
+    #cur { width: 12px; height: 12px; background: var(--teal); border-radius: 50%; position: fixed, pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .15s, height .15s; mix-blend-mode: screen; will-change: transform; }
     body:not(:hover) #cur { opacity: 0; }
     #cur.big { width: 36px; height: 36px; background: transparent; border: 1.5px solid var(--teal); }
     @media(hover:none) { #cur { display: none; } body { cursor: auto; } }
@@ -76,7 +76,7 @@
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.in { opacity: 1; transform: none; }
 
-    /* ═══════ SHARED SECTION HEADERS ═══════ */
+    /* ══════ SHARED SECTION HEADERS ═══════ */
     .sec-tag { font-family: 'Orbitron', monospace; font-size: .62rem; letter-spacing: 5px; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; display: block; }
     h2 { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.1; letter-spacing: 1px; color: var(--text); margin-bottom: 12px; }
     h2 em { color: var(--teal); font-style: normal; }
@@ -221,7 +221,7 @@
     #games { background: var(--bg); border-top: 1px solid var(--border); }
     .games-hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
     .games-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
-    .game-card { position: relative; overflow: hidden; aspect-ratio: 2/3; border: 1px solid var(--border2); background: var(--card); transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .28s; cursor: none; }
+    .game-card { position: relative, overflow: hidden, aspect-ratio: 2/3; border: 1px solid var(--border2); background: var(--card); transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .28s; cursor: none; }
     .game-card:hover { transform: translateY(-10px) scale(1.03); border-color: var(--teal); box-shadow: 0 12px 32px rgba(0,0,0,.6); }
     .game-hover-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(2,0,10,.0) 0%, rgba(2,0,10,.85) 45%, rgba(2,0,10,.97) 100%); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 16px 12px; opacity: 0; transition: opacity .25s ease; pointer-events: none; }
     .game-card:hover .game-hover-overlay { opacity: 1; }
@@ -243,8 +243,8 @@
   <!-- NAVIGATION -->
   <nav>
     <div class="wrap nav-l">
-      <a href="#hero" class="logo" aria-label="Alternative Input — Indie Game Discovery Discord">
-        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">◆ Alternative Input ◆</span>
+      <a href="#hero" class="logo" aria-label="Monolith Social — Indie Game Discovery Discord">
+        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">◆ Monolith Social ◆</span>
       </a>
       <div class="nav-r">
         <a href="#features" class="nav-link">Explore</a>
@@ -272,8 +272,8 @@
         </div>
         <span class="eyebrow">A Home for Curious Gamers</span>
         <h1>
-          <span class="line1">Alternative</span>
-          <span class="line2">Input</span>
+          <span class="line1">Monolith</span>
+          <span class="line2">Social</span>
         </h1>
         <p class="hero-hook">Beyond blockbusters. Discover indie gems. Find your niche.</p>
         <p class="hero-tagline">Low-pressure space for explorers who love the art of gaming.</p>
@@ -284,7 +284,7 @@
             </svg>
             Explore Niches
           </a>
-          <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Alternative Input Discord">Join Us</a>
+          <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Monolith Social Discord">Join Us</a>
         </div>
         <div class="hero-stats">
           <div class="stat">
@@ -319,7 +319,7 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">What's Inside</span>
-        <h2>Why You'll Love Alternative Input</h2>
+        <h2>Why You'll Love Monolith Social</h2>
         <p class="sec-sub">We've created spaces for indie explorers, discovery seekers, and art-game enthusiasts.</p>
       </div>
       <div class="feat-grid">
@@ -355,7 +355,7 @@
   <section id="inside" class="section-pad">
     <div class="wrap">
       <div class="reveal">
-        <span class="sec-tag">Inside Alternative Input</span>
+        <span class="sec-tag">Inside Monolith Social</span>
         <h2>What Awaits the Explorer</h2>
         <p class="sec-sub">A low-stakes, open-minded space where you can go at your own pace.</p>
       </div>
@@ -431,87 +431,104 @@
       </div>
       <div class="games-grid">
         <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Game Title - Action FPS Game">
-            <div class="game-img g1" aria-hidden="true"></div>
+          <a href="#" class="game-link" aria-label="Hotline Miami 2 - Action Game">
+            <div class="game-img" style="background-image:url('download.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
             <div class="game-label">
-              <div class="game-title">Game Title</div>
-              <div class="game-genre">Action, FPS</div>
+              <div class="game-title">Hotline Miami 2</div>
+              <div class="game-genre">Action</div>
             </div>
           </a>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge beta">Beta</div>
-              <div class="game-hover-date">Coming Soon</div>
+              <div class="game-hover-badge beta">CLASSIC</div>
+              <div class="game-hover-date">Retro Indie</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Join the fight in this action-packed FPS game. Team up, gear up, and dominate the battlefield.</div>
+              <div class="game-hover-desc">Brutal top-down action with an unforgettable soundtrack. A cult classic for indie game enthusiasts.</div>
             </div>
           </div>
         </div>
         <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Another Game Title - RPG Adventure">
-            <div class="game-img g2" aria-hidden="true"></div>
+          <a href="#" class="game-link" aria-label="Dead by Daylight - Survival Horror">
+            <div class="game-img" style="background-image:url('dead-by-daylight-1db3d.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
             <div class="game-label">
-              <div class="game-title">Another Game Title</div>
-              <div class="game-genre">RPG, Adventure</div>
+              <div class="game-title">Dead by Daylight</div>
+              <div class="game-genre">Survival Horror</div>
             </div>
           </a>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge release">Release</div>
-              <div class="game-hover-date">Date: TBA</div>
+              <div class="game-hover-badge release">POPULAR</div>
+              <div class="game-hover-date">2016</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Embark on an epic journey in this open-world RPG. Uncover mysteries, fight foes, and build your legend.</div>
+              <div class="game-hover-desc">Asymmetrical multiplayer horror. Hide or hunt in this twisted game of cat and mouse.</div>
             </div>
           </div>
         </div>
         <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Cool Game Title - Strategy Game">
-            <div class="game-img g3" aria-hidden="true"></div>
+          <a href="#" class="game-link" aria-label="Hatsune Miku Logic Paint - Puzzle">
+            <div class="game-img" style="background-image:url('miku_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
             <div class="game-label">
-              <div class="game-title">Cool Game Title</div>
-              <div class="game-genre">Strategy</div>
+              <div class="game-title">Hatsune Miku Logic Paint</div>
+              <div class="game-genre">Puzzle / Rhythm</div>
             </div>
           </a>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge">Free</div>
-              <div class="game-hover-date">Play Now</div>
+              <div class="game-hover-badge">NEW</div>
+              <div class="game-hover-date">Anime Music</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Test your wit and strategy in this exciting game. Plan your moves, outsmart your opponents, and claim victory.</div>
+              <div class="game-hover-desc">Paint and solve puzzles to Miku's iconic songs. A unique blend of rhythm and logic.</div>
             </div>
           </div>
         </div>
         <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Amazing Game Title - MOBA">
-            <div class="game-img g4" aria-hidden="true"></div>
+          <a href="#" class="game-link" aria-label="The Song of Saya - Visual Novel">
+            <div class="game-img" style="background-image:url('saya_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
             <div class="game-label">
-              <div class="game-title">Amazing Game Title</div>
-              <div class="game-genre">MOBA</div>
+              <div class="game-title">The Song of Saya</div>
+              <div class="game-genre">Visual Novel</div>
             </div>
           </a>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge">New</div>
-              <div class="game-hover-date">Just Released</div>
+              <div class="game-hover-badge">INDIE GEM</div>
+              <div class="game-hover-date">Deep Story</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Dive into the action in this fast-paced MOBA. Choose your hero, devise your strategy, and lead your team to victory.</div>
+              <div class="game-hover-desc">A haunting visual novel that explores themes of isolation and connection. Unforgettable narrative.</div>
             </div>
           </div>
         </div>
         <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Epic Game Title - Battle Royale">
-            <div class="game-img g5" aria-hidden="true"></div>
+          <a href="#" class="game-link" aria-label="Death Stranding - Action Adventure">
+            <div class="game-img" style="background-image:url('MV5BYmVkNDM3MzUtN2YyYS00MDg0LWIxN2EtMjQ2ZGQ1ZDhlZWY4XkEyXkFqcGc@._V1_.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
             <div class="game-label">
-              <div class="game-title">Epic Game Title</div>
-              <div class="game-genre">Battle Royale</div>
+              <div class="game-title">Death Stranding</div>
+              <div class="game-genre">Action Adventure</div>
             </div>
           </a>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge">Limited Time</div>
-              <div class="game-hover-date">Join Now</div>
+              <div class="game-hover-badge release">GAME</div>
+              <div class="game-hover-date">2019</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Survive the chaos in this thrilling battle royale game. Scavenge for weapons, outlast your opponents, and be the last one standing.</div>
+              <div class="game-hover-desc">Kojima's surreal masterpiece. Connect the disconnected in this bold, experimental adventure.</div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card reveal">
+          <a href="#" class="game-link" aria-label="Invincible vs - Action Fighting">
+            <div class="game-img" style="background-image:url('invincible_vs.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
+            <div class="game-label">
+              <div class="game-title">Invincible vs</div>
+              <div class="game-genre">Action / Fighting</div>
+            </div>
+          </a>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge">OPEN BETA</div>
+              <div class="game-hover-date">April 9th - 11th</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Open Beta: April 9th 10AM PT - April 11th 9PM PT. Fast-paced battles inspired by the Invincible universe. Full release April 30th.</div>
             </div>
           </div>
         </div>
@@ -562,6 +579,1022 @@
   <script src="script.js" defer></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
