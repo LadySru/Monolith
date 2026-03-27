@@ -5,3 +5,4 @@
 /.vs
 /.vs/slnx.sqlite
 /node_modules/
+/.tools/
