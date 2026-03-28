@@ -256,6 +256,7 @@ function switchTab(id) {
   document.getElementById('panel-' + id).classList.add('active');
   if (id !== 'snake' && window.snakePause) snakePause();
   if (id !== 'tap' && window.stopTapGame) stopTapGame();
+  if (id === 'tap' && window.resizeSealCanvas) window.resizeSealCanvas();
   switchSB(id);
 }
 
@@ -448,10 +449,13 @@ window.saveSilScore = async function() {
   const startGraceFrames = 24;
 
   function resizeCanvas(){
-    const w = Math.min(420, C.parentElement.clientWidth);
+    const pw = C.parentElement ? C.parentElement.clientWidth : 0;
+    if(pw < 10) return;
+    const w = Math.min(420, pw);
     C.style.width = w + 'px';
     C.style.height = (w * 0.75) + 'px';
   }
+  window.resizeSealCanvas = resizeCanvas;
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
@@ -532,6 +536,7 @@ window.saveSilScore = async function() {
   }
 
   function gameOver(){
+    if(!running) return;
     running = false;
     clearInterval(loop);
     loop = null;
@@ -599,6 +604,7 @@ window.saveSilScore = async function() {
   window.startTapGame = function(){
     document.getElementById('flappy-overlay').style.display = 'none';
     document.getElementById('flappy-gameover').style.display = 'none';
+    resizeCanvas();
     resetState();
     started = true;
     startedFrame = 0;
