@@ -443,6 +443,7 @@ window.saveSilScore = async function() {
   const speed = 2.6;
   const gap = 120;
   const pipeW = 56;
+  const startGraceFrames = 24;
 
   function resizeCanvas(){
     const w = Math.min(420, C.parentElement.clientWidth);
@@ -457,7 +458,7 @@ window.saveSilScore = async function() {
     frame = 0;
     score = 0;
     sealY = 130;
-    sealV = 0;
+    sealV = flap * 0.55;
     pipes = [];
     updateHud();
   }
@@ -559,12 +560,12 @@ window.saveSilScore = async function() {
         p.passed = true;
         score++;
       }
-      if(hitPipe(p)) gameOver();
+      if(frame > startGraceFrames && hitPipe(p)) gameOver();
     });
 
     pipes = pipes.filter(p => p.x + pipeW > -4);
 
-    if(sealY < 8 || sealY > C.height - 8) gameOver();
+    if(frame > startGraceFrames && (sealY < 8 || sealY > C.height - 8)) gameOver();
 
     drawBG();
     drawPipes();
