@@ -196,8 +196,9 @@
     .stat-n.teal  { color: var(--teal); }
     .stat-l { font-family: 'Orbitron', monospace; font-size: .52rem; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; margin-top: 3px; display: block; }
 
-    .scroll-cue { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: 'Orbitron', monospace; font-size: .52rem; letter-spacing: 4px; color: var(--text3); text-transform: uppercase; animation: scrollBob 2.5s ease-in-out infinite; }
-    .scroll-cue::after { content: '↓'; color: var(--teal); font-size: 1rem; }
+    .scroll-cue { position: absolute; right: 18px; left: auto; bottom: 22px; transform: none; z-index: 2; width: 34px; height: 34px; border: 1px solid rgba(0,255,231,.28); background: rgba(2,0,10,.45); display: grid; place-items: center; color: var(--teal); animation: scrollBob 2.5s ease-in-out infinite; pointer-events: none; }
+    .scroll-cue::after { content: '\2193'; color: var(--teal); font-size: .9rem; line-height: 1; }
+    .scroll-cue span { display: none; }
 
     /* ═══════ SERVER INFO ═══════ */
     .server-info { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 28px; padding: 16px 24px; background: rgba(139,47,255,0.06); border: 1px solid rgba(139,47,255,0.2); border-radius: 4px; opacity: 0; animation: fadeUp .8s .7s ease forwards; }
@@ -430,6 +431,7 @@
       .stat:last-child { border-bottom: none; }
       .server-info { flex-direction: column; gap: 12px; }
       .channels-grid { grid-template-columns: 1fr; }
+      .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
     }
     @media (max-width: 480px) {
       .wrap { padding: 0 16px; }
@@ -440,7 +442,12 @@
       h1 { font-size: clamp(2rem, 6vw, 3.5rem); }
       h2 { font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
     }
-  </style>
+  
+    .scroll-cue{left:auto !important;right:18px !important;bottom:22px !important;transform:none !important;width:34px !important;height:34px !important;display:grid !important;place-items:center !important;border:1px solid rgba(0,255,231,.28) !important;background:rgba(2,0,10,.45) !important;pointer-events:none !important;}
+    .scroll-cue::after{content:'\2193' !important;color:var(--teal) !important;font-size:.9rem !important;line-height:1 !important;}
+    .scroll-cue span{display:none !important;}
+    @media (max-width: 768px){ .scroll-cue{right:10px !important;bottom:14px !important;width:30px !important;height:30px !important;} }
+</style>
 </head>
 <body>
   <!-- NAVIGATION -->
@@ -499,19 +506,16 @@
         </div>
         <div class="server-info">
           <div class="server-stat">
-            <span class="server-online">🟢 50 Online</span>
+            <span class="server-online">&#x1F7E2; 50 Online</span>
           </div>
           <div class="server-stat">
-            <span class="server-members">👥 322 Members</span>
+            <span class="server-members">&#x1F465; 322 Members</span>
           </div>
           <div class="server-stat">
             <span class="server-est">Est. Jul 2021</span>
           </div>
         </div>
-        <div class="scroll-cue" aria-hidden="true">
-          <span>Scroll Down</span>
-          <span>↓</span>
-        </div>
+        <div class="scroll-cue" aria-hidden="true"></div>
       </div>
     </div>
     <div class="hero-mesh"></div>
@@ -765,3 +769,16 @@
   <script src="script.js" defer="defer"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

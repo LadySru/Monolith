@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social Arcade — Play Neon Snake, Anime Guesser, and Tap Rush. Compete on the global leaderboard."/>
+  <meta name="description" content="Monolith Social Arcade — Play Neon Snake, Anime Guesser, and Seal Sky Dash. Compete on the global leaderboard."/>
   <title>Arcade — Monolith Social</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -23,14 +23,10 @@
     .game-panel{display:none;}
     .game-panel.active{display:block;}
 
-    /* ── TAP RUSH ── */
-    .tap-body{padding:18px 14px 14px;}
-    .tap-stats{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-family:'Orbitron',monospace;font-size:.62rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
-    .tap-stats b{color:var(--teal);font-size:.8rem;}
-    .tap-arena{position:relative;height:360px;background:radial-gradient(circle at 50% 40%,rgba(13,242,212,.06),rgba(5,5,10,.92));border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-    .tap-target{position:absolute;width:54px;height:54px;border-radius:50%;border:2px solid var(--teal);background:rgba(13,242,212,.12);box-shadow:0 0 18px rgba(13,242,212,.45);color:var(--teal);font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .08s ease;}
-    .tap-target:hover{transform:scale(1.06);}
-    .tap-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:10px;background:rgba(5,5,10,.78);}
+    /* ── FLAPPY SEAL ── */
+    .flap-body{padding:18px 14px 14px;}
+    .flap-canvas-wrap{position:relative;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:radial-gradient(circle at 50% 30%,rgba(13,242,212,.05),rgba(5,5,10,.94));}
+    .flap-canvas-wrap canvas{display:block;width:100%;height:auto;max-width:100%;touch-action:manipulation;}
 
   </style>
 </head>
@@ -81,7 +77,7 @@
     <div class="game-tabs">
       <button class="game-tab active" data-game="snake" onclick="switchTab('snake')">🐍 Neon Snake</button>
       <button class="game-tab" data-game="silhouette" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
-      <button class="game-tab" data-game="tap" onclick="switchTab('tap')">⚡ Tap Rush</button>
+      <button class="game-tab" data-game="tap" onclick="switchTab('tap')">🦭 Seal Sky Dash</button>
     </div>
 
     <div class="arcade-layout">
@@ -178,34 +174,30 @@
           </div>
         </div>
 
-        <!-- TAP RUSH -->
+        <!-- SEAL SKY DASH -->
         <div id="panel-tap" class="game-panel">
           <div class="arc-box">
             <div class="arc-header">
-              <span class="arc-title">⚡ Cyber Tap Rush</span>
+              <span class="arc-title">🦭 Seal Sky Dash</span>
               <div class="arc-meta">
-                <span class="arc-score-lbl">Time</span>
-                <span class="arc-score" id="tap-time">15</span>
-                <span class="arc-score-lbl" style="margin-left:12px;">Score</span>
+                <span class="arc-score-lbl">Score</span>
                 <span class="arc-score" id="tap-score">0</span>
+                <span class="arc-score-lbl" style="margin-left:12px;">Best</span>
+                <span class="arc-score" id="tap-best" style="color:var(--amber);">0</span>
               </div>
             </div>
-            <div class="tap-body">
-              <div class="tap-stats">
-                <span>Best combo: <b id="tap-combo">0</b></span>
-                <span>Goal: <b>40+</b></span>
-              </div>
-              <div class="tap-arena" id="tap-arena">
-                <button class="tap-target" id="tap-target" onclick="tapHit()" style="display:none;">⚡</button>
-                <div class="tap-overlay" id="tap-overlay">
-                  <div class="arc-overlay-icon">⚡</div>
-                  <div class="arc-overlay-title">Cyber Tap Rush</div>
-                  <div class="arc-overlay-sub">Tap the moving target for 15 seconds.</div>
+            <div class="flap-body">
+              <div class="flap-canvas-wrap">
+                <canvas id="flappyCanvas" width="400" height="300"></canvas>
+                <div class="arc-overlay" id="flappy-overlay">
+                  <div class="arc-overlay-icon">🦭</div>
+                  <div class="arc-overlay-title">Seal Sky Dash</div>
+                  <div class="arc-overlay-sub">Tap / click / space to flap and dodge pipes.</div>
                   <button class="btn-primary" onclick="startTapGame()">Start →</button>
                 </div>
-                <div class="tap-overlay" id="tap-result" style="display:none;">
+                <div class="arc-overlay" id="flappy-gameover" style="display:none;">
                   <div class="arc-overlay-icon">🏁</div>
-                  <div class="arc-overlay-title">Time Up</div>
+                  <div class="arc-overlay-title">Crashed!</div>
                   <div class="arc-overlay-sub" id="tap-final-score">Score: 0</div>
                   <div class="sb-entry" style="justify-content:center;">
                     <input class="sb-input" id="tap-name-input" placeholder="Your name..." maxlength="16"/>
@@ -229,7 +221,7 @@
             <div class="global-sb-tabs">
               <button class="gsb-tab active" onclick="switchSB('snake')">🐍 Snake</button>
               <button class="gsb-tab" onclick="switchSB('silhouette')">🎌 Guesser</button>
-              <button class="gsb-tab" onclick="switchSB('tap')">⚡ Tap</button>
+              <button class="gsb-tab" onclick="switchSB('tap')">🦭 Seal</button>
             </div>
           </div>
           <div class="global-sb-body" id="global-sb-body">
@@ -237,6 +229,7 @@
           </div>
         </div>
       </div>
+
 
     </div>
   </div>
@@ -429,89 +422,197 @@ window.saveSilScore = async function() {
   document.getElementById('sil-score-saved').style.display='block';
 };
 
-/* ── CYBER TAP RUSH ── */
+/* ── SEAL SKY DASH (Flappy-style) ── */
 (function(){
-  const arena=document.getElementById('tap-arena');
-  const target=document.getElementById('tap-target');
-  let timer=null,timeLeft=15,score=0,bestCombo=0,combo=0,running=false;
-  window.tapScore=0;
+  const C = document.getElementById('flappyCanvas');
+  const ctx = C.getContext('2d');
+  let running = false;
+  let loop = null;
+  let frame = 0;
+  let score = 0;
+  let best = parseInt(localStorage.getItem('ms_flappy_best') || '0', 10);
+  let sealY = 130;
+  let sealV = 0;
+  let sealX = 96;
+  let pipes = [];
+  const gravity = 0.38;
+  const flap = -6.8;
+  const speed = 2.6;
+  const gap = 120;
+  const pipeW = 56;
 
-  function moveTarget(){
-    const pad=6;
-    const maxX=Math.max(0,arena.clientWidth-target.offsetWidth-pad*2);
-    const maxY=Math.max(0,arena.clientHeight-target.offsetHeight-pad*2);
-    target.style.left=(pad+Math.random()*maxX)+'px';
-    target.style.top=(pad+Math.random()*maxY)+'px';
+  function resizeCanvas(){
+    const w = Math.min(420, C.parentElement.clientWidth);
+    C.style.width = w + 'px';
+    C.style.height = (w * 0.75) + 'px';
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function resetState(){
+    running = true;
+    frame = 0;
+    score = 0;
+    sealY = 130;
+    sealV = 0;
+    pipes = [];
+    updateHud();
   }
 
-  function updateTapHud(){
-    document.getElementById('tap-time').textContent=timeLeft;
-    document.getElementById('tap-score').textContent=score;
-    document.getElementById('tap-combo').textContent=bestCombo;
+  function updateHud(){
+    document.getElementById('tap-score').textContent = score;
+    document.getElementById('tap-best').textContent = best;
   }
 
-  function finishTap(){
-    running=false;
-    clearInterval(timer);
-    timer=null;
-    target.style.display='none';
-    window.tapScore=score;
-    document.getElementById('tap-final-score').textContent='Score: '+score+' taps';
-    document.getElementById('tap-result').style.display='flex';
-    const ni=document.getElementById('tap-name-input');if(ni){ni.disabled=false;ni.value='';}
-    const sv=document.getElementById('tap-score-saved');if(sv)sv.style.display='none';
-    const sb=document.querySelector('#tap-result .sb-save');if(sb)sb.disabled=false;
+  function spawnPipe(){
+    const minTop = 32;
+    const maxTop = C.height - gap - 32;
+    const topH = Math.floor(minTop + Math.random() * (maxTop - minTop));
+    pipes.push({ x: C.width + 6, top: topH, passed: false });
+  }
+
+  function drawBG(){
+    ctx.fillStyle = '#05050a';
+    ctx.fillRect(0,0,C.width,C.height);
+    ctx.strokeStyle = 'rgba(13,242,212,.05)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<=10;i++){
+      const x = i * (C.width / 10);
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,C.height); ctx.stroke();
+    }
+    for(let j=0;j<=8;j++){
+      const y = j * (C.height / 8);
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(C.width,y); ctx.stroke();
+    }
+  }
+
+  function drawSeal(){
+    const x = sealX, y = sealY;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(Math.max(-0.25, Math.min(0.35, sealV * 0.04)));
+    ctx.fillStyle = '#9bb7c8';
+    ctx.beginPath(); ctx.ellipse(0,0,18,13,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#cddbe4';
+    ctx.beginPath(); ctx.ellipse(8,2,8,6,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(10,-2,1.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(14,1,1.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(14,4,1.2,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawPipes(){
+    pipes.forEach(p=>{
+      ctx.fillStyle = 'rgba(13,242,212,.14)';
+      ctx.strokeStyle = 'rgba(13,242,212,.55)';
+      ctx.lineWidth = 2;
+      ctx.fillRect(p.x, 0, pipeW, p.top);
+      ctx.strokeRect(p.x, 0, pipeW, p.top);
+      const bottomY = p.top + gap;
+      ctx.fillRect(p.x, bottomY, pipeW, C.height - bottomY);
+      ctx.strokeRect(p.x, bottomY, pipeW, C.height - bottomY);
+    });
+  }
+
+  function hitPipe(p){
+    const rx = sealX - 14, ry = sealY - 12, rw = 28, rh = 24;
+    const hitTop = rx < p.x + pipeW && rx + rw > p.x && ry < p.top;
+    const bottomY = p.top + gap;
+    const hitBottom = rx < p.x + pipeW && rx + rw > p.x && ry + rh > bottomY;
+    return hitTop || hitBottom;
+  }
+
+  function gameOver(){
+    running = false;
+    clearInterval(loop);
+    loop = null;
+    if(score > best){
+      best = score;
+      localStorage.setItem('ms_flappy_best', String(best));
+    }
+    updateHud();
+    window.tapScore = score;
+    document.getElementById('tap-final-score').textContent = 'Score: ' + score;
+    document.getElementById('flappy-gameover').style.display = 'flex';
+    const ni = document.getElementById('tap-name-input'); if(ni){ni.disabled=false;ni.value='';}
+    const sv = document.getElementById('tap-score-saved'); if(sv) sv.style.display='none';
+    const sb = document.querySelector('#flappy-gameover .sb-save'); if(sb) sb.disabled=false;
     switchSB('tap');
   }
 
-  window.startTapGame=function(){
-    timeLeft=15;score=0;combo=0;bestCombo=0;running=true;
-    document.getElementById('tap-overlay').style.display='none';
-    document.getElementById('tap-result').style.display='none';
-    target.style.display='flex';
-    updateTapHud();
-    moveTarget();
-    clearInterval(timer);
-    timer=setInterval(()=>{
-      if(!running)return;
-      timeLeft--;
-      combo=0;
-      if(timeLeft<=0){timeLeft=0;updateTapHud();finishTap();return;}
-      updateTapHud();
-      moveTarget();
-    },1000);
+  function tick(){
+    if(!running) return;
+    frame++;
+
+    if(frame % 90 === 0) spawnPipe();
+
+    sealV += gravity;
+    sealY += sealV;
+
+    pipes.forEach(p=>{
+      p.x -= speed;
+      if(!p.passed && p.x + pipeW < sealX){
+        p.passed = true;
+        score++;
+      }
+      if(hitPipe(p)) gameOver();
+    });
+
+    pipes = pipes.filter(p => p.x + pipeW > -4);
+
+    if(sealY < 8 || sealY > C.height - 8) gameOver();
+
+    drawBG();
+    drawPipes();
+    drawSeal();
+    updateHud();
+  }
+
+  function flapNow(){
+    if(!running) return;
+    sealV = flap;
+  }
+
+  window.startTapGame = function(){
+    document.getElementById('flappy-overlay').style.display = 'none';
+    document.getElementById('flappy-gameover').style.display = 'none';
+    resetState();
+    if(loop) clearInterval(loop);
+    loop = setInterval(tick, 1000/60);
   };
 
-  window.tapHit=function(){
-    if(!running)return;
-    score++;
-    combo++;
-    if(combo>bestCombo)bestCombo=combo;
-    updateTapHud();
-    moveTarget();
+  window.stopTapGame = function(){
+    running = false;
+    if(loop){ clearInterval(loop); loop = null; }
+    drawBG();
+    drawSeal();
+    document.getElementById('flappy-gameover').style.display = 'none';
+    document.getElementById('flappy-overlay').style.display = 'flex';
+    score = 0;
+    window.tapScore = 0;
+    updateHud();
   };
 
-  window.stopTapGame=function(){
-    if(timer){
-      clearInterval(timer);
-      timer=null;
+  C.addEventListener('pointerdown', flapNow);
+  C.addEventListener('touchstart', (e)=>{ flapNow(); e.preventDefault(); }, { passive:false });
+  document.addEventListener('keydown', (e)=>{
+    if(e.code==='Space' || e.code==='ArrowUp'){
+      flapNow();
+      if(e.code==='Space') e.preventDefault();
     }
-    running=false;
-    target.style.display='none';
-    document.getElementById('tap-result').style.display='none';
-    document.getElementById('tap-overlay').style.display='flex';
-    timeLeft=15;
-    score=0;
-    combo=0;
-    bestCombo=0;
-    updateTapHud();
-  };
+  });
+
+  drawBG();
+  drawSeal();
+  updateHud();
 })();
+
 window.saveTapScore = async function() {
   const nameEl=document.getElementById('tap-name-input');
   const name=nameEl.value.trim()||'Anonymous';
   nameEl.disabled=true;
-  document.querySelector('#tap-result .sb-save').disabled=true;
+  document.querySelector('#flappy-gameover .sb-save').disabled=true;
   await SB.save('tap', name, window.tapScore || 0, 'global-sb-body');
   document.getElementById('tap-score-saved').style.display='block';
 };
