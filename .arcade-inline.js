@@ -7,6 +7,7 @@ function switchTab(id) {
   document.getElementById('panel-' + id).classList.add('active');
   if (id !== 'snake' && window.snakePause) snakePause();
   if (id !== 'tap' && window.stopTapGame) stopTapGame();
+  if (id === 'tap' && window.resizeFlappyCanvas) window.resizeFlappyCanvas();
   switchSB(id);
 }
 
@@ -181,6 +182,8 @@ window.saveSilScore = async function() {
   const ctx = C.getContext('2d');
   if(!ctx) return;
   let running = false;
+  let started = false;
+  let startedFrame = 0;
   let loop = null;
   let frame = 0;
   let score = 0;
@@ -197,19 +200,24 @@ window.saveSilScore = async function() {
   const startGraceFrames = 24;
 
   function resizeCanvas(){
-    const w = Math.min(420, C.parentElement.clientWidth);
+    const parentWidth = C.parentElement ? C.parentElement.clientWidth : 0;
+    const baseWidth = parentWidth > 0 ? parentWidth : C.width;
+    const w = Math.min(420, Math.max(260, baseWidth));
     C.style.width = w + 'px';
     C.style.height = (w * 0.75) + 'px';
   }
+  window.resizeFlappyCanvas = resizeCanvas;
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
   function resetState(){
     running = true;
+    started = false;
+    startedFrame = 0;
     frame = 0;
     score = 0;
     sealY = 130;
-    sealV = flap * 0.55;
+    sealV = 0;
     pipes = [];
     updateHud();
   }
@@ -300,10 +308,14 @@ window.saveSilScore = async function() {
     if(!running) return;
     frame++;
 
-    if(frame % 90 === 0) spawnPipe();
+    const activeFrames = started ? (frame - startedFrame) : 0;
 
-    sealV += gravity;
-    sealY += sealV;
+    if(started && activeFrames > 20 && activeFrames % 90 === 0) spawnPipe();
+
+    if(started){
+      sealV += gravity;
+      sealY += sealV;
+    }
 
     pipes.forEach(p=>{
       p.x -= speed;
@@ -311,28 +323,42 @@ window.saveSilScore = async function() {
         p.passed = true;
         score++;
       }
-      if(frame > startGraceFrames && hitPipe(p)) gameOver();
+      if(started && activeFrames > startGraceFrames && hitPipe(p)) gameOver();
     });
 
     pipes = pipes.filter(p => p.x + pipeW > -4);
 
-    if(frame > startGraceFrames && (sealY < 8 || sealY > C.height - 8)) gameOver();
+    if(started && activeFrames > startGraceFrames && (sealY < 8 || sealY > C.height - 8)) gameOver();
 
     drawBG();
     drawPipes();
     drawSeal();
+    if(!started){
+      ctx.fillStyle = 'rgba(240,232,255,.8)';
+      ctx.font = '700 12px Orbitron, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TAP / CLICK / SPACE TO FLAP', C.width/2, 36);
+    }
     updateHud();
   }
 
   function flapNow(){
     if(!running) return;
+    if(!started){
+      started = true;
+      startedFrame = frame;
+    }
     sealV = flap;
   }
 
   window.startTapGame = function(){
+    resizeCanvas();
     document.getElementById('flappy-overlay').style.display = 'none';
     document.getElementById('flappy-gameover').style.display = 'none';
     resetState();
+    started = true;
+    startedFrame = 0;
+    sealV = flap * 0.85;
     if(loop) clearInterval(loop);
     loop = setInterval(tick, 1000/60);
   };
