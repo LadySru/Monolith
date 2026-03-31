@@ -1,42 +1,131 @@
 import type { Context, Config } from "@netlify/functions";
 import { Anthropic } from "@anthropic-ai/sdk";
 
+// Detailed anime knowledge base with specific plot points and characters
+const ANIME_FACTS = {
+  "Naruto": {
+    characters: ["Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake"],
+    facts: [
+      "Naruto's village is the Hidden Leaf Village",
+      "Naruto has the Nine-Tailed Fox sealed inside him",
+      "Sasuke defects to join Orochimaru",
+      "Kakashi has a Sharingan eye from Obito",
+      "The final villain is Kaguya Otsutsuki"
+    ]
+  },
+  "One Piece": {
+    characters: ["Luffy", "Zoro", "Nami", "Usopp", "Sanji"],
+    facts: [
+      "Luffy's goal is to become King of the Pirates",
+      "The One Piece is the legendary treasure",
+      "Zoro wants to become the world's greatest swordsman",
+      "Nami navigates using her weather-prediction skills",
+      "The Straw Hat crew has 10 members"
+    ]
+  },
+  "Death Note": {
+    characters: ["Light Yagami", "L", "Misa Amane", "Near"],
+    facts: [
+      "Light Yagami finds a Death Note that kills anyone whose name is written in it",
+      "L is a genius detective who opposes Light",
+      "Misa is a Kira supporter and model",
+      "Light becomes increasingly obsessed with godhood",
+      "The series ends with Light's death"
+    ]
+  },
+  "Monster": {
+    characters: ["Kenzo Tenma", "Johan Liebert", "Nina Fortner"],
+    facts: [
+      "Tenma is a surgeon who saves a criminal's life",
+      "Johan is the perfect monster - intelligent and manipulative",
+      "The story spans across Europe following Tenma's investigation",
+      "Nina is Johan's sister with amnesia",
+      "The anime has 74 episodes"
+    ]
+  },
+  "Steins;Gate": {
+    characters: ["Rintaro Okabe", "Makise Kurisu", "Mayuri Shiina"],
+    facts: [
+      "Okabe invents the Phone Microwave for time travel",
+      "Makise Kurisu is a genius scientist",
+      "The story involves changing the timeline",
+      "El Psy Kongroo is Okabe's catchphrase",
+      "Mayuri's death is a key turning point"
+    ]
+  },
+  "Attack on Titan": {
+    characters: ["Eren Yeager", "Mikasa Ackerman", "Arwin Smith"],
+    facts: [
+      "Titans are giant humanoid creatures that eat humans",
+      "Eren can transform into a Titan",
+      "The walls protect humanity from Titans",
+      "Mikasa has incredible combat skills",
+      "The series reveals complex truth about the world"
+    ]
+  },
+  "Demon Slayer": {
+    characters: ["Tanjiro Kamado", "Nezuko Kamado", "Giyu Tomioka"],
+    facts: [
+      "Tanjiro's sister Nezuko becomes a demon but retains humanity",
+      "Tanjiro trains under Giyu to become a Demon Slayer",
+      "The Twelve Kizuki are powerful demons",
+      "Tanjiro learns Water Breathing technique",
+      "Muzan Kibutsuji is the first and strongest demon"
+    ]
+  },
+  "Re:Zero": {
+    characters: ["Subaru Emilia", "Rem", "Ram"],
+    facts: [
+      "Subaru can 'Return by Death' to change the past",
+      "Emilia is a half-elf candidate to become next ruler",
+      "Rem is a demon maid who falls in love with Subaru",
+      "Ram is Rem's twin sister",
+      "Subaru experiences traumatic timelines"
+    ]
+  },
+  "Ergo Proxy": {
+    characters: ["Re-l Mayer", "Vincent Law", "Pino"],
+    facts: [
+      "Re-l searches for the truth about the world",
+      "Vincent is connected to Proxies - god-like beings",
+      "The world is covered in radiation",
+      "Pino is an android child",
+      "The series is set in a post-apocalyptic world"
+    ]
+  },
+  "Serial Experiments Lain": {
+    characters: ["Lain Iwakura", "Arisu Mizuki", "Masayuki Iwakura"],
+    facts: [
+      "Lain is a god-like entity within the Wired",
+      "The Wired is a virtual reality network",
+      "Arisu is Lain's friend who commits suicide",
+      "The series explores the nature of reality",
+      "Lain becomes increasingly detached from the physical world"
+    ]
+  }
+};
+
 // Extended niche anime titles and facts database
 const NICHE_ANIME_DB = {
   scifi: [
-    { title: "Ergo Proxy", studio: "Manglobe", year: 2006, difficulty: 4 },
-    { title: "Haibane Renmei", studio: "Radiix", year: 2002, difficulty: 4 },
-    { title: "ABe", characters: "Nakamura Takashi", difficulty: 3 },
-    { title: "Serial Experiments Lain", studio: "Triangle Staff", year: 1998, difficulty: 5 },
-    { title: "Texhnolyze", studio: "Madhouse", year: 2003, difficulty: 4 },
-    { title: "Natsume Yuujinchou", studio: "Brain's Base", difficulty: 2 },
+    { title: "Ergo Proxy", facts: ANIME_FACTS["Ergo Proxy"], difficulty: 4 },
+    { title: "Serial Experiments Lain", facts: ANIME_FACTS["Serial Experiments Lain"], difficulty: 5 },
   ],
   psychological: [
-    { title: "Monster", creator: "Naoki Urasawa", episodes: 74, difficulty: 4 },
-    { title: "Paranoia Agent", director: "Satoshi Kon", year: 2004, difficulty: 5 },
-    { title: "The Tatami Galaxy", studio: "P.I.C.S", style: "rotoscope", difficulty: 4 },
-    { title: "Perfect Blue", type: "film", director: "Satoshi Kon", year: 1997, difficulty: 5 },
+    { title: "Monster", facts: ANIME_FACTS["Monster"], difficulty: 4 },
   ],
-  slice_of_life: [
-    { title: "Nichijou", gags_per_episode: "200+", difficulty: 3 },
-    { title: "K-On!", characters: 5, school: "Sakuragaoka", difficulty: 2 },
-    { title: "Azuki Chan", episodes: 50, difficulty: 1 },
-    { title: "Hidamari Sketch", art_style: "manga-like", difficulty: 2 },
+  action: [
+    { title: "Attack on Titan", facts: ANIME_FACTS["Attack on Titan"], difficulty: 3 },
+    { title: "Demon Slayer", facts: ANIME_FACTS["Demon Slayer"], difficulty: 2 },
   ],
   isekai: [
-    { title: "Re:Zero", protagonist: "Subaru", ability: "Return by Death", difficulty: 3 },
-    { title: "That Time I Got Reincarnated as a Spider", cgi: "heavy", difficulty: 2 },
-    { title: "Sword Art Online", vr_game: "Aincrad", difficulty: 2 },
+    { title: "Re:Zero", facts: ANIME_FACTS["Re:Zero"], difficulty: 3 },
   ],
-  horror: [
-    { title: "Higurashi: When They Cry", arcs: 8, difficulty: 4 },
-    { title: "Corpse Party", episodes: 4, ova: true, difficulty: 3 },
-    { title: "Another", curse: "classroom", difficulty: 3 },
-  ],
-  avant_garde: [
-    { title: "FLCL", director: "Kazuaki Takano", episodes: 6, difficulty: 5 },
-    { title: "Paniponi Dash!", pace: "chaotic", difficulty: 5 },
-    { title: "Pani Poni Dash", references: "heavy", difficulty: 4 },
+  popular: [
+    { title: "Naruto", facts: ANIME_FACTS["Naruto"], difficulty: 1 },
+    { title: "One Piece", facts: ANIME_FACTS["One Piece"], difficulty: 1 },
+    { title: "Death Note", facts: ANIME_FACTS["Death Note"], difficulty: 2 },
+    { title: "Steins;Gate", facts: ANIME_FACTS["Steins;Gate"], difficulty: 3 },
   ],
 };
 
@@ -102,23 +191,45 @@ export default async (req: Request, context: Context): Promise<Response> => {
           : parseInt(requestedDifficulty) || 3;
 
       try {
+        // Get anime facts if available
+        const animeFacts = ANIME_FACTS[anime.title] || { characters: [], facts: [] };
+
         const response = await client.messages.create({
           model: "claude-opus-4-6",
           max_tokens: 500,
           messages: [
             {
               role: "user",
-              content: `Generate a trivia question about the anime "${anime.title}". The question should be difficulty level ${recommendedDifficulty}/5 (1=easy, 5=expert/niche knowledge).
+              content: `You are a trivia master for the anime "${anime.title}".
 
-              Return ONLY a JSON object with this exact structure:
-              {
-                "question": "The trivia question here",
-                "options": ["option A", "option B", "option C", "option D"],
-                "correctIndex": 0,
-                "explanation": "Why this is correct and interesting trivia"
-              }
+HERE ARE THE KEY FACTS ABOUT THIS ANIME:
+Characters: ${animeFacts.characters?.join(", ") || "Various"}
+Plot Points: ${animeFacts.facts?.slice(0, 3).join(" | ") || "Various"}
 
-              Make it interesting and educational. Vary between: plot details, character facts, production details, cultural references, and niche trivia.`,
+CREATE A QUESTION that:
+1. MUST ask about a CHARACTER NAME, PLOT POINT, or STORY EVENT from this specific anime
+2. MUST use only facts from the anime's story
+3. Difficulty level: ${recommendedDifficulty}/5
+
+EXAMPLES OF GOOD QUESTIONS:
+- "What is the main goal of [Character] in ${anime.title}?"
+- "In ${anime.title}, [Character] can [ability/power]. What is this?"
+- "What happens to [Character] in the climax of ${anime.title}?"
+
+EXAMPLES OF BAD QUESTIONS (DO NOT CREATE THESE):
+- "What is an anime opening?"
+- "What does a light novel mean?"
+- "What animation technique is used?"
+- "[Studio name] produced ${anime.title}"
+- "In what year was ${anime.title} released?"
+
+Return ONLY this exact JSON format:
+{
+  "question": "question about ${anime.title}'s characters or plot",
+  "options": ["answer A", "answer B", "answer C", "answer D"],
+  "correctIndex": 0,
+  "explanation": "why this is correct"
+}`,
             },
           ],
         });
@@ -192,40 +303,54 @@ function generateFallbackQuestion(
   difficulty: number
 ): QuizQuestion {
   const title = anime.title as string;
-  const questions = [
-    {
-      question: `Which studio produced "${title}"?`,
-      options: [
-        "MAPPA",
-        "Madhouse",
-        "Bones",
-        "Ufotable",
-      ],
-      correctIndex: 1,
-      explanation: `${title} is a notable anime production.`,
-    },
-    {
-      question: `In what year was "${title}" released?`,
-      options: [String(anime.year || 2000), "2001", "2002", "2003"],
-      correctIndex: 0,
-      explanation: `${title} aired in the late 1990s/2000s era.`,
-    },
-    {
-      question: `"${title}" is primarily in which genre?`,
-      options: [
-        "Psychological Thriller",
-        "Slice of Life",
-        "Sci-Fi",
-        "Horror",
-      ],
-      correctIndex: Math.floor(Math.random() * 4),
-      explanation: `${title} is known for its unique storytelling.`,
-    },
-  ];
+  const animeFacts = ANIME_FACTS[title];
 
-  const q = questions[Math.floor(Math.random() * questions.length)];
+  // If we have facts for this anime, create a question from them
+  if (animeFacts && animeFacts.facts.length > 0) {
+    const facts = animeFacts.facts;
+    const characters = animeFacts.characters || [];
+
+    // Create different question types
+    const questionTypes = [
+      {
+        question: `In ${title}, who is a main character?`,
+        options: characters.length > 0 ? characters.slice(0, 4) : ["Unknown"],
+        correctIndex: 0,
+        explanation: `${characters[0]} is a protagonist in ${title}.`,
+      },
+      {
+        question: `What is a key plot point in ${title}? "${facts[0]}"`,
+        options: [
+          "That's correct",
+          "That's about a different anime",
+          "That was retconned",
+          "That's fan fiction",
+        ],
+        correctIndex: 0,
+        explanation: `This is indeed a major plot point in ${title}.`,
+      },
+      {
+        question: `In ${title}, ${facts[Math.floor(Math.random() * facts.length)]} What happens next?`,
+        options: [facts[1] || "The story continues", facts[2] || "Character development", "An unexpected twist", "Comedy relief"],
+        correctIndex: 0,
+        explanation: `Following this plot point, the story continues with important developments in ${title}.`,
+      },
+    ];
+
+    const selectedQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+    return {
+      ...selectedQuestion,
+      difficulty,
+      anime: title,
+    };
+  }
+
+  // Fallback for anime not in our database
   return {
-    ...q,
+    question: `${title} is an anime. True or False?`,
+    options: ["True - it's a great anime series", "False - it's a manga only", "True - but it's not finished", "False - I've never heard of it"],
+    correctIndex: 0,
+    explanation: `${title} is indeed an anime series with memorable characters and plots.`,
     difficulty,
     anime: title,
   };
