@@ -15,8 +15,13 @@ exports.handler = async (event, context) => {
 
       const scores = await sql`
         SELECT id, player_name, score, created_at
-        FROM game_scores
-        WHERE game_type = ${game}
+        FROM (
+          SELECT DISTINCT ON (LOWER(TRIM(player_name)))
+            id, player_name, score, created_at
+          FROM game_scores
+          WHERE game_type = ${game}
+          ORDER BY LOWER(TRIM(player_name)), score DESC, created_at DESC
+        ) ranked_scores
         ORDER BY score DESC, created_at ASC
         LIMIT ${limit}
       `;

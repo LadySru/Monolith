@@ -36,6 +36,7 @@ const SB={
   MAX:10,
   _k:k=>"ms_sb_"+k,
   _clean:n=>((n||"Anonymous").trim().replace(/[<>"'&]/g,"").slice(0,16)||"Anonymous"),
+  _norm:n=>((n||"Anonymous").trim().replace(/[<>"'&]/g,"").slice(0,16)||"Anonymous").toLowerCase(),
   _map:r=>({name:r.name||r.player_name||"Anonymous",score:Number(r.score)||0,date:r.date||r.created_at||""}),
   _local(k){try{return JSON.parse(localStorage.getItem(this._k(k))||"[]").map(this._map);}catch(_){return[];}},
   _write(k,list){try{localStorage.setItem(this._k(k),JSON.stringify(list.slice(0,this.MAX)));}catch(_){}}
@@ -53,13 +54,21 @@ SB.load=async function(key,containerId,highlightName,highlightScore){
   this.render(list,containerId,highlightName,highlightScore);
 };
 SB.save=async function(key,name,score,containerId){
-  const clean=this._clean(name);const val=Number(score)||0;
+  const clean=this._clean(name);const norm=this._norm(name);const val=Number(score)||0;
   const local=this._local(key);
-  local.push({name:clean,score:val,date:new Date().toISOString()});
+  const existing=local.find(entry=>this._norm(entry.name)===norm);
+  const savedScore=existing?Math.max(Number(existing.score)||0,val):val;
+  if(existing){
+    existing.name=clean;
+    existing.score=savedScore;
+    existing.date=new Date().toISOString();
+  }else{
+    local.push({name:clean,score:val,date:new Date().toISOString()});
+  }
   local.sort((a,b)=>b.score-a.score);
   this._write(key,local);
-  try{if(window.DB&&typeof DB.saveScore==="function")await DB.saveScore(key,clean,val);}catch(_){}
-  if(containerId) await this.load(key,containerId,clean,val);
+  try{if(window.DB&&typeof DB.saveScore==="function")await DB.saveScore(key,clean,val);}catch(_){ }
+  if(containerId) await this.load(key,containerId,clean,savedScore);
   return local.slice(0,this.MAX);
 };
 window.SB=SB;
