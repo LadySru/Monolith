@@ -175,92 +175,146 @@
 
 <script src="shared.js"></script>
 <script src="db-integration.js"></script>
+<script src="anime-quiz-system.js"></script>
 <script>
-// Quiz questions
-const QUESTIONS = [
-  {q:"What is the name of Naruto's village?",o:["Hidden Leaf","Hidden Sand","Hidden Cloud","Hidden Mist"],a:0},
-  {q:"Which anime features the Titan Wars?",o:["Attack on Titan","Demon Slayer","My Hero Academia","Jujutsu Kaisen"],a:0},
-  {q:"What is Luffy's goal in One Piece?",o:["Become King of Pirates","Find the One Piece","Become a Marine","Rule the World"],a:1},
-  {q:"Who is the main character of Death Note?",o:["L","Light Yagami","Misa","Watari"],a:1},
-  {q:"In Dragon Ball Z, what is Goku's most iconic technique?",o:["Kamehameha","Senzu Bean","Spirit Bomb","Power Level 9000"],a:0},
-  {q:"What is the name of the school in My Hero Academia?",o:["UA High","Yuei Academy","Hero Academy","UA Academy"],a:0},
-  {q:"Who is the main antagonist of Demon Slayer?",o:["Tanjiro","Muzan","Hashira","Inosuke"],a:1},
-  {q:"What year did Sword Art Online air?",o:["2010","2011","2012","2013"],a:2},
-  {q:"In Steins;Gate, what is the main time-traveling device?",o:["Phone Microwave","Time Machine","Flux Capacitor","Tardis"],a:0},
-  {q:"Who is the protagonist of Jujutsu Kaisen?",o:["Yuji Itadori","Megumi Fushiguro","Gojo Satoru","Sukuna"],a:0}
-];
-
-let qIndex = 0;
-let qScore = 0;
+// ═══════ AI-POWERED QUIZ SYSTEM ═══════
+let quizAI = null;
 let qAnswered = false;
+let currentQuestion = null;
 
-function initQuiz() {
-  qIndex = 0;
-  qScore = 0;
-  qAnswered = false;
-  document.getElementById('quiz-screen').style.display = 'block';
-  document.getElementById('quiz-result').classList.remove('show');
-  loadQuestion();
+async function initQuiz() {
+  // Initialize AI quiz system
+  quizAI = new AnimeQuizAI();
+
+  // Show loading state
+  document.getElementById('q-text').textContent = '🔮 Generating questions with AI...';
+  document.getElementById('q-opts').innerHTML = '<p style="text-align:center;color:var(--text2);">Please wait...</p>';
+
+  try {
+    // Generate adaptive questions based on user's knowledge
+    await quizAI.generateQuestions(10, 'adaptive');
+    console.log(`Generated ${quizAI.questions.length} questions`);
+
+    // Load first question
+    loadQuestion();
+
+    // Display user stats if they exist
+    displayUserStats();
+  } catch (error) {
+    console.error('Failed to initialize quiz:', error);
+    document.getElementById('q-text').textContent = '⚠️ Error generating questions';
+  }
+}
+
+function displayUserStats() {
+  const stats = quizAI.getStats();
+  if (stats.totalAttempts > 0) {
+    const msg = `📊 Your Overall Accuracy: ${stats.overallAccuracy}% (${stats.totalCorrect}/${stats.totalAttempts})`;
+    console.log(msg);
+  }
 }
 
 function loadQuestion() {
-  if (qIndex >= QUESTIONS.length) {
+  if (quizAI.isComplete()) {
     showResult();
     return;
   }
+
   qAnswered = false;
-  const q = QUESTIONS[qIndex];
-  document.getElementById('q-num').textContent = `Question ${qIndex + 1} of ${QUESTIONS.length}`;
-  document.getElementById('q-text').textContent = q.q;
-  document.getElementById('q-score-hdr').textContent = `${qScore} / ${QUESTIONS.length}`;
-  document.getElementById('q-bar').style.width = ((qIndex / QUESTIONS.length) * 100) + '%';
-  document.getElementById('q-score-foot').textContent = `Score: ${qScore}`;
+  currentQuestion = quizAI.getCurrentQuestion();
+
+  if (!currentQuestion) {
+    console.error('No question found');
+    return;
+  }
+
+  const qIndex = quizAI.currentIndex;
+  const totalQuestions = quizAI.questions.length;
+
+  // Update header
+  document.getElementById('q-num').textContent = `Question ${qIndex + 1} of ${totalQuestions} • Difficulty: ${'⭐'.repeat(currentQuestion.difficulty)}`;
+  document.getElementById('q-text').textContent = currentQuestion.question;
+  document.getElementById('q-text').innerHTML += `<div style="font-size:0.75rem;color:var(--text3);margin-top:8px;">📚 ${currentQuestion.anime}</div>`;
+  document.getElementById('q-score-hdr').textContent = `${quizAI.score} / ${totalQuestions}`;
+  document.getElementById('q-bar').style.width = ((qIndex / totalQuestions) * 100) + '%';
+  document.getElementById('q-score-foot').textContent = `Score: ${quizAI.score}`;
+
+  // Render options
   const optsEl = document.getElementById('q-opts');
-  optsEl.innerHTML = q.o.map((opt, i) => `
+  optsEl.innerHTML = currentQuestion.options.map((opt, i) => `
     <button class="quiz-option" onclick="answerQuestion(${i})">${opt}</button>
   `).join('');
+
   document.getElementById('q-feedback').classList.remove('show', 'correct', 'wrong');
   document.getElementById('q-next').style.display = 'none';
 }
 
-function answerQuestion(i) {
+function answerQuestion(selectedIndex) {
   if (qAnswered) return;
   qAnswered = true;
-  const q = QUESTIONS[qIndex];
-  const correct = i === q.a;
+
+  // Record answer and get result
+  const result = quizAI.recordAnswer(selectedIndex);
+  if (!result) return;
+
+  const isCorrect = result.isCorrect;
   const btns = document.querySelectorAll('.quiz-option');
-  btns[q.a].classList.add('correct');
-  if (!correct) btns[i].classList.add('wrong');
-  if (correct) qScore++;
+
+  // Highlight correct and incorrect answers
+  btns[currentQuestion.correctIndex].classList.add('correct');
+  if (!isCorrect) btns[selectedIndex].classList.add('wrong');
+
+  // Show feedback
   const fb = document.getElementById('q-feedback');
-  fb.textContent = correct ? '✓ Correct!' : '✗ Wrong! ' + q.o[q.a];
-  fb.classList.add('show', correct ? 'correct' : 'wrong');
+  fb.innerHTML = `
+    <div style="margin-bottom:8px;">${isCorrect ? '✓ Correct!' : '✗ Incorrect!'}</div>
+    <div style="font-size:0.85rem;font-weight:300;line-height:1.4;">${result.explanation}</div>
+  `;
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+
   btns.forEach(b => b.disabled = true);
   document.getElementById('q-next').style.display = 'block';
 }
 
 function nextQuestion() {
-  qIndex++;
-  loadQuestion();
+  if (quizAI.nextQuestion()) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
 }
 
-function showResult() {
+async function showResult() {
   document.getElementById('quiz-screen').style.display = 'none';
   const result = document.getElementById('quiz-result');
   result.classList.add('show');
-  document.getElementById('res-score').innerHTML = qScore + '<span>/10</span>';
-  const ranks = [
-    {label:'Beginner 🌱',msg:'Keep watching!'},
-    {label:'Casual Viewer 📺',msg:'Good knowledge!'},
-    {label:'Seasoned Fan 🎌',msg:'Impressive!'},
-    {label:'Anime Expert ⭐',msg:'Outstanding!'},
-    {label:'Anime God 🏆',msg:'You are a legend!'}
-  ];
-  const pct = qScore / QUESTIONS.length;
-  const rank = pct < 0.3 ? ranks[0] : pct < 0.5 ? ranks[1] : pct < 0.7 ? ranks[2] : pct < 0.9 ? ranks[3] : ranks[4];
-  document.getElementById('res-rank').textContent = rank.label;
-  document.getElementById('res-msg').textContent = rank.msg;
-  window.qScore = qScore;
+
+  const results = quizAI.getResults();
+  const rec = quizAI.getRecommendations();
+
+  // Display score
+  document.getElementById('res-score').innerHTML = `${results.score}<span>/${results.totalQuestions}</span>`;
+  document.getElementById('res-rank').textContent = results.rank;
+  document.getElementById('res-msg').textContent = results.message;
+
+  // Display recommendations
+  if (rec) {
+    const recMsg = `
+      <div style="margin-top:16px;padding:12px;background:rgba(139,47,255,.1);border-left:3px solid var(--purple);border-radius:4px;">
+        <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">
+          <strong>💡 AI Recommendations:</strong><br/>
+          ${rec.message}<br/>
+          <span style="font-size:0.8rem;">Focus on: ${rec.focusAreas.join(', ') || 'varied genres'}</span>
+        </div>
+      </div>
+    `;
+    document.getElementById('res-msg').innerHTML += recMsg;
+  }
+
+  // Save user results to learning system
+  await quizAI.submitResults();
+
+  window.qScore = results.score;
   const ni = document.getElementById('quiz-name-input');
   if (ni) { ni.disabled = false; ni.value = ''; }
   const sv = document.getElementById('quiz-score-saved');
