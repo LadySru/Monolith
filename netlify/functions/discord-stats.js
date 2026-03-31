@@ -1,24 +1,28 @@
 const GUILD_ID = "863475027214598173";
 
-module.exports = async (req, context) => {
+exports.handler = async (event, context) => {
+  const req = {
+    method: event.httpMethod,
+  };
   if (req.method !== "GET") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-    });
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
   }
 
   try {
     const botToken = process.env.DISCORD_BOT_TOKEN;
 
     if (!botToken) {
-      return new Response(
-        JSON.stringify({
+      return {
+        statusCode: 503,
+        body: JSON.stringify({
           error: "Discord bot token not configured",
           online: 0,
           members: 0,
         }),
-        { status: 503 }
-      );
+      };
     }
 
     // Fetch guild data from Discord API
@@ -32,14 +36,14 @@ module.exports = async (req, context) => {
       console.error(
         `Discord API error: ${response.status} ${response.statusText}`
       );
-      return new Response(
-        JSON.stringify({
+      return {
+        statusCode: response.status,
+        body: JSON.stringify({
           error: "Failed to fetch Discord stats",
           online: 0,
           members: 0,
         }),
-        { status: response.status }
-      );
+      };
     }
 
     const guildData = await response.json();
@@ -80,31 +84,29 @@ module.exports = async (req, context) => {
       onlineCount = Math.ceil(memberCount * 0.3);
     }
 
-    return new Response(
-      JSON.stringify({
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=300",
+      },
+      body: JSON.stringify({
         online: onlineCount,
         members: memberCount,
         icon: iconUrl,
         name: guildName,
         cached: false,
       }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=300", // Cache for 5 minutes (icon rarely changes)
-        },
-      }
-    );
+    };
   } catch (error) {
     console.error("Discord stats error:", error);
-    return new Response(
-      JSON.stringify({
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",
         online: 0,
         members: 0,
       }),
-      { status: 500 }
-    );
+    };
   }
 };
