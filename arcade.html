@@ -75,10 +75,12 @@
   <div class="wrap">
 
     <!-- GAME TABS -->
-    <div class="game-tabs">
-      <button class="game-tab active" data-game="snake" onclick="switchTab('snake')">🐍 Neon Snake</button>
-      <button class="game-tab" data-game="silhouette" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
-      <button class="game-tab" data-game="tap" onclick="switchTab('tap')">🦭 Seal Sky Dash</button>
+    <div id="react-game-tabs">
+      <div class="game-tabs">
+        <button class="game-tab active" data-game="snake" onclick="switchTab('snake')">🐍 Neon Snake</button>
+        <button class="game-tab" data-game="silhouette" onclick="switchTab('silhouette')">🎌 Anime Guesser</button>
+        <button class="game-tab" data-game="tap" onclick="switchTab('tap')">🦭 Seal Sky Dash</button>
+      </div>
     </div>
 
     <div class="arcade-layout">
@@ -257,6 +259,7 @@ function switchTab(id) {
   if (id !== 'snake' && window.snakePause) snakePause();
   if (id !== 'tap' && window.stopTapGame) stopTapGame();
   if (id === 'tap' && window.resizeSealCanvas) window.resizeSealCanvas();
+  if (window.dispatchEvent) window.dispatchEvent(new CustomEvent('arcade:tab-changed', { detail: id }));
   switchSB(id);
 }
 
@@ -653,5 +656,9 @@ window.saveTapScore = async function() {
 // Init leaderboard
 switchSB('snake');
 </script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="arcade-react.js"></script>
 </body>
 </html>
+

@@ -71,7 +71,7 @@ window.switchSB=function(key){
       (key==="snake"&&x.includes("Snake"))||
       (key==="silhouette"&&x.includes("Guesser"))||
       (key==="quiz"&&x.includes("Quiz"))||
-      (key==="tap"&&x.includes("Tap"))
+      (key==="tap"&&(x.includes("Tap")||x.includes("Seal")))
     );
   });
   ["global-sb-body","global-sb-body-quiz"].forEach(id=>{if(document.getElementById(id))SB.load(key,id);});
