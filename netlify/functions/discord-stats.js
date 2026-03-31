@@ -1,8 +1,6 @@
-import type { Context, Config } from "@netlify/functions";
-
 const GUILD_ID = "863475027214598173";
 
-export default async (req: Request, context: Context): Promise<Response> => {
+module.exports = async (req, context) => {
   if (req.method !== "GET") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -10,7 +8,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
   }
 
   try {
-    const botToken = Netlify.env.get("DISCORD_BOT_TOKEN");
+    const botToken = process.env.DISCORD_BOT_TOKEN;
 
     if (!botToken) {
       return new Response(
@@ -24,7 +22,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
     }
 
     // Fetch guild data from Discord API
-    const response = await fetch(`https://discordapp.com/api/v10/guilds/${GUILD_ID}`, {
+    const response = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}`, {
       headers: {
         Authorization: `Bot ${botToken}`,
       },
@@ -44,12 +42,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
       );
     }
 
-    const guildData = await response.json() as {
-      member_count?: number;
-      presences?: Array<{ status: string }>;
-      icon?: string;
-      name?: string;
-    };
+    const guildData = await response.json();
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
     const memberCount = guildData.member_count || 0;
@@ -75,7 +68,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
       );
 
       if (presenceResponse.ok) {
-        const presenceData = (await presenceResponse.json()) as { approximate_presence_count?: number };
+        const presenceData = await presenceResponse.json();
         onlineCount = presenceData.approximate_presence_count || Math.ceil(memberCount * 0.3);
       } else {
         // Fallback: estimate online as ~30% of members
@@ -107,16 +100,11 @@ export default async (req: Request, context: Context): Promise<Response> => {
     console.error("Discord stats error:", error);
     return new Response(
       JSON.stringify({
-        error:
-          error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : "Unknown error",
         online: 0,
         members: 0,
       }),
       { status: 500 }
     );
   }
-};
-
-export const config: Config = {
-  path: "/discord-stats",
 };
