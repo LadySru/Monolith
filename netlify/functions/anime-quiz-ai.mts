@@ -108,17 +108,29 @@ export default async (req: Request, context: Context): Promise<Response> => {
           messages: [
             {
               role: "user",
-              content: `Generate a trivia question about the anime "${anime.title}". The question should be difficulty level ${recommendedDifficulty}/5 (1=easy, 5=expert/niche knowledge).
+              content: `Generate a SPECIFIC trivia question about the anime "${anime.title}" at difficulty ${recommendedDifficulty}/5.
 
-              Return ONLY a JSON object with this exact structure:
-              {
-                "question": "The trivia question here",
-                "options": ["option A", "option B", "option C", "option D"],
-                "correctIndex": 0,
-                "explanation": "Why this is correct and interesting trivia"
-              }
+FOCUS ON (choose one):
+- Character names, personalities, or relationships
+- Main plot points or story arcs
+- Specific events or battles in the story
+- Character abilities or powers
+- Story details that require watching/knowing the anime
 
-              Make it interesting and educational. Vary between: plot details, character facts, production details, cultural references, and niche trivia.`,
+DO NOT ask about:
+- General anime terminology (opening, ending, animation types)
+- Studio or production details
+- Release dates or episode counts
+- Voice actors or seiyuu
+- General anime knowledge
+
+Return ONLY valid JSON:
+{
+  "question": "Specific question about this anime's plot or characters",
+  "options": ["char/plot detail A", "char/plot detail B", "char/plot detail C", "char/plot detail D"],
+  "correctIndex": 0,
+  "explanation": "Why this answer is correct based on the anime's story"
+}`,
             },
           ],
         });
@@ -192,40 +204,70 @@ function generateFallbackQuestion(
   difficulty: number
 ): QuizQuestion {
   const title = anime.title as string;
-  const questions = [
-    {
-      question: `Which studio produced "${title}"?`,
-      options: [
-        "MAPPA",
-        "Madhouse",
-        "Bones",
-        "Ufotable",
-      ],
-      correctIndex: 1,
-      explanation: `${title} is a notable anime production.`,
-    },
-    {
-      question: `In what year was "${title}" released?`,
-      options: [String(anime.year || 2000), "2001", "2002", "2003"],
-      correctIndex: 0,
-      explanation: `${title} aired in the late 1990s/2000s era.`,
-    },
-    {
-      question: `"${title}" is primarily in which genre?`,
-      options: [
-        "Psychological Thriller",
-        "Slice of Life",
-        "Sci-Fi",
-        "Horror",
-      ],
-      correctIndex: Math.floor(Math.random() * 4),
-      explanation: `${title} is known for its unique storytelling.`,
-    },
-  ];
 
-  const q = questions[Math.floor(Math.random() * questions.length)];
+  // Anime-specific character/plot questions
+  const fallbackQuestions: Record<string, QuizQuestion> = {
+    "Ergo Proxy": {
+      question: "What is Re-l Mayer searching for in Ergo Proxy?",
+      options: ["The truth about the world", "Her lost memories", "A way home", "Food and shelter"],
+      correctIndex: 0,
+      explanation: "Re-l Mayer is a key character who searches for the truth about existence.",
+      difficulty,
+      anime: title,
+    },
+    "Monster": {
+      question: "What is the main profession of the protagonist Kenzo Tenma in Monster?",
+      options: ["Detective", "Surgeon", "Teacher", "Journalist"],
+      correctIndex: 1,
+      explanation: "Kenzo Tenma is a talented surgeon who becomes entangled in a mysterious case.",
+      difficulty,
+      anime: title,
+    },
+    "Steins;Gate": {
+      question: "What does the 'Phone Microwave' do in Steins;Gate?",
+      options: ["Heat food", "Send messages to the past", "Control time", "Create portals"],
+      correctIndex: 1,
+      explanation: "The Phone Microwave is the time-traveling device central to the story.",
+      difficulty,
+      anime: title,
+    },
+    "Serial Experiments Lain": {
+      question: "What is Lain Iwakura's relationship to the Wired in Serial Experiments Lain?",
+      options: ["She created it", "She's a god-like entity within it", "She's just a user", "She's trying to destroy it"],
+      correctIndex: 1,
+      explanation: "Lain's connection to the Wired becomes increasingly godlike throughout the series.",
+      difficulty,
+      anime: title,
+    },
+    "Re:Zero": {
+      question: "What is Subaru Emilia's main ability in Re:Zero?",
+      options: ["Return by Death", "Healing magic", "Time manipulation", "Telepathy"],
+      correctIndex: 0,
+      explanation: "Subaru can return to the past when he dies, though only he remembers.",
+      difficulty,
+      anime: title,
+    },
+    "One Piece": {
+      question: "What is Luffy's ultimate goal in One Piece?",
+      options: ["Find the One Piece treasure", "Become King of the Pirates", "Save his friends", "Defeat all marines"],
+      correctIndex: 1,
+      explanation: "Luffy's dream is to become the Pirate King, which is why he seeks the One Piece.",
+      difficulty,
+      anime: title,
+    },
+  };
+
+  // Return anime-specific question or generic fallback
+  if (fallbackQuestions[title]) {
+    return fallbackQuestions[title];
+  }
+
+  // Generic character/plot fallback
   return {
-    ...q,
+    question: `What is the main conflict or goal in ${title}?`,
+    options: ["Saving the world", "Discovering the truth", "Personal redemption", "Fighting an evil force"],
+    correctIndex: Math.floor(Math.random() * 4),
+    explanation: `${title} centers around its protagonist's journey and personal struggle.`,
     difficulty,
     anime: title,
   };
