@@ -180,6 +180,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-event
     .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 460px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
 
     .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; opacity: 0; animation: fadeUp .8s .48s ease forwards; }
+    .hero-cta .btn-primary, .hero-cta .btn-outline { justify-content: center; min-width: 220px; }
 
     .hero-stats { display: flex; align-items: stretch; border: 1px solid rgba(0,255,231,.2); overflow: hidden; opacity: 0; animation: fadeUp .8s .6s ease forwards; }
     .stat { padding: 14px 28px; text-align: center; border-right: 1px solid rgba(0,255,231,.15); background: rgba(0,255,231,.03); }
