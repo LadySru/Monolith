@@ -187,7 +187,7 @@ async function initQuiz() {
   quizAI = new AnimeQuizAI();
 
   // Show loading state
-  document.getElementById('q-text').textContent = '🔮 Generating questions with AI...';
+  document.getElementById('q-text').textContent = '🔮 Generating questions with ...';
   document.getElementById('q-opts').innerHTML = '<p style="text-align:center;color:var(--text2);">Please wait...</p>';
 
   try {
@@ -302,7 +302,7 @@ async function showResult() {
     const recMsg = `
       <div style="margin-top:16px;padding:12px;background:rgba(139,47,255,.1);border-left:3px solid var(--purple);border-radius:4px;">
         <div style="font-size:0.85rem;color:var(--text2);line-height:1.6;">
-          <strong>💡 AI Recommendations:</strong><br/>
+          <strong>💡 Recommendations:</strong><br/>
           ${rec.message}<br/>
           <span style="font-size:0.8rem;">Focus on: ${rec.focusAreas.join(', ') || 'varied genres'}</span>
         </div>
