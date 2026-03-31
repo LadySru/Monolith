@@ -1,6 +1,6 @@
 const GUILD_ID = "863475027214598173";
 
-export default async (req, context) => {
+module.exports = async (req, context) => {
   if (req.method !== "GET") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -8,7 +8,7 @@ export default async (req, context) => {
   }
 
   try {
-    const botToken = Netlify.env.get("DISCORD_BOT_TOKEN");
+    const botToken = process.env.DISCORD_BOT_TOKEN;
 
     if (!botToken) {
       return new Response(
