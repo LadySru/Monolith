@@ -1,9 +1,10 @@
 {
   "name": "monolith-social",
   "version": "1.0.0",
-  "description": "Monolith Social",
+  "description": "Monolith Social - Indie game discovery with AI-powered anime quiz",
   "dependencies": {
-    "@netlify/neon": "^0.1.0"
+    "@netlify/neon": "^0.1.0",
+    "@anthropic-ai/sdk": "^0.24.0"
   },
   "devDependencies": {
     "eslint": "^10.1.0"
