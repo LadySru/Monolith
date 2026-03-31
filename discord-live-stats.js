@@ -1,9 +1,11 @@
 /**
  * ═══════════════════════════════════════════════════════════
- * DISCORD LIVE STATS
+ * DISCORD LIVE STATS & AVATAR
  * ───────────────────────────────────────────────────────────
- * Fetches and displays real-time Discord server statistics
- * Updates every 30 seconds with live member/online counts
+ * Fetches and displays:
+ * - Real-time server statistics (members, online)
+ * - Live Discord server icon/avatar
+ * Updates every 30 seconds
  * ═══════════════════════════════════════════════════════════
  */
 
@@ -12,6 +14,7 @@ class DiscordLiveStats {
     this.updateInterval = 30000; // 30 seconds
     this.onlineEl = null;
     this.membersEl = null;
+    this.avatarEls = [];
     this.init();
   }
 
@@ -31,6 +34,11 @@ class DiscordLiveStats {
         }
       });
 
+      // Find all avatar images to update
+      this.avatarEls = document.querySelectorAll(
+        ".nav-av, .footer-av, .hero-av, [alt*='avatar'], [alt*='Monolith']"
+      );
+
       // Fetch immediately on load
       this.updateStats();
 
@@ -49,9 +57,9 @@ class DiscordLiveStats {
       }
 
       const data = await response.json();
-      const { online, members } = data;
+      const { online, members, icon, name } = data;
 
-      // Update DOM with live counts
+      // Update stat counters
       if (this.onlineEl && online > 0) {
         this.onlineEl.innerHTML = `&#x1F7E2; ${online} Online`;
       }
@@ -60,10 +68,23 @@ class DiscordLiveStats {
         this.membersEl.innerHTML = `&#x1F465; ${members} Members`;
       }
 
-      console.log(`Discord Stats Updated: ${online} online, ${members} members`);
+      // Update Discord server icon/avatar
+      if (icon && this.avatarEls.length > 0) {
+        this.avatarEls.forEach((el) => {
+          if (el.tagName === "IMG") {
+            el.src = icon;
+            el.alt = name || "Monolith Social";
+            el.title = name || "Monolith Social";
+          }
+        });
+      }
+
+      console.log(
+        `Discord Updated: ${online} online, ${members} members, icon: ${icon ? "loaded" : "not available"}`
+      );
     } catch (error) {
       console.warn("Discord stats error:", error);
-      // Silently fail - keep showing fallback numbers
+      // Silently fail - keep showing fallback numbers and avatar
     }
   }
 }

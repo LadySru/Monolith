@@ -47,10 +47,20 @@ export default async (req: Request, context: Context): Promise<Response> => {
     const guildData = await response.json() as {
       member_count?: number;
       presences?: Array<{ status: string }>;
+      icon?: string;
+      name?: string;
     };
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
     const memberCount = guildData.member_count || 0;
+    const guildName = guildData.name || "Monolith Social";
+
+    // Build guild icon URL
+    let iconUrl = null;
+    if (guildData.icon) {
+      const iconFormat = guildData.icon.startsWith("a_") ? "gif" : "png";
+      iconUrl = `https://cdn.discordapp.com/icons/${GUILD_ID}/${guildData.icon}.${iconFormat}`;
+    }
 
     // Try to get online count from guild presences
     let onlineCount = 0;
@@ -80,13 +90,15 @@ export default async (req: Request, context: Context): Promise<Response> => {
       JSON.stringify({
         online: onlineCount,
         members: memberCount,
+        icon: iconUrl,
+        name: guildName,
         cached: false,
       }),
       {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=60", // Cache for 1 minute
+          "Cache-Control": "public, max-age=300", // Cache for 5 minutes (icon rarely changes)
         },
       }
     );
