@@ -96,33 +96,29 @@ const ANIME_DATABASE = {
   }
 };
 
-// Anime list for selection
+// Anime list with difficulty ratings (1=easy, 5=hard)
 const ANIME_LIST = [
-  "Naruto",
-  "One Piece",
-  "Death Note",
-  "Monster",
-  "Steins;Gate",
-  "Attack on Titan",
-  "Demon Slayer"
+  { title: "Naruto", difficulty: 1 },
+  { title: "One Piece", difficulty: 1 },
+  { title: "Demon Slayer", difficulty: 2 },
+  { title: "Attack on Titan", difficulty: 2 },
+  { title: "Death Note", difficulty: 3 },
+  { title: "Steins;Gate", difficulty: 4 },
+  { title: "Monster", difficulty: 5 },
 ];
 
-function generateCharacterQuestion(animeTitle, animeData) {
+function generateCharacterQuestion(animeTitle, animeDifficulty, animeData) {
   const characters = animeData.characters;
   if (!characters || characters.length === 0) return null;
 
-  // Pick a random character
   const targetCharacter = characters[Math.floor(Math.random() * characters.length)];
-  const otherAnimes = ANIME_LIST.filter((t) => t !== animeTitle);
+  const otherAnimes = ANIME_LIST.filter((t) => t.title !== animeTitle);
 
-  // Get other character names for distractors
   const distractorNames = [];
   for (const otherAnime of otherAnimes) {
-    const otherData = ANIME_DATABASE[otherAnime];
-    if (otherData.characters && otherData.characters.length > 0) {
-      const otherChar = otherData.characters[
-        Math.floor(Math.random() * otherData.characters.length)
-      ];
+    const otherData = ANIME_DATABASE[otherAnime.title];
+    if (otherData && otherData.characters && otherData.characters.length > 0) {
+      const otherChar = otherData.characters[Math.floor(Math.random() * otherData.characters.length)];
       distractorNames.push(otherChar.name);
       if (distractorNames.length >= 3) break;
     }
@@ -132,29 +128,30 @@ function generateCharacterQuestion(animeTitle, animeData) {
   const shuffled = options.sort(() => Math.random() - 0.5);
   const correctIndex = shuffled.indexOf(targetCharacter.name);
 
+  // Character questions are harder than plot questions (+1 difficulty)
+  const difficulty = Math.min(5, animeDifficulty + 1);
+
   return {
-    question: `This character: "${targetCharacter.description}" is from which anime?`,
+    question: `This character: "${targetCharacter.description}" — which anime are they from?`,
     options: shuffled,
     correctIndex,
-    difficulty: 3,
+    difficulty,
     anime: animeTitle,
     explanation: `${targetCharacter.name} is a character from ${animeTitle}.`,
     type: "character",
   };
 }
 
-function generatePlotQuestion(animeTitle, animeData) {
+function generatePlotQuestion(animeTitle, animeDifficulty, animeData) {
   const plots = animeData.plots;
   if (!plots || plots.length === 0) return null;
 
-  // Pick a random plot
   const targetPlot = plots[Math.floor(Math.random() * plots.length)];
-  const otherAnimes = ANIME_LIST.filter((t) => t !== animeTitle);
+  const otherAnimes = ANIME_LIST.filter((t) => t.title !== animeTitle);
 
-  // Get other anime titles for distractors
   const distractorAnimes = [];
   for (const otherAnime of otherAnimes) {
-    distractorAnimes.push(otherAnime);
+    distractorAnimes.push(otherAnime.title);
     if (distractorAnimes.length >= 3) break;
   }
 
@@ -166,7 +163,7 @@ function generatePlotQuestion(animeTitle, animeData) {
     question: `Which anime has this plot: "${targetPlot}"?`,
     options: shuffled,
     correctIndex,
-    difficulty: 2,
+    difficulty: animeDifficulty,
     anime: animeTitle,
     explanation: `This plot is from ${animeTitle}.`,
     type: "plot",
@@ -191,30 +188,29 @@ exports.handler = async (event, context) => {
 
     for (let i = 0; i < questionCount; i++) {
       // Alternate between character and plot questions
-      const questionType = i % 2 === 0 ? "character" : "plot";
+      const questionType = i % 2 === 0 ? "plot" : "character";
 
       // Pick a random anime
-      const animeTitle = ANIME_LIST[Math.floor(Math.random() * ANIME_LIST.length)];
-      const animeData = ANIME_DATABASE[animeTitle];
+      const anime = ANIME_LIST[Math.floor(Math.random() * ANIME_LIST.length)];
+      const animeData = ANIME_DATABASE[anime.title];
 
       if (!animeData) continue;
 
       try {
         if (questionType === "character") {
-          const question = generateCharacterQuestion(animeTitle, animeData);
-          if (question) {
-            questions.push(question);
-          }
+          const question = generateCharacterQuestion(anime.title, anime.difficulty, animeData);
+          if (question) questions.push(question);
         } else {
-          const question = generatePlotQuestion(animeTitle, animeData);
-          if (question) {
-            questions.push(question);
-          }
+          const question = generatePlotQuestion(anime.title, anime.difficulty, animeData);
+          if (question) questions.push(question);
         }
       } catch (error) {
-        console.error(`Failed to generate question for ${animeTitle}:`, error);
+        console.error(`Failed to generate question for ${anime.title}:`, error);
       }
     }
+
+    // Sort questions from easiest to hardest
+    questions.sort((a, b) => a.difficulty - b.difficulty);
 
     return {
       statusCode: 200,
