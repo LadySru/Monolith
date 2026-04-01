@@ -48,6 +48,11 @@ exports.handler = async (event, context) => {
 
     const guildData = await response.json();
 
+    // Log what the API returns
+    console.log("Guild data fields:", Object.keys(guildData));
+    console.log("member_count:", guildData.member_count);
+    console.log("approximate_member_count:", guildData.approximate_member_count);
+
     // Get approximate online count (requires GUILD_PRESENCES intent)
     // Use hardcoded member count for now (Discord API returns 0)
     const memberCount = 392;
@@ -74,6 +79,9 @@ exports.handler = async (event, context) => {
 
       if (presenceResponse.ok) {
         const presenceData = await presenceResponse.json();
+        console.log("Presence data fields:", Object.keys(presenceData));
+        console.log("approximate_member_count:", presenceData.approximate_member_count);
+        console.log("approximate_presence_count:", presenceData.approximate_presence_count);
         onlineCount = presenceData.approximate_presence_count || Math.ceil(memberCount * 0.3);
       } else {
         // Fallback: estimate online as ~30% of members
