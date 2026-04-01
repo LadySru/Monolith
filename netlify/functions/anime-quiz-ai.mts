@@ -1,133 +1,162 @@
 import type { Context, Config } from "@netlify/functions";
 import { Anthropic } from "@anthropic-ai/sdk";
 
-// Detailed anime knowledge base with specific plot points and characters
-const ANIME_FACTS = {
+// Comprehensive anime database with character descriptions and plot summaries
+const ANIME_DATABASE = {
   "Naruto": {
-    characters: ["Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake"],
-    facts: [
-      "Naruto's village is the Hidden Leaf Village",
-      "Naruto has the Nine-Tailed Fox sealed inside him",
-      "Sasuke defects to join Orochimaru",
-      "Kakashi has a Sharingan eye from Obito",
-      "The final villain is Kaguya Otsutsuki"
+    characters: [
+      { name: "Naruto Uzumaki", description: "A loud, energetic ninja from the Hidden Leaf Village who was ostracized as a child. Has the Nine-Tailed Fox sealed inside him and dreams of becoming Hokage." },
+      { name: "Sasuke Uchiha", description: "A talented, cold ninja from the prestigious Uchiha clan who seeks revenge against his brother. Leaves the village to gain power." },
+      { name: "Sakura Haruno", description: "An intelligent kunoichi with exceptional medical abilities. Member of Team 7 and has pink hair." },
+      { name: "Kakashi Hatake", description: "A highly skilled ninja mentor known as the Copy Ninja. Has a Sharingan eye covered by his headband." }
+    ],
+    plots: [
+      "A young ninja from a small village is ostracized by everyone due to a demon sealed within him. He dreams of becoming the leader of his village.",
+      "A powerful demon attacks a village 16 years before the story begins. It is sealed into a newborn baby, making him hated by the villagers.",
+      "A ninja seeks revenge against his older brother and is willing to betray his friends to gain the power needed for vengeance.",
+      "Four ninjas train together in a team, bonding through countless battles and overcoming a series of increasingly dangerous threats."
     ]
   },
   "One Piece": {
-    characters: ["Luffy", "Zoro", "Nami", "Usopp", "Sanji"],
-    facts: [
-      "Luffy's goal is to become King of the Pirates",
-      "The One Piece is the legendary treasure",
-      "Zoro wants to become the world's greatest swordsman",
-      "Nami navigates using her weather-prediction skills",
-      "The Straw Hat crew has 10 members"
+    characters: [
+      { name: "Luffy", description: "A rubber-powered pirate captain with an infectious laugh who dreams of finding the legendary treasure and becoming King of the Pirates." },
+      { name: "Zoro", description: "A green-haired swordsman who wields three swords simultaneously. His dream is to become the world's greatest swordsman." },
+      { name: "Nami", description: "A skilled navigator and cartographer with orange hair. She uses weather-based weapons and is obsessed with treasure and maps." },
+      { name: "Sanji", description: "A blonde-haired cook who fights using only his legs. He protects the crew's food supplies at all costs." }
+    ],
+    plots: [
+      "A man aspires to find a legendary treasure and become the ruler of all pirates, inspiring others to join his cause.",
+      "A crew of misfits sails across a vast ocean, gathering members and battling powerful enemies to reach their shared dream.",
+      "A young woman forced into slavery escapes and joins pirates to map the world and find freedom.",
+      "A catastrophic war splits the world, creating three main powers that control the balance of the entire age."
     ]
   },
   "Death Note": {
-    characters: ["Light Yagami", "L", "Misa Amane", "Near"],
-    facts: [
-      "Light Yagami finds a Death Note that kills anyone whose name is written in it",
-      "L is a genius detective who opposes Light",
-      "Misa is a Kira supporter and model",
-      "Light becomes increasingly obsessed with godhood",
-      "The series ends with Light's death"
+    characters: [
+      { name: "Light Yagami", description: "A brilliant high school student who finds a supernatural notebook that kills anyone whose name is written in it. He becomes corrupted by power." },
+      { name: "L", description: "An eccentric detective with a massive intellect who investigates serial killings. He works in the shadows and is obsessed with sugar." },
+      { name: "Misa Amane", description: "A model and actress who falls in love with a mass murderer. She makes a devil's bargain to help him." },
+      { name: "Near", description: "A young detective who is L's successor. He has white hair and is tactically brilliant." }
+    ],
+    plots: [
+      "A high school student gains the power to kill anyone by writing their name in a supernatural notebook. He uses this power to create a new world.",
+      "A detective must stop a mysterious killer who leaves no evidence. The killer can eliminate anyone who threatens their plans.",
+      "A god-like being decides humanity is corrupt and takes it upon himself to judge and execute those he deems guilty.",
+      "A supernatural notebook falls to earth. Its first rule: anyone whose name is written in it dies within 40 seconds."
     ]
   },
   "Monster": {
-    characters: ["Kenzo Tenma", "Johan Liebert", "Nina Fortner"],
-    facts: [
-      "Tenma is a surgeon who saves a criminal's life",
-      "Johan is the perfect monster - intelligent and manipulative",
-      "The story spans across Europe following Tenma's investigation",
-      "Nina is Johan's sister with amnesia",
-      "The anime has 74 episodes"
+    characters: [
+      { name: "Kenzo Tenma", description: "A Japanese surgeon in Germany who saves a criminal's life, only to discover he created a monster. He spends years hunting down his mistake." },
+      { name: "Johan Liebert", description: "A beautiful but emotionless man capable of manipulating anyone. He is considered the perfect monster created by unethical experiments." },
+      { name: "Nina Fortner", description: "A girl with a mysterious past who may be connected to Johan. She has twin-like memories." }
+    ],
+    plots: [
+      "A doctor saves a criminal's life, believing everyone deserves a second chance. Years later, he realizes his patient became a monster and hunts him across continents.",
+      "A mysterious experiment created a perfect human being with no conscience. This being manipulates everyone around them for their own amusement.",
+      "A surgeon must stop a serial killer while uncovering the truth about the killer's origins in a secret laboratory.",
+      "A detective's investigation into serial murders leads to a disturbing conspiracy involving illegal human experimentation."
     ]
   },
   "Steins;Gate": {
-    characters: ["Rintaro Okabe", "Makise Kurisu", "Mayuri Shiina"],
-    facts: [
-      "Okabe invents the Phone Microwave for time travel",
-      "Makise Kurisu is a genius scientist",
-      "The story involves changing the timeline",
-      "El Psy Kongroo is Okabe's catchphrase",
-      "Mayuri's death is a key turning point"
+    characters: [
+      { name: "Rintaro Okabe", description: "An eccentric self-proclaimed mad scientist who invents a device to send messages to the past. He struggles with the consequences of changing time." },
+      { name: "Makise Kurisu", description: "A brilliant young scientist who helps Okabe develop time-travel technology. She challenges Okabe's beliefs constantly." },
+      { name: "Mayuri Shiina", description: "Okabe's childhood friend with a bubbly personality. Her repeated death becomes the central tragedy driving the story." }
+    ],
+    plots: [
+      "A group of friends accidentally discover how to send messages to the past using a modified microwave. Changing history has severe consequences.",
+      "A scientist must undo multiple timelines to save someone dear to him, but discovers each attempt creates a new tragedy.",
+      "A conspiracy involving time travel forces ordinary people to become soldiers in an invisible war across multiple realities.",
+      "A young man becomes trapped in a time loop, forced to witness the same tragic events repeatedly while searching for a way to change them."
     ]
   },
   "Attack on Titan": {
-    characters: ["Eren Yeager", "Mikasa Ackerman", "Arwin Smith"],
-    facts: [
-      "Titans are giant humanoid creatures that eat humans",
-      "Eren can transform into a Titan",
-      "The walls protect humanity from Titans",
-      "Mikasa has incredible combat skills",
-      "The series reveals complex truth about the world"
+    characters: [
+      { name: "Eren Yeager", description: "An angry, determined teen who vows to eliminate all Titans after his mother is eaten. He discovers he can transform into a Titan himself." },
+      { name: "Mikasa Ackerman", description: "A stoic girl with gray eyes and black hair. She is Eren's devoted companion and an exceptionally skilled soldier." },
+      { name: "Arwin Smith", description: "The strategic commander of the military with blonde hair. He holds many secrets about the world and pursues the truth relentlessly." }
+    ],
+    plots: [
+      "Giant humanoid creatures called Titans attack humanity, which survives behind three massive walls. A teen seeks revenge against them.",
+      "Mysterious walls protect humanity from extinction, but cracks appear, suggesting an even larger threat exists beyond them.",
+      "A soldier with the ability to transform into a Titan joins the military to uncover the truth about the Titans' origins.",
+      "A secret organization controls information about the outside world. A group of soldiers begins to question everything they've been taught."
     ]
   },
   "Demon Slayer": {
-    characters: ["Tanjiro Kamado", "Nezuko Kamado", "Giyu Tomioka"],
-    facts: [
-      "Tanjiro's sister Nezuko becomes a demon but retains humanity",
-      "Tanjiro trains under Giyu to become a Demon Slayer",
-      "The Twelve Kizuki are powerful demons",
-      "Tanjiro learns Water Breathing technique",
-      "Muzan Kibutsuji is the first and strongest demon"
+    characters: [
+      { name: "Tanjiro Kamado", description: "A kind-hearted demon slayer with dark reddish hair and a burn mark on his forehead. His sister becomes a demon but retains her humanity." },
+      { name: "Nezuko Kamado", description: "Tanjiro's sister who is transformed into a demon but retains her human consciousness. She is the only demon to never consume human flesh." },
+      { name: "Giyu Tomioka", description: "A Water Breathing user and one of the nine Pillars. He saved Tanjiro and Nezuko and becomes an important mentor figure." }
+    ],
+    plots: [
+      "A young man discovers his entire family slaughtered and his sister transformed into a demon. He vows to find a cure for her condition.",
+      "A secret organization of elite swordsmen battles demons that plague humanity. A swordsman with a demon companion joins their ranks.",
+      "An ancient demon awakens after centuries of slumber, forcing the strongest warriors to band together for a final battle.",
+      "A teenager trains to master a specific breathing technique that grants him supernatural abilities to fight inhuman creatures."
     ]
   },
-  "Re:Zero": {
-    characters: ["Subaru Emilia", "Rem", "Ram"],
-    facts: [
-      "Subaru can 'Return by Death' to change the past",
-      "Emilia is a half-elf candidate to become next ruler",
-      "Rem is a demon maid who falls in love with Subaru",
-      "Ram is Rem's twin sister",
-      "Subaru experiences traumatic timelines"
+  "Psychological-Thriller-Mystery": {
+    characters: [
+      { name: "L Lawliet", description: "A mysterious detective who works in the shadows. Hunches folded, eating sweets constantly, and speaking in riddles." },
+      { name: "Shinji Ikari", description: "A shy teenager forced to pilot a giant bio-mechanical creature to save the world. He constantly questions his worth." },
+      { name: "Okabe Rintaro", description: "A self-proclaimed mad scientist who becomes paranoid after discovering time-travel conspiracies." }
+    ],
+    plots: [
+      "A reclusive detective works in complete secrecy, communicating only through intermediaries while hunting a powerful criminal.",
+      "A teenager is forced into military service piloting an experimental weapon. As the series progresses, reality becomes increasingly distorted.",
+      "A group of friends discovers a time-travel conspiracy that forces them into a dangerous game where the stakes increase with each timeline."
     ]
   },
-  "Ergo Proxy": {
-    characters: ["Re-l Mayer", "Vincent Law", "Pino"],
-    facts: [
-      "Re-l searches for the truth about the world",
-      "Vincent is connected to Proxies - god-like beings",
-      "The world is covered in radiation",
-      "Pino is an android child",
-      "The series is set in a post-apocalyptic world"
+  "Sci-Fi-Dystopian": {
+    characters: [
+      { name: "Lain Iwakura", description: "A introverted girl who becomes a god-like entity within a virtual reality network. She gradually loses connection to reality." },
+      { name: "Motoko Kusanagi", description: "A cyborg soldier with a fully synthetic body in a futuristic Japan. She questions what it means to be human." },
+      { name: "Spike Spiegel", description: "A laid-back bounty hunter with one eye and a mysterious past. He drifts through space collecting bounties." }
+    ],
+    plots: [
+      "A teenage girl discovers a virtual reality network called the Wired. As she explores it, she realizes the boundary between reality and virtual is blurring.",
+      "An elite team of special operatives works in a futuristic Japan where nearly everyone is a cyborg. They struggle against corruption and identity.",
+      "A small ragtag crew of misfits flies through space as bounty hunters, each carrying dark secrets from their past."
     ]
   },
-  "Serial Experiments Lain": {
-    characters: ["Lain Iwakura", "Arisu Mizuki", "Masayuki Iwakura"],
-    facts: [
-      "Lain is a god-like entity within the Wired",
-      "The Wired is a virtual reality network",
-      "Arisu is Lain's friend who commits suicide",
-      "The series explores the nature of reality",
-      "Lain becomes increasingly detached from the physical world"
+  "Niche-Psychological": {
+    characters: [
+      { name: "Lain Iwakura", description: "A quiet, introverted girl with bowl-cut black hair. She gradually transforms into something transcendent and god-like." },
+      { name: "Arisu Mizuki", description: "Lain's childhood friend who is vibrant and social. Her suicide becomes a pivotal moment in the story." },
+      { name: "Johan Liebert", description: "A beautiful man with no capacity for empathy. He is called the 'perfect monster' by those around him." }
+    ],
+    plots: [
+      "A girl's suicide triggers a chain of mysterious events involving an underground virtual network and existential questions about reality.",
+      "A girl receives an invitation to a secret internet forum. Her identity begins to blur as she explores strange digital spaces.",
+      "A teenage girl's classmate commits suicide, sparking an investigation into an underground internet community full of disturbing content."
+    ]
+  },
+  "Shounen-Action": {
+    characters: [
+      { name: "Tanjiro Kamado", description: "A humble demon slayer with water-drop shaped pupils and dark reddish-burgundy hair. Extremely kind-hearted despite his tragedy." },
+      { name: "Ichigo Kurosaki", description: "A orange-haired teenager who can see ghosts. He becomes a Soul Reaper to protect the living world from corrupted spirits." },
+      { name: "Yuji Itadori", description: "A cheerful high schooler who swallows a cursed finger and becomes the vessel for a powerful demon." }
+    ],
+    plots: [
+      "A young man trains to become stronger after a personal tragedy, climbing ranks and battling increasingly powerful opponents.",
+      "A teenager discovers he can see supernatural beings and is suddenly thrust into a war between the spirit world and human world.",
+      "A high schooler becomes the host of a powerful curse and must control it while fighting others like him in a deadly tournament."
     ]
   }
 };
 
-// Extended niche anime titles and facts database
-const NICHE_ANIME_DB = {
-  scifi: [
-    { title: "Ergo Proxy", facts: ANIME_FACTS["Ergo Proxy"], difficulty: 4 },
-    { title: "Serial Experiments Lain", facts: ANIME_FACTS["Serial Experiments Lain"], difficulty: 5 },
-  ],
-  psychological: [
-    { title: "Monster", facts: ANIME_FACTS["Monster"], difficulty: 4 },
-  ],
-  action: [
-    { title: "Attack on Titan", facts: ANIME_FACTS["Attack on Titan"], difficulty: 3 },
-    { title: "Demon Slayer", facts: ANIME_FACTS["Demon Slayer"], difficulty: 2 },
-  ],
-  isekai: [
-    { title: "Re:Zero", facts: ANIME_FACTS["Re:Zero"], difficulty: 3 },
-  ],
-  popular: [
-    { title: "Naruto", facts: ANIME_FACTS["Naruto"], difficulty: 1 },
-    { title: "One Piece", facts: ANIME_FACTS["One Piece"], difficulty: 1 },
-    { title: "Death Note", facts: ANIME_FACTS["Death Note"], difficulty: 2 },
-    { title: "Steins;Gate", facts: ANIME_FACTS["Steins;Gate"], difficulty: 3 },
-  ],
-};
+// Anime list for selection
+const ANIME_LIST = [
+  "Naruto",
+  "One Piece",
+  "Death Note",
+  "Monster",
+  "Steins;Gate",
+  "Attack on Titan",
+  "Demon Slayer"
+];
 
 interface UserKnowledge {
   [anime: string]: number; // 0-1 confidence level
@@ -140,6 +169,7 @@ interface QuizQuestion {
   difficulty: number;
   anime: string;
   explanation: string;
+  type: "character" | "plot"; // Question type
 }
 
 export default async (req: Request, context: Context): Promise<Response> => {
@@ -159,98 +189,34 @@ export default async (req: Request, context: Context): Promise<Response> => {
 
     const questionCount = Math.min(body.count || 10, 50);
     const userKnowledge = body.userKnowledge || {};
-    const requestedDifficulty = body.difficulty || "adaptive";
 
-    // Initialize Anthropic client
-    const client = new Anthropic();
-
-    // Generate questions using Claude API
+    // Generate questions from database
     const questions: QuizQuestion[] = [];
 
-    // Select anime genres weighted by user knowledge gaps
-    const genres = Object.keys(NICHE_ANIME_DB) as Array<
-      keyof typeof NICHE_ANIME_DB
-    >;
-    const selectedGenres = selectGenresByKnowledge(
-      genres,
-      userKnowledge,
-      questionCount
-    );
-
-    // Generate questions with Claude
     for (let i = 0; i < questionCount; i++) {
-      const genre = selectedGenres[i % selectedGenres.length];
-      const animeList = NICHE_ANIME_DB[genre];
-      const anime = animeList[Math.floor(Math.random() * animeList.length)];
+      // Alternate between character and plot questions
+      const questionType = i % 2 === 0 ? "character" : "plot";
 
-      // Determine difficulty based on user's knowledge
-      const userConfidence = userKnowledge[anime.title] || 0.5;
-      const recommendedDifficulty =
-        requestedDifficulty === "adaptive"
-          ? Math.max(1, Math.ceil((1 - userConfidence) * 5))
-          : parseInt(requestedDifficulty) || 3;
+      // Pick a random anime
+      const animeTitle = ANIME_LIST[Math.floor(Math.random() * ANIME_LIST.length)];
+      const animeData = ANIME_DATABASE[animeTitle];
+
+      if (!animeData) continue;
 
       try {
-        // Get anime facts if available
-        const animeFacts = ANIME_FACTS[anime.title] || { characters: [], facts: [] };
-
-        const response = await client.messages.create({
-          model: "claude-opus-4-6",
-          max_tokens: 500,
-          messages: [
-            {
-              role: "user",
-              content: `You are a trivia master for the anime "${anime.title}".
-
-HERE ARE THE KEY FACTS ABOUT THIS ANIME:
-Characters: ${animeFacts.characters?.join(", ") || "Various"}
-Plot Points: ${animeFacts.facts?.slice(0, 3).join(" | ") || "Various"}
-
-CREATE A QUESTION that:
-1. MUST ask about a CHARACTER NAME, PLOT POINT, or STORY EVENT from this specific anime
-2. MUST use only facts from the anime's story
-3. Difficulty level: ${recommendedDifficulty}/5
-
-EXAMPLES OF GOOD QUESTIONS:
-- "What is the main goal of [Character] in ${anime.title}?"
-- "In ${anime.title}, [Character] can [ability/power]. What is this?"
-- "What happens to [Character] in the climax of ${anime.title}?"
-
-EXAMPLES OF BAD QUESTIONS (DO NOT CREATE THESE):
-- "What is an anime opening?"
-- "What does a light novel mean?"
-- "What animation technique is used?"
-- "[Studio name] produced ${anime.title}"
-- "In what year was ${anime.title} released?"
-
-Return ONLY this exact JSON format:
-{
-  "question": "question about ${anime.title}'s characters or plot",
-  "options": ["answer A", "answer B", "answer C", "answer D"],
-  "correctIndex": 0,
-  "explanation": "why this is correct"
-}`,
-            },
-          ],
-        });
-
-        const content = response.content[0];
-        if (content.type === "text") {
-          // Extract JSON from response
-          const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const questionData = JSON.parse(jsonMatch[0]);
-            questions.push({
-              ...questionData,
-              difficulty: recommendedDifficulty,
-              anime: anime.title,
-            });
+        if (questionType === "character") {
+          const question = generateCharacterQuestion(animeTitle, animeData);
+          if (question) {
+            questions.push(question);
+          }
+        } else {
+          const question = generatePlotQuestion(animeTitle, animeData);
+          if (question) {
+            questions.push(question);
           }
         }
       } catch (error) {
-        console.error(`Failed to generate question for ${anime.title}:`, error);
-        // Fall back to a simple question
-        questions.push(generateFallbackQuestion(anime, recommendedDifficulty));
+        console.error(`Failed to generate question for ${animeTitle}:`, error);
       }
     }
 
@@ -270,89 +236,75 @@ Return ONLY this exact JSON format:
   }
 };
 
-function selectGenresByKnowledge(
-  genres: string[],
-  knowledge: UserKnowledge,
-  count: number
-): string[] {
-  // Weight genres by user's knowledge gaps
-  const weightedGenres = genres.map((genre) => {
-    const animeInGenre = NICHE_ANIME_DB[genre as keyof typeof NICHE_ANIME_DB];
-    const avgKnowledge =
-      animeInGenre.reduce(
-        (sum, anime) => sum + (knowledge[anime.title] || 0),
-        0
-      ) / animeInGenre.length;
+function generateCharacterQuestion(
+  animeTitle: string,
+  animeData: Record<string, unknown>
+): QuizQuestion | null {
+  const characters = animeData.characters as Array<{ name: string; description: string }>;
+  if (!characters || characters.length === 0) return null;
 
-    // Higher weight for genres where user knows less
-    const weight = 1 - avgKnowledge + Math.random() * 0.2;
-    return { genre, weight };
-  });
+  // Pick a random character
+  const targetCharacter = characters[Math.floor(Math.random() * characters.length)];
+  const otherAnimes = ANIME_LIST.filter((t) => t !== animeTitle);
 
-  // Sort by weight and select
-  const selected = weightedGenres
-    .sort((a, b) => b.weight - a.weight)
-    .slice(0, count)
-    .map((item) => item.genre);
-
-  return selected.length > 0 ? selected : genres;
-}
-
-function generateFallbackQuestion(
-  anime: Record<string, unknown>,
-  difficulty: number
-): QuizQuestion {
-  const title = anime.title as string;
-  const animeFacts = ANIME_FACTS[title];
-
-  // If we have facts for this anime, create a question from them
-  if (animeFacts && animeFacts.facts.length > 0) {
-    const facts = animeFacts.facts;
-    const characters = animeFacts.characters || [];
-
-    // Create different question types
-    const questionTypes = [
-      {
-        question: `In ${title}, who is a main character?`,
-        options: characters.length > 0 ? characters.slice(0, 4) : ["Unknown"],
-        correctIndex: 0,
-        explanation: `${characters[0]} is a protagonist in ${title}.`,
-      },
-      {
-        question: `What is a key plot point in ${title}? "${facts[0]}"`,
-        options: [
-          "That's correct",
-          "That's about a different anime",
-          "That was retconned",
-          "That's fan fiction",
-        ],
-        correctIndex: 0,
-        explanation: `This is indeed a major plot point in ${title}.`,
-      },
-      {
-        question: `In ${title}, ${facts[Math.floor(Math.random() * facts.length)]} What happens next?`,
-        options: [facts[1] || "The story continues", facts[2] || "Character development", "An unexpected twist", "Comedy relief"],
-        correctIndex: 0,
-        explanation: `Following this plot point, the story continues with important developments in ${title}.`,
-      },
-    ];
-
-    const selectedQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-    return {
-      ...selectedQuestion,
-      difficulty,
-      anime: title,
-    };
+  // Get other character names for distractors
+  const distractorNames: string[] = [];
+  for (const otherAnime of otherAnimes) {
+    const otherData = ANIME_DATABASE[otherAnime];
+    if (otherData.characters && otherData.characters.length > 0) {
+      const otherChar = (otherData.characters as Array<{ name: string }>)[
+        Math.floor(Math.random() * otherData.characters.length)
+      ];
+      distractorNames.push(otherChar.name);
+      if (distractorNames.length >= 3) break;
+    }
   }
 
-  // Fallback for anime not in our database
+  const options = [targetCharacter.name, ...distractorNames.slice(0, 3)];
+  const shuffled = options.sort(() => Math.random() - 0.5);
+  const correctIndex = shuffled.indexOf(targetCharacter.name);
+
   return {
-    question: `${title} is an anime. True or False?`,
-    options: ["True - it's a great anime series", "False - it's a manga only", "True - but it's not finished", "False - I've never heard of it"],
-    correctIndex: 0,
-    explanation: `${title} is indeed an anime series with memorable characters and plots.`,
-    difficulty,
-    anime: title,
+    question: `This character: "${targetCharacter.description}" is from which anime?`,
+    options: shuffled,
+    correctIndex,
+    difficulty: 3,
+    anime: animeTitle,
+    explanation: `${targetCharacter.name} is a character from ${animeTitle}.`,
+    type: "character",
+  };
+}
+
+function generatePlotQuestion(
+  animeTitle: string,
+  animeData: Record<string, unknown>
+): QuizQuestion | null {
+  const plots = animeData.plots as string[];
+  if (!plots || plots.length === 0) return null;
+
+  // Pick a random plot
+  const targetPlot = plots[Math.floor(Math.random() * plots.length)];
+  const otherAnimes = ANIME_LIST.filter((t) => t !== animeTitle);
+
+  // Get other anime titles for distractors
+  const distractorAnimes: string[] = [];
+  for (const otherAnime of otherAnimes) {
+    distractorAnimes.push(otherAnime);
+    if (distractorAnimes.length >= 3) break;
+  }
+
+  const options = [animeTitle, ...distractorAnimes];
+  const shuffled = options.sort(() => Math.random() - 0.5);
+  const correctIndex = shuffled.indexOf(animeTitle);
+
+  return {
+    question: `Which anime has this plot: "${targetPlot}"?`,
+    options: shuffled,
+    correctIndex,
+    difficulty: 2,
+    anime: animeTitle,
+    explanation: `This plot is from ${animeTitle}.`,
+    type: "plot",
   };
 }
 
