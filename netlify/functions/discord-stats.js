@@ -54,8 +54,6 @@ exports.handler = async (event, context) => {
     console.log("approximate_member_count:", guildData.approximate_member_count);
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
-    // Use hardcoded member count for now (Discord API returns 0)
-    const memberCount = 392;
     const guildName = guildData.name || "Monolith Social";
 
     // Build guild icon URL
@@ -65,7 +63,8 @@ exports.handler = async (event, context) => {
       iconUrl = `https://cdn.discordapp.com/icons/${GUILD_ID}/${guildData.icon}.${iconFormat}`;
     }
 
-    // Try to get online count from guild presences
+    // Get real member and presence counts from guild with counts
+    let memberCount = 0;
     let onlineCount = 0;
     try {
       const presenceResponse = await fetch(
@@ -79,18 +78,17 @@ exports.handler = async (event, context) => {
 
       if (presenceResponse.ok) {
         const presenceData = await presenceResponse.json();
-        console.log("Presence data fields:", Object.keys(presenceData));
-        console.log("approximate_member_count:", presenceData.approximate_member_count);
-        console.log("approximate_presence_count:", presenceData.approximate_presence_count);
-        onlineCount = presenceData.approximate_presence_count || Math.ceil(memberCount * 0.3);
+        memberCount = presenceData.approximate_member_count || 0;
+        onlineCount = presenceData.approximate_presence_count || 0;
       } else {
-        // Fallback: estimate online as ~30% of members
-        onlineCount = Math.ceil(memberCount * 0.3);
+        // Fallback if we can't get counts
+        memberCount = 0;
+        onlineCount = 0;
       }
     } catch (error) {
-      console.warn("Could not fetch presence data:", error);
-      // Fallback: estimate online as ~30% of members
-      onlineCount = Math.ceil(memberCount * 0.3);
+      console.warn("Could not fetch guild counts:", error);
+      memberCount = 0;
+      onlineCount = 0;
     }
 
     return {
