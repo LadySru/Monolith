@@ -234,7 +234,7 @@ function loadQuestion() {
   // Update header
   document.getElementById('q-num').textContent = `Question ${qIndex + 1} of ${totalQuestions} • Difficulty: ${'⭐'.repeat(currentQuestion.difficulty)}`;
   document.getElementById('q-text').textContent = currentQuestion.question;
-  document.getElementById('q-text').innerHTML += `<div style="font-size:0.75rem;color:var(--text3);margin-top:8px;">📚 ${currentQuestion.anime}</div>`;
+  // Don't show anime label - it gives away the answer!
   document.getElementById('q-score-hdr').textContent = `${quizAI.score} / ${totalQuestions}`;
   document.getElementById('q-bar').style.width = ((qIndex / totalQuestions) * 100) + '%';
   document.getElementById('q-score-foot').textContent = `Score: ${quizAI.score}`;
@@ -269,6 +269,7 @@ function answerQuestion(selectedIndex) {
   fb.innerHTML = `
     <div style="margin-bottom:8px;">${isCorrect ? '✓ Correct!' : '✗ Incorrect!'}</div>
     <div style="font-size:0.85rem;font-weight:300;line-height:1.4;">${result.explanation}</div>
+    <div style="font-size:0.75rem;color:var(--text3);margin-top:6px;">📚 Anime: ${currentQuestion.anime}</div>
   `;
   fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
 
