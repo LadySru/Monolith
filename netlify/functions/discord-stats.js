@@ -48,6 +48,11 @@ exports.handler = async (event, context) => {
 
     const guildData = await response.json();
 
+    // Log what the API returns
+    console.log("Guild data fields:", Object.keys(guildData));
+    console.log("member_count:", guildData.member_count);
+    console.log("approximate_member_count:", guildData.approximate_member_count);
+
     // Get approximate online count (requires GUILD_PRESENCES intent)
     const guildName = guildData.name || "Monolith Social";
 

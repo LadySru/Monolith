@@ -1,10 +1,13 @@
 // ═══════ SEASONAL PARTICLE SYSTEM ═══════
 class SeasonalParticles {
-  constructor() {
+  constructor(intensity = 100) {
     this.season = this.detectSeason();
     this.particles = [];
     this.canvas = null;
     this.ctx = null;
+    this.intensity = intensity;
+    this.enabled = intensity > 0;
+    this.animationId = null;
     this.init();
   }
 
@@ -51,7 +54,8 @@ class SeasonalParticles {
   }
 
   spawnParticles() {
-    const count = this.season === 'winter' ? 80 : this.season === 'summer' ? 60 : 50;
+    let count = this.season === 'winter' ? 80 : this.season === 'summer' ? 60 : 50;
+    count = Math.ceil(count * (this.intensity / 100));
     for (let i = 0; i < count; i++) {
       this.particles.push(this.createParticle());
     }
@@ -214,9 +218,38 @@ class SeasonalParticles {
   }
 
   animate() {
-    this.update();
-    this.draw();
-    requestAnimationFrame(() => this.animate());
+    if (this.enabled) {
+      this.update();
+      this.draw();
+    } else {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    this.animationId = requestAnimationFrame(() => this.animate());
+  }
+
+  setEnabled(enabled) {
+    this.enabled = enabled;
+    if (enabled && this.particles.length === 0) {
+      this.spawnParticles();
+    }
+  }
+
+  setIntensity(intensity) {
+    this.intensity = Math.max(0, Math.min(100, intensity));
+    this.enabled = this.intensity > 0;
+
+    // Adjust particle count based on intensity
+    let targetCount = this.season === 'winter' ? 80 : this.season === 'summer' ? 60 : 50;
+    targetCount = Math.ceil(targetCount * (this.intensity / 100));
+
+    // Add or remove particles to match target count
+    if (this.particles.length < targetCount) {
+      while (this.particles.length < targetCount) {
+        this.particles.push(this.createParticle());
+      }
+    } else if (this.particles.length > targetCount) {
+      this.particles.splice(targetCount);
+    }
   }
 }
 
@@ -230,8 +263,15 @@ const observer = new IntersectionObserver((entries) => {
 
 // ═══════ INITIALIZE ALL SYSTEMS ═══════
 document.addEventListener('DOMContentLoaded', () => {
+  // Load particle settings from localStorage
+  const savedIntensity = parseInt(localStorage.getItem('particleIntensity') || '100', 10);
+  const savedEnabled = localStorage.getItem('particleEnabled') !== 'false';
+
   // Initialize seasonal particles
-  new SeasonalParticles();
+  window.particleSystem = new SeasonalParticles(savedEnabled ? savedIntensity : 0);
+  if (!savedEnabled) {
+    window.particleSystem.setEnabled(false);
+  }
 
   // Custom cursor
   document.addEventListener('mousemove', (e) => {
