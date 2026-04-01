@@ -49,7 +49,8 @@ exports.handler = async (event, context) => {
     const guildData = await response.json();
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
-    const memberCount = guildData.member_count || 0;
+    // Use hardcoded member count for now (Discord API returns 0)
+    const memberCount = 392;
     const guildName = guildData.name || "Monolith Social";
 
     // Build guild icon URL
