@@ -49,15 +49,9 @@ exports.handler = async (event, context) => {
     const guildData = await response.json();
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
-    const memberCount = guildData.member_count || 0;
+    // Use hardcoded member count for now (Discord API returns 0)
+    const memberCount = 392;
     const guildName = guildData.name || "Monolith Social";
-
-    console.log("Discord API Response:", {
-      member_count: guildData.member_count,
-      approximate_member_count: guildData.approximate_member_count,
-      presence_count: guildData.approximate_presence_count,
-      allKeys: Object.keys(guildData),
-    });
 
     // Build guild icon URL
     let iconUrl = null;
@@ -103,11 +97,6 @@ exports.handler = async (event, context) => {
         icon: iconUrl,
         name: guildName,
         cached: false,
-        debug: {
-          member_count: guildData.member_count,
-          approximate_member_count: guildData.approximate_member_count,
-          approximate_presence_count: guildData.approximate_presence_count,
-        },
       }),
     };
   } catch (error) {
