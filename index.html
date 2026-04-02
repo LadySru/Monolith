@@ -359,6 +359,15 @@
       background: rgba(129,46,189,.95);
       clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 8px 100%);
       box-shadow: 0 0 14px rgba(139,47,255,.4), 0 0 26px rgba(139,47,255,.18);
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .game-card.invincible-card:hover .invincible-top-tail,
+    .game-card.invincible-card.locked .invincible-top-tail {
+      opacity: 1;
+      transform: translateY(0);
     }
     .invincible-top-tail::before,
     .invincible-top-tail::after {
@@ -405,6 +414,15 @@
       clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
       box-shadow: 0 0 12px rgba(255,45,107,.35), 0 0 24px rgba(255,45,107,.15);
       text-shadow: 0 0 8px rgba(255,255,255,.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .game-card.invincible-card:hover .invincible-bottom-tail,
+    .game-card.invincible-card.locked .invincible-bottom-tail {
+      opacity: 1;
+      transform: translateY(0);
     }
     @media (min-width: 1025px) {
       .games-grid {
