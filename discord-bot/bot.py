@@ -36,6 +36,8 @@ def init_database():
             user_id BIGINT PRIMARY KEY,
             guild_id BIGINT,
             username VARCHAR(255),
+            nickname VARCHAR(255),
+            avatar_url VARCHAR(500),
             join_date TIMESTAMP,
             message_count INT DEFAULT 0,
             voice_time_seconds INT DEFAULT 0,
@@ -86,14 +88,21 @@ async def on_message(message):
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # Get member info from guild
+        member = message.guild.get_member(message.author.id)
+        nickname = member.nick if member and member.nick else None
+        avatar_url = str(message.author.display_avatar.url) if message.author.display_avatar else None
+
         cur.execute('''
-            INSERT INTO member_stats (user_id, guild_id, username, message_count, join_date, last_updated)
-            VALUES (%s, %s, %s, 1, %s, NOW())
+            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
             ON CONFLICT (user_id) DO UPDATE SET
                 message_count = member_stats.message_count + 1,
                 username = %s,
+                nickname = %s,
+                avatar_url = %s,
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), message.author.created_at, str(message.author)))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, message.author.created_at, str(message.author), nickname, avatar_url))
 
         conn.commit()
         cur.close()
@@ -151,7 +160,7 @@ async def stats(interaction: discord.Interaction):
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute('''
-        SELECT user_id, username, message_count, voice_time_seconds, join_date
+        SELECT user_id, username, nickname, avatar_url, message_count, voice_time_seconds, join_date
         FROM member_stats WHERE user_id = %s
     ''', (user_id,))
 
@@ -165,11 +174,15 @@ async def stats(interaction: discord.Interaction):
 
     voice_hours = stats_data['voice_time_seconds'] // 3600
     voice_mins = (stats_data['voice_time_seconds'] % 3600) // 60
+    display_name = stats_data['nickname'] or stats_data['username']
 
-    embed = discord.Embed(title="Your Statistics", color=discord.Color.blue())
+    embed = discord.Embed(title=f"{display_name}'s Statistics", color=discord.Color.blue())
     embed.add_field(name="Messages", value=stats_data['message_count'], inline=False)
     embed.add_field(name="Voice Time", value=f"{voice_hours}h {voice_mins}m", inline=False)
     embed.add_field(name="Member Since", value=stats_data['join_date'].strftime("%B %d, %Y"), inline=False)
+
+    if stats_data['avatar_url']:
+        embed.set_thumbnail(url=stats_data['avatar_url'])
 
     await interaction.response.send_message(embed=embed)
 
@@ -180,7 +193,7 @@ async def leaderboard(interaction: discord.Interaction):
 
     # Messages leaderboard
     cur.execute('''
-        SELECT username, message_count FROM member_stats
+        SELECT username, nickname, avatar_url, message_count FROM member_stats
         WHERE guild_id = %s
         ORDER BY message_count DESC LIMIT 10
     ''', (interaction.guild.id,))
@@ -189,7 +202,7 @@ async def leaderboard(interaction: discord.Interaction):
 
     # Voice time leaderboard
     cur.execute('''
-        SELECT username, voice_time_seconds FROM member_stats
+        SELECT username, nickname, avatar_url, voice_time_seconds FROM member_stats
         WHERE guild_id = %s
         ORDER BY voice_time_seconds DESC LIMIT 10
     ''', (interaction.guild.id,))
@@ -202,12 +215,12 @@ async def leaderboard(interaction: discord.Interaction):
     embed = discord.Embed(title="Community Leaderboard", color=discord.Color.gold())
 
     # Messages leaderboard
-    messages_text = "\n".join([f"{i+1}. {row['username']}: {row['message_count']} messages"
+    messages_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['message_count']} messages"
                                for i, row in enumerate(top_messages)])
     embed.add_field(name="🏆 Top Messagers", value=messages_text or "No data yet", inline=False)
 
     # Voice leaderboard
-    voice_text = "\n".join([f"{i+1}. {row['username']}: {row['voice_time_seconds']//3600}h"
+    voice_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['voice_time_seconds']//3600}h"
                             for i, row in enumerate(top_voice)])
     embed.add_field(name="🎤 Top Voice Chatters", value=voice_text or "No data yet", inline=False)
 
@@ -220,7 +233,7 @@ async def profile(interaction: discord.Interaction, member: discord.Member):
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute('''
-        SELECT user_id, username, message_count, voice_time_seconds, join_date
+        SELECT user_id, username, nickname, avatar_url, message_count, voice_time_seconds, join_date
         FROM member_stats WHERE user_id = %s
     ''', (member.id,))
 
@@ -234,13 +247,20 @@ async def profile(interaction: discord.Interaction, member: discord.Member):
 
     voice_hours = stats_data['voice_time_seconds'] // 3600
     voice_mins = (stats_data['voice_time_seconds'] % 3600) // 60
+    display_name = stats_data['nickname'] or stats_data['username']
 
-    embed = discord.Embed(title=f"{member.name}'s Profile", color=discord.Color.purple())
-    embed.set_thumbnail(url=member.avatar.url)
+    embed = discord.Embed(title=f"{display_name}'s Profile", color=discord.Color.purple())
+
+    if stats_data['avatar_url']:
+        embed.set_thumbnail(url=stats_data['avatar_url'])
+    elif member.avatar:
+        embed.set_thumbnail(url=member.avatar.url)
+
+    embed.add_field(name="Username", value=stats_data['username'], inline=True)
+    embed.add_field(name="Status", value=str(member.status), inline=True)
     embed.add_field(name="Messages", value=stats_data['message_count'], inline=True)
     embed.add_field(name="Voice Time", value=f"{voice_hours}h {voice_mins}m", inline=True)
     embed.add_field(name="Member Since", value=stats_data['join_date'].strftime("%B %d, %Y"), inline=False)
-    embed.add_field(name="Status", value=str(member.status), inline=True)
 
     await interaction.response.send_message(embed=embed)
 
@@ -250,7 +270,7 @@ async def oldest(interaction: discord.Interaction):
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute('''
-        SELECT username, join_date FROM member_stats
+        SELECT username, nickname, avatar_url, join_date FROM member_stats
         WHERE guild_id = %s
         ORDER BY join_date ASC LIMIT 1
     ''', (interaction.guild.id,))
@@ -263,9 +283,15 @@ async def oldest(interaction: discord.Interaction):
         await interaction.response.send_message("No member data available.", ephemeral=True)
         return
 
+    display_name = oldest_member['nickname'] or oldest_member['username']
+
     embed = discord.Embed(title="👑 Oldest Member", color=discord.Color.green())
-    embed.add_field(name="Member", value=oldest_member['username'], inline=False)
-    embed.add_field(name="Joined", value=oldest_member['join_date'].strftime("%B %d, %Y"), inline=False)
+    embed.add_field(name="Member", value=display_name, inline=False)
+    embed.add_field(name="Username", value=oldest_member['username'], inline=True)
+    embed.add_field(name="Joined", value=oldest_member['join_date'].strftime("%B %d, %Y"), inline=True)
+
+    if oldest_member['avatar_url']:
+        embed.set_thumbnail(url=oldest_member['avatar_url'])
 
     await interaction.response.send_message(embed=embed)
 
