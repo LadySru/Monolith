@@ -34,6 +34,7 @@ def init_database():
     cur.execute('''
         CREATE TABLE IF NOT EXISTS member_stats (
             user_id BIGINT PRIMARY KEY,
+            guild_id BIGINT,
             username VARCHAR(255),
             join_date TIMESTAMP,
             message_count INT DEFAULT 0,
@@ -86,13 +87,13 @@ async def on_message(message):
         cur = conn.cursor()
 
         cur.execute('''
-            INSERT INTO member_stats (user_id, username, message_count, join_date, last_updated)
-            VALUES (%s, %s, 1, %s, NOW())
+            INSERT INTO member_stats (user_id, guild_id, username, message_count, join_date, last_updated)
+            VALUES (%s, %s, %s, 1, %s, NOW())
             ON CONFLICT (user_id) DO UPDATE SET
                 message_count = member_stats.message_count + 1,
                 username = %s,
                 last_updated = NOW()
-        ''', (message.author.id, str(message.author), message.author.created_at, str(message.author)))
+        ''', (message.author.id, message.guild.id, str(message.author), message.author.created_at, str(message.author)))
 
         conn.commit()
         cur.close()
@@ -180,16 +181,18 @@ async def leaderboard(interaction: discord.Interaction):
     # Messages leaderboard
     cur.execute('''
         SELECT username, message_count FROM member_stats
+        WHERE guild_id = %s
         ORDER BY message_count DESC LIMIT 10
-    ''')
+    ''', (interaction.guild.id,))
 
     top_messages = cur.fetchall()
 
     # Voice time leaderboard
     cur.execute('''
         SELECT username, voice_time_seconds FROM member_stats
+        WHERE guild_id = %s
         ORDER BY voice_time_seconds DESC LIMIT 10
-    ''')
+    ''', (interaction.guild.id,))
 
     top_voice = cur.fetchall()
 
@@ -248,8 +251,9 @@ async def oldest(interaction: discord.Interaction):
 
     cur.execute('''
         SELECT username, join_date FROM member_stats
+        WHERE guild_id = %s
         ORDER BY join_date ASC LIMIT 1
-    ''')
+    ''', (interaction.guild.id,))
 
     oldest_member = cur.fetchone()
     cur.close()
