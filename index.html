@@ -472,15 +472,27 @@
       color: var(--teal);
       opacity: 0;
       transform: translateX(0);
-      transition: opacity .3s, transform .3s;
+      transition: opacity .3s, transform .3s, color .3s;
       font-weight: 700;
       text-shadow: 0 0 8px rgba(0,255,231,.3);
       z-index: 3;
-      pointer-events: none;
+      cursor: pointer;
+      user-select: none;
     }
     .game-card.has-sequel:hover .sequel-indicator {
       opacity: 1;
       transform: translateX(4px);
+    }
+    .sequel-indicator.active {
+      color: var(--green);
+      text-shadow: 0 0 12px rgba(57,255,138,.5);
+      transform: translateX(8px) rotate(90deg);
+    }
+    .game-card-sequel.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+      visibility: visible;
     }
 
     @media (max-width: 768px) {
