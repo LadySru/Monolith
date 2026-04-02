@@ -133,8 +133,8 @@ async def on_ready():
     if not track_voice_activity.is_running():
         track_voice_activity.start()
 
-@bot.event
-async def on_message(message):
+@bot.listen('on_message')
+async def on_message_handler(message):
     print(f"[EVENT FIRED] on_message called for: {message.author}")
 
     if message.author == bot.user:
