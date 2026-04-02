@@ -179,8 +179,9 @@ async def on_message(message):
                 username = %s,
                 nickname = %s,
                 avatar_url = %s,
+                join_date = %s,
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url, join_date))
 
         conn.commit()
         cur.close()
@@ -244,13 +245,20 @@ async def on_voice_state_update(member, before, after):
         ''', (member.id,))
 
         # Update total voice time
+        nickname = member.nick if member.nick else None
+        avatar_url = str(member.display_avatar.url) if member.display_avatar else None
+
         cur.execute('''
-            INSERT INTO member_stats (user_id, username, voice_time_seconds, join_date, guild_id)
-            VALUES (%s, %s, (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s), %s, %s)
-            ON CONFLICT (user_id) DO UPDATE SET
+            INSERT INTO member_stats (user_id, username, nickname, avatar_url, voice_time_seconds, join_date, guild_id)
+            VALUES (%s, %s, %s, %s, (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s), %s, %s)
+            ON CONFLICT (user_id, guild_id) DO UPDATE SET
                 voice_time_seconds = (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s),
+                username = %s,
+                nickname = %s,
+                avatar_url = %s,
+                join_date = %s,
                 last_updated = NOW()
-        ''', (member.id, str(member), member.id, member.joined_at, member.guild.id, member.id))
+        ''', (member.id, str(member), nickname, avatar_url, member.id, member.joined_at, member.guild.id, member.id, str(member), nickname, avatar_url, member.joined_at))
 
         conn.commit()
 
