@@ -22,13 +22,12 @@ if not DISCORD_TOKEN:
 if not DATABASE_URL:
     raise ValueError("ERROR: DATABASE_URL environment variable not set!")
 
-# Initialize bot with intents
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-intents.voice_states = True
+# Initialize bot with intents - explicitly enable all needed intents
+intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='/', intents=intents)
+
+print(f"[STARTUP] Bot created with intents.message_content={intents.message_content}")
 
 # Database connection
 def get_db_connection():
