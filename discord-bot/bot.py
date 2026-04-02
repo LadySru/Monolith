@@ -92,6 +92,7 @@ async def on_message(message):
         member = message.guild.get_member(message.author.id)
         nickname = member.nick if member and member.nick else None
         avatar_url = str(message.author.display_avatar.url) if message.author.display_avatar else None
+        join_date = member.joined_at if member else message.author.created_at
 
         cur.execute('''
             INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, join_date, last_updated)
@@ -102,7 +103,7 @@ async def on_message(message):
                 nickname = %s,
                 avatar_url = %s,
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, message.author.created_at, str(message.author), nickname, avatar_url))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, join_date, str(message.author), nickname, avatar_url))
 
         conn.commit()
         cur.close()
@@ -137,15 +138,12 @@ async def on_voice_state_update(member, before, after):
 
         # Update total voice time
         cur.execute('''
-            INSERT INTO member_stats (user_id, username, voice_time_seconds, join_date)
-            SELECT user_id, %s, COALESCE(SUM(duration_seconds), 0), %s
-            FROM voice_sessions WHERE user_id = %s
+            INSERT INTO member_stats (user_id, username, voice_time_seconds, join_date, guild_id)
+            VALUES (%s, %s, (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s), %s, %s)
             ON CONFLICT (user_id) DO UPDATE SET
-                voice_time_seconds = COALESCE(SUM(
-                    (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s)
-                ), 0),
+                voice_time_seconds = (SELECT COALESCE(SUM(duration_seconds), 0) FROM voice_sessions WHERE user_id = %s),
                 last_updated = NOW()
-        ''', (str(member), member.created_at, member.id, member.id))
+        ''', (member.id, str(member), member.id, member.joined_at, member.guild.id, member.id))
 
         conn.commit()
 
