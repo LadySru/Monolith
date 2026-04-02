@@ -55,6 +55,53 @@ def init_database():
         )
     ''')
 
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS message_media (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT,
+            guild_id BIGINT,
+            message_id BIGINT,
+            username VARCHAR(255),
+            nickname VARCHAR(255),
+            avatar_url VARCHAR(500),
+            media_type VARCHAR(50),
+            message_content TEXT,
+            created_at TIMESTAMP DEFAULT NOW()
+        )
+    ''')
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS message_reactions (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT,
+            guild_id BIGINT,
+            message_id BIGINT,
+            username VARCHAR(255),
+            nickname VARCHAR(255),
+            avatar_url VARCHAR(500),
+            message_content TEXT,
+            reaction_count INT,
+            created_at TIMESTAMP DEFAULT NOW()
+        )
+    ''')
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS member_stats (
+            user_id BIGINT,
+            guild_id BIGINT,
+            PRIMARY KEY (user_id, guild_id),
+            username VARCHAR(255),
+            nickname VARCHAR(255),
+            avatar_url VARCHAR(500),
+            join_date TIMESTAMP,
+            message_count INT DEFAULT 0,
+            gif_count INT DEFAULT 0,
+            image_count INT DEFAULT 0,
+            voice_time_seconds INT DEFAULT 0,
+            last_updated TIMESTAMP DEFAULT NOW()
+        )
+    ''')
+
     conn.commit()
     cur.close()
     conn.close()
@@ -94,25 +141,85 @@ async def on_message(message):
         avatar_url = str(message.author.display_avatar.url) if message.author.display_avatar else None
         join_date = member.joined_at if member else message.author.created_at
 
+        # Detect media types
+        gif_count = 0
+        image_count = 0
+
+        # Check attachments
+        for attachment in message.attachments:
+            if attachment.content_type:
+                if 'image/gif' in attachment.content_type or attachment.filename.lower().endswith('.gif'):
+                    gif_count += 1
+                    cur.execute('''
+                        INSERT INTO message_media (user_id, guild_id, message_id, username, nickname, avatar_url, media_type, message_content)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ''', (message.author.id, message.guild.id, message.id, str(message.author), nickname, avatar_url, 'gif', message.content or 'GIF'))
+                elif 'image/' in attachment.content_type:
+                    image_count += 1
+                    cur.execute('''
+                        INSERT INTO message_media (user_id, guild_id, message_id, username, nickname, avatar_url, media_type, message_content)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ''', (message.author.id, message.guild.id, message.id, str(message.author), nickname, avatar_url, 'image', message.content or 'Image'))
+
+        # Check embeds for images/gifs
+        for embed in message.embeds:
+            if embed.image:
+                image_count += 1
+            if embed.video:
+                gif_count += 1
+
+        # Update member stats
         cur.execute('''
-            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, join_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
-            ON CONFLICT (user_id) DO UPDATE SET
+            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, gif_count, image_count, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
+            ON CONFLICT (user_id, guild_id) DO UPDATE SET
                 message_count = member_stats.message_count + 1,
+                gif_count = member_stats.gif_count + %s,
+                image_count = member_stats.image_count + %s,
                 username = %s,
                 nickname = %s,
                 avatar_url = %s,
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, join_date, str(message.author), nickname, avatar_url))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url))
 
         conn.commit()
         cur.close()
         conn.close()
-        print(f"[TRACKED] {message.author} - message count updated")
+        print(f"[TRACKED] {message.author} - message count updated (GIFs: {gif_count}, Images: {image_count})")
     except Exception as e:
         print(f"[ERROR] Failed to track message: {e}")
 
     await bot.process_commands(message)
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    try:
+        # Only track reactions on messages from other users
+        if reaction.message.author == user:
+            return
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Get message author info
+        message_member = reaction.message.guild.get_member(reaction.message.author.id) if reaction.message.guild else None
+        nickname = message_member.nick if message_member and message_member.nick else None
+        avatar_url = str(reaction.message.author.display_avatar.url) if reaction.message.author.display_avatar else None
+
+        # Update or insert reaction tracking
+        cur.execute('''
+            INSERT INTO message_reactions (user_id, guild_id, message_id, username, nickname, avatar_url, message_content, reaction_count)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (message_id) DO UPDATE SET
+                reaction_count = %s
+        ''', (reaction.message.author.id, reaction.message.guild.id, reaction.message.id, str(reaction.message.author), nickname, avatar_url, reaction.message.content[:100] or 'Message', len(reaction.message.reactions), len(reaction.message.reactions)))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[REACTION] Message {reaction.message.id} now has {len(reaction.message.reactions)} reactions")
+    except Exception as e:
+        print(f"[ERROR] Failed to track reaction: {e}")
 
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -221,6 +328,95 @@ async def leaderboard(interaction: discord.Interaction):
     voice_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['voice_time_seconds']//3600}h"
                             for i, row in enumerate(top_voice)])
     embed.add_field(name="🎤 Top Voice Chatters", value=voice_text or "No data yet", inline=False)
+
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="most-gifs", description="View who sent the most GIFs")
+async def most_gifs(interaction: discord.Interaction):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute('''
+        SELECT username, nickname, avatar_url, gif_count FROM member_stats
+        WHERE guild_id = %s AND gif_count > 0
+        ORDER BY gif_count DESC LIMIT 5
+    ''', (interaction.guild.id,))
+
+    top_gifs = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    if not top_gifs:
+        await interaction.response.send_message("No GIFs shared yet.", ephemeral=True)
+        return
+
+    embed = discord.Embed(title="🎬 Most GIFs Sent", color=discord.Color.purple())
+    for i, row in enumerate(top_gifs):
+        display_name = row['nickname'] or row['username']
+        embed.add_field(name=f"{i+1}. {display_name}", value=f"{row['gif_count']} GIFs", inline=False)
+
+    if top_gifs[0]['avatar_url']:
+        embed.set_thumbnail(url=top_gifs[0]['avatar_url'])
+
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="most-images", description="View who sent the most images")
+async def most_images(interaction: discord.Interaction):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute('''
+        SELECT username, nickname, avatar_url, image_count FROM member_stats
+        WHERE guild_id = %s AND image_count > 0
+        ORDER BY image_count DESC LIMIT 5
+    ''', (interaction.guild.id,))
+
+    top_images = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    if not top_images:
+        await interaction.response.send_message("No images shared yet.", ephemeral=True)
+        return
+
+    embed = discord.Embed(title="🖼️ Most Images Sent", color=discord.Color.blue())
+    for i, row in enumerate(top_images):
+        display_name = row['nickname'] or row['username']
+        embed.add_field(name=f"{i+1}. {display_name}", value=f"{row['image_count']} Images", inline=False)
+
+    if top_images[0]['avatar_url']:
+        embed.set_thumbnail(url=top_images[0]['avatar_url'])
+
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="most-reactions", description="View the most reacted message")
+async def most_reactions(interaction: discord.Interaction):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute('''
+        SELECT username, nickname, avatar_url, message_content, reaction_count FROM message_reactions
+        WHERE guild_id = %s
+        ORDER BY reaction_count DESC LIMIT 1
+    ''', (interaction.guild.id,))
+
+    top_message = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not top_message:
+        await interaction.response.send_message("No reactions tracked yet.", ephemeral=True)
+        return
+
+    display_name = top_message['nickname'] or top_message['username']
+
+    embed = discord.Embed(title="🎉 Most Reacted Message", color=discord.Color.gold())
+    embed.add_field(name="Member", value=display_name, inline=True)
+    embed.add_field(name="Reactions", value=f"{top_message['reaction_count']} 👍", inline=True)
+    embed.add_field(name="Message", value=top_message['message_content'], inline=False)
+
+    if top_message['avatar_url']:
+        embed.set_thumbnail(url=top_message['avatar_url'])
 
     await interaction.response.send_message(embed=embed)
 
