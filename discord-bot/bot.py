@@ -74,25 +74,32 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    print(f"[MESSAGE] {message.author} in #{message.channel}: {message.content[:50]}")
+
     if message.author == bot.user:
+        print(f"[IGNORED] Message from bot itself")
         return
 
-    # Track message count
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        # Track message count
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-    cur.execute('''
-        INSERT INTO member_stats (user_id, username, message_count, join_date, last_updated)
-        VALUES (%s, %s, 1, %s, NOW())
-        ON CONFLICT (user_id) DO UPDATE SET
-            message_count = member_stats.message_count + 1,
-            username = %s,
-            last_updated = NOW()
-    ''', (message.author.id, str(message.author), message.author.created_at, str(message.author)))
+        cur.execute('''
+            INSERT INTO member_stats (user_id, username, message_count, join_date, last_updated)
+            VALUES (%s, %s, 1, %s, NOW())
+            ON CONFLICT (user_id) DO UPDATE SET
+                message_count = member_stats.message_count + 1,
+                username = %s,
+                last_updated = NOW()
+        ''', (message.author.id, str(message.author), message.author.created_at, str(message.author)))
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[TRACKED] {message.author} - message count updated")
+    except Exception as e:
+        print(f"[ERROR] Failed to track message: {e}")
 
     await bot.process_commands(message)
 
