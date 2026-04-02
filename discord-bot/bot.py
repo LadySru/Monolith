@@ -118,6 +118,9 @@ def init_database():
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    print(f"Bot intents: {bot.intents}")
+    print(f"Bot intents.message_content: {bot.intents.message_content}")
+    print(f"Bot intents.guilds: {bot.intents.guilds}")
     init_database()
 
     # Sync commands with Discord
@@ -133,14 +136,20 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(f"[MESSAGE RECEIVED] {message.author} in #{message.channel}: {message.content[:50]}")
+    print(f"[EVENT FIRED] on_message called for: {message.author}")
 
     if message.author == bot.user:
         print(f"[IGNORED] Message from bot itself")
         return
 
+    print(f"[MESSAGE RECEIVED] {message.author} in #{message.channel}: {message.content[:50]}")
+
+    if message.guild is None:
+        print(f"[IGNORED] DM message (no guild)")
+        return
+
     if message.guild.id != GUILD_ID:
-        print(f"[IGNORED] Message from different guild: {message.guild.id}")
+        print(f"[IGNORED] Message from different guild: {message.guild.id} (expected {GUILD_ID})")
         return
 
     try:
