@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Monolith Community Stats — Member statistics and leaderboards"/>
+  <title>Community Stats — Monolith Social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #02000a;
+      --bg2: #06041a;
+      --card: #0a0818;
+      --border: #1a1540;
+      --teal: #00ffe7;
+      --text: #f0e8ff;
+      --text2: #7a6faa;
+      --star: #ffd200;
+      --font-jp: "Yu Gothic UI", "Yu Gothic", "YuGothic", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-jp);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(2,0,10,.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    nav .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    nav a {
+      color: var(--text2);
+      text-decoration: none;
+      margin-left: 32px;
+      font-size: .9rem;
+      transition: color .3s;
+    }
+
+    nav a:hover { color: var(--teal); }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 120px 48px 80px;
+    }
+
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: var(--text2);
+      font-size: 1rem;
+      margin-bottom: 48px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      margin-bottom: 64px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: 4px;
+      transition: all .3s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--teal);
+      box-shadow: 0 0 20px rgba(0,255,231,.15);
+    }
+
+    .stat-label {
+      font-family: 'Orbitron', monospace;
+      font-size: .7rem;
+      letter-spacing: 2px;
+      color: var(--text2);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 4px;
+    }
+
+    .stat-detail {
+      font-size: .9rem;
+      color: var(--text2);
+    }
+
+    .leaderboard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: 4px;
+      margin-bottom: 32px;
+    }
+
+    .leaderboard h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .leaderboard-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(139,47,255,.08);
+      border-left: 3px solid var(--teal);
+      border-radius: 2px;
+    }
+
+    .rank {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      color: var(--teal);
+      margin-right: 16px;
+      min-width: 32px;
+    }
+
+    .member-name {
+      flex: 1;
+      font-size: .95rem;
+    }
+
+    .member-stat {
+      font-family: 'Orbitron', monospace;
+      color: var(--star);
+      font-weight: 600;
+      font-size: .9rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text2);
+    }
+
+    .error {
+      background: rgba(255,45,107,.1);
+      border: 1px solid rgba(255,45,107,.3);
+      color: #ff2d6b;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 100px 20px 60px; }
+      h1 { font-size: 2rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+      nav { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">◆ Monolith Social ◆</a>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="arcade.html">Arcade</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="reviews.html">Reviews</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Community Appreciation</h1>
+    <p class="subtitle">Member statistics and leaderboards</p>
+
+    <div id="error-container"></div>
+
+    <!-- Oldest Member Card -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">👑 Oldest Member</div>
+        <div class="stat-value" id="oldest-member">—</div>
+        <div class="stat-detail" id="oldest-date">Loading...</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">📊 Total Members Tracked</div>
+        <div class="stat-value" id="total-members">—</div>
+        <div class="stat-detail">Contributing to community</div>
+      </div>
+    </div>
+
+    <!-- Leaderboards -->
+    <div class="leaderboard">
+      <h2>🏆 Top Messagers</h2>
+      <div class="leaderboard-list" id="messages-leaderboard">
+        <div class="loading">Loading leaderboard...</div>
+      </div>
+    </div>
+
+    <div class="leaderboard">
+      <h2>🎤 Top Voice Chatters</h2>
+      <div class="leaderboard-list" id="voice-leaderboard">
+        <div class="loading">Loading leaderboard...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadStats() {
+      try {
+        // Load oldest member
+        const oldestRes = await fetch('/.netlify/functions/member-stats?type=oldest');
+        if (oldestRes.ok) {
+          const oldest = await oldestRes.json();
+          document.getElementById('oldest-member').textContent = oldest.username;
+          const joinDate = new Date(oldest.join_date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          document.getElementById('oldest-date').textContent = `Joined ${joinDate}`;
+        }
+
+        // Load leaderboards
+        const leaderboardRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
+        if (leaderboardRes.ok) {
+          const data = await leaderboardRes.json();
+
+          // Messages leaderboard
+          const messagesHtml = data.top_messages.map((member, i) => `
+            <div class="leaderboard-item">
+              <div class="rank">#${i + 1}</div>
+              <div class="member-name">${member.username}</div>
+              <div class="member-stat">${member.count} messages</div>
+            </div>
+          `).join('');
+          document.getElementById('messages-leaderboard').innerHTML = messagesHtml || '<div class="loading">No data yet</div>';
+
+          // Voice leaderboard
+          const voiceHtml = data.top_voice.map((member, i) => `
+            <div class="leaderboard-item">
+              <div class="rank">#${i + 1}</div>
+              <div class="member-name">${member.username}</div>
+              <div class="member-stat">${member.hours}h voice</div>
+            </div>
+          `).join('');
+          document.getElementById('voice-leaderboard').innerHTML = voiceHtml || '<div class="loading">No data yet</div>';
+        }
+      } catch (error) {
+        document.getElementById('error-container').innerHTML = `
+          <div class="error">Error loading stats: ${error.message}</div>
+        `;
+      }
+    }
+
+    loadStats();
+    setInterval(loadStats, 60000); // Refresh every minute
+  </script>
+</body>
+</html>
