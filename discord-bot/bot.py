@@ -133,10 +133,14 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(f"[MESSAGE] {message.author} in #{message.channel}: {message.content[:50]}")
+    print(f"[MESSAGE RECEIVED] {message.author} in #{message.channel}: {message.content[:50]}")
 
     if message.author == bot.user:
         print(f"[IGNORED] Message from bot itself")
+        return
+
+    if message.guild.id != GUILD_ID:
+        print(f"[IGNORED] Message from different guild: {message.guild.id}")
         return
 
     try:
@@ -198,6 +202,8 @@ async def on_message(message):
         print(f"[TRACKED] {message.author} - message count updated (GIFs: {gif_count}, Images: {image_count})")
     except Exception as e:
         print(f"[ERROR] Failed to track message: {e}")
+        import traceback
+        traceback.print_exc()
 
     await bot.process_commands(message)
 
