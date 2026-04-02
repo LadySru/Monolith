@@ -10,7 +10,8 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <title>Monolith Social — Indie Game Discovery</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap&amp;font-display=swap" rel="stylesheet"/>
   <style>
     /* ═══════ TOKENS ═══════ */
     :root {
@@ -254,7 +255,7 @@
     .game-hover-desc { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: var(--text2); line-height: 1.4; }
     .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
     .g1{background:linear-gradient(160deg,#1a0808,#300)} .g2{background:linear-gradient(160deg,#080816,#14143a)} .g3{background:linear-gradient(160deg,#001a18,#003530)} .g4{background:linear-gradient(160deg,#071a03,#0d3008)} .g5{background:linear-gradient(160deg,#1a1500,#342900)}
-    .game-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+    .game-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; contain: layout style paint; }
     .game-card:hover .game-img { transform: scale(1.06); }
     .game-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg,rgba(5,3,15,.97) 0%,transparent 100%); padding: 16px 10px 10px; }
     .game-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .65rem; color: var(--text); line-height: 1.2; letter-spacing: .5px; }
@@ -460,6 +461,34 @@
     }
     .game-card-sequel .game-card {
       margin: 0;
+    }
+
+    /* ═══════ SEQUEL INDICATOR ═══════ */
+    .sequel-indicator {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      font-size: 1.2rem;
+      color: var(--teal);
+      opacity: 0;
+      transform: translateX(0);
+      transition: opacity .3s, transform .3s;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(0,255,231,.3);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .game-card.has-sequel:hover .sequel-indicator {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+
+    @media (max-width: 768px) {
+      .sequel-indicator {
+        font-size: 1rem;
+        bottom: 10px;
+        right: 10px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -880,9 +909,10 @@
           </div>
         </div>
         <div class="game-card-wrapper">
-          <div class="game-card reveal">
+          <div class="game-card reveal has-sequel">
             <a href="#" class="game-link" aria-label="Death Stranding - Action Adventure">
-              <div class="game-img" style="background-image:url('MV5BYmVkNDM3MzUtN2YyYS00MDg0LWIxN2EtMjQ2ZGQ1ZDhlZWY4XkEyXkFqcGc@._V1_.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
+              <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
+              <div class="sequel-indicator" aria-label="More versions available">→</div>
               <div class="game-label">
                 <div class="game-title">Death Stranding</div>
                 <div class="game-genre">Action Adventure</div>
@@ -900,7 +930,7 @@
           <div class="game-card-sequel">
             <div class="game-card">
               <a href="#" class="game-link" aria-label="Death Stranding 2 - Action Adventure">
-                <div class="game-img" style="background-image:url('deathstranding2.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
+                <div class="game-img" style="background-image:url('MV5BYmVkNDM3MzUtN2YyYS00MDg0LWIxN2EtMjQ2ZGQ1ZDhlZWY4XkEyXkFqcGc@._V1_.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
                 <div class="game-label">
                   <div class="game-title">Death Stranding 2</div>
                   <div class="game-genre">Action Adventure</div>
