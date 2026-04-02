@@ -434,6 +434,31 @@
       .channels-grid { grid-template-columns: 1fr; }
       .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
     }
+    /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
+    .game-card-wrapper {
+      position: relative;
+    }
+    .game-card-sequel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .game-card-wrapper:hover .game-card-sequel {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .game-card-sequel .game-card {
+      margin: 0;
+    }
+
     @media (max-width: 480px) {
       .wrap { padding: 0 16px; }
       nav { padding: 0 12px; }
@@ -851,20 +876,41 @@
             </div>
           </div>
         </div>
-        <div class="game-card reveal">
-          <a href="#" class="game-link" aria-label="Death Stranding - Action Adventure">
-            <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Death Stranding</div>
-              <div class="game-genre">Action Adventure</div>
+        <div class="game-card-wrapper">
+          <div class="game-card reveal">
+            <a href="#" class="game-link" aria-label="Death Stranding - Action Adventure">
+              <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
+              <div class="game-label">
+                <div class="game-title">Death Stranding</div>
+                <div class="game-genre">Action Adventure</div>
+              </div>
+            </a>
+            <div class="game-hover-overlay">
+              <div class="game-hover-content">
+                <div class="game-hover-badge release">GAME</div>
+                <div class="game-hover-date">2019</div>
+                <div class="game-hover-divider"></div>
+                <div class="game-hover-desc">Kojima's surreal masterpiece. Connect the disconnected in this bold, experimental adventure.</div>
+              </div>
             </div>
-          </a>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge release">GAME</div>
-              <div class="game-hover-date">2019</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Kojima's surreal masterpiece. Connect the disconnected in this bold, experimental adventure.</div>
+          </div>
+          <div class="game-card-sequel">
+            <div class="game-card">
+              <a href="#" class="game-link" aria-label="Death Stranding 2 - Action Adventure">
+                <div class="game-img" style="background-image:url('deathstranding2.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
+                <div class="game-label">
+                  <div class="game-title">Death Stranding 2</div>
+                  <div class="game-genre">Action Adventure</div>
+                </div>
+              </a>
+              <div class="game-hover-overlay">
+                <div class="game-hover-content">
+                  <div class="game-hover-badge release">COMING SOON</div>
+                  <div class="game-hover-date">2025</div>
+                  <div class="game-hover-divider"></div>
+                  <div class="game-hover-desc">The continuation of Kojima's vision. A new journey awaits.</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
