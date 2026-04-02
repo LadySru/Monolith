@@ -437,6 +437,7 @@
     /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
     .game-card-wrapper {
       position: relative;
+      height: fit-content;
     }
     .game-card-sequel {
       position: absolute;
@@ -445,15 +446,17 @@
       right: 0;
       margin-top: 8px;
       opacity: 0;
-      transform: translateY(-10px);
-      transition: opacity .3s, transform .3s;
+      transform: translateY(-10px) scale(0.95);
+      transition: opacity .3s ease, transform .3s ease;
       pointer-events: none;
-      z-index: 5;
+      z-index: 10;
+      visibility: hidden;
     }
     .game-card-wrapper:hover .game-card-sequel {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
       pointer-events: auto;
+      visibility: visible;
     }
     .game-card-sequel .game-card {
       margin: 0;
