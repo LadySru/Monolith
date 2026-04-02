@@ -13,6 +13,15 @@ DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL')
 GUILD_ID = 863475027214598173
 
+# Debug: Check if environment variables are loaded
+print(f"DISCORD_TOKEN loaded: {'Yes' if DISCORD_TOKEN else 'No - MISSING'}")
+print(f"DATABASE_URL loaded: {'Yes' if DATABASE_URL else 'No - MISSING'}")
+
+if not DISCORD_TOKEN:
+    raise ValueError("ERROR: DISCORD_TOKEN environment variable not set!")
+if not DATABASE_URL:
+    raise ValueError("ERROR: DATABASE_URL environment variable not set!")
+
 # Initialize bot with intents
 intents = discord.Intents.default()
 intents.message_content = True
