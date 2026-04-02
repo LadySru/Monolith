@@ -60,29 +60,46 @@ def init_database():
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     init_database()
-    track_voice_activity.start()
+
+    # Sync commands with Discord
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(f"Error syncing commands: {e}")
+
+    # Start voice tracking if not already running
+    if not track_voice_activity.is_running():
+        track_voice_activity.start()
 
 @bot.event
 async def on_message(message):
+    print(f"[MESSAGE] {message.author} in #{message.channel}: {message.content[:50]}")
+
     if message.author == bot.user:
+        print(f"[IGNORED] Message from bot itself")
         return
 
-    # Track message count
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        # Track message count
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-    cur.execute('''
-        INSERT INTO member_stats (user_id, username, message_count, join_date, last_updated)
-        VALUES (%s, %s, 1, %s, NOW())
-        ON CONFLICT (user_id) DO UPDATE SET
-            message_count = member_stats.message_count + 1,
-            username = %s,
-            last_updated = NOW()
-    ''', (message.author.id, str(message.author), message.author.created_at, str(message.author)))
+        cur.execute('''
+            INSERT INTO member_stats (user_id, username, message_count, join_date, last_updated)
+            VALUES (%s, %s, 1, %s, NOW())
+            ON CONFLICT (user_id) DO UPDATE SET
+                message_count = member_stats.message_count + 1,
+                username = %s,
+                last_updated = NOW()
+        ''', (message.author.id, str(message.author), message.author.created_at, str(message.author)))
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[TRACKED] {message.author} - message count updated")
+    except Exception as e:
+        print(f"[ERROR] Failed to track message: {e}")
 
     await bot.process_commands(message)
 
@@ -267,15 +284,6 @@ async def track_voice_activity():
     conn.commit()
     cur.close()
     conn.close()
-
-# Sync commands with Discord
-@bot.event
-async def on_ready():
-    try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s)")
-    except Exception as e:
-        print(e)
 
 # Run bot
 if __name__ == "__main__":
