@@ -245,16 +245,43 @@
         <div class="loading">Loading leaderboard...</div>
       </div>
     </div>
+
+    <!-- Media Leaderboards -->
+    <div class="leaderboard">
+      <h2>🎬 Most GIFs Sent</h2>
+      <div class="leaderboard-list" id="gifs-leaderboard">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <div class="leaderboard">
+      <h2>🖼️ Most Images Sent</h2>
+      <div class="leaderboard-list" id="images-leaderboard">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Most Reacted Message -->
+    <div class="leaderboard">
+      <h2>🎉 Most Reacted Message</h2>
+      <div id="reactions-card">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
   </div>
 
   <script>
+    function getDisplayName(member) {
+      return member.nickname || member.username || 'Unknown';
+    }
+
     async function loadStats() {
       try {
         // Load oldest member
         const oldestRes = await fetch('/.netlify/functions/member-stats?type=oldest');
         if (oldestRes.ok) {
           const oldest = await oldestRes.json();
-          document.getElementById('oldest-member').textContent = oldest.username;
+          document.getElementById('oldest-member').textContent = getDisplayName(oldest);
           const joinDate = new Date(oldest.join_date).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -272,7 +299,7 @@
           const messagesHtml = data.top_messages.map((member, i) => `
             <div class="leaderboard-item">
               <div class="rank">#${i + 1}</div>
-              <div class="member-name">${member.username}</div>
+              <div class="member-name">${getDisplayName(member)}</div>
               <div class="member-stat">${member.count} messages</div>
             </div>
           `).join('');
@@ -282,11 +309,58 @@
           const voiceHtml = data.top_voice.map((member, i) => `
             <div class="leaderboard-item">
               <div class="rank">#${i + 1}</div>
-              <div class="member-name">${member.username}</div>
+              <div class="member-name">${getDisplayName(member)}</div>
               <div class="member-stat">${member.hours}h voice</div>
             </div>
           `).join('');
           document.getElementById('voice-leaderboard').innerHTML = voiceHtml || '<div class="loading">No data yet</div>';
+        }
+
+        // Load GIFs leaderboard
+        const gifsRes = await fetch('/.netlify/functions/member-stats?type=most-gifs');
+        if (gifsRes.ok) {
+          const data = await gifsRes.json();
+          const gifsHtml = data.top_gifs.map((member, i) => `
+            <div class="leaderboard-item">
+              <div class="rank">#${i + 1}</div>
+              <div class="member-name">${getDisplayName(member)}</div>
+              <div class="member-stat">${member.count} GIFs</div>
+            </div>
+          `).join('');
+          document.getElementById('gifs-leaderboard').innerHTML = gifsHtml || '<div class="loading">No GIFs shared yet</div>';
+        }
+
+        // Load images leaderboard
+        const imagesRes = await fetch('/.netlify/functions/member-stats?type=most-images');
+        if (imagesRes.ok) {
+          const data = await imagesRes.json();
+          const imagesHtml = data.top_images.map((member, i) => `
+            <div class="leaderboard-item">
+              <div class="rank">#${i + 1}</div>
+              <div class="member-name">${getDisplayName(member)}</div>
+              <div class="member-stat">${member.count} Images</div>
+            </div>
+          `).join('');
+          document.getElementById('images-leaderboard').innerHTML = imagesHtml || '<div class="loading">No images shared yet</div>';
+        }
+
+        // Load most reacted message
+        const reactionsRes = await fetch('/.netlify/functions/member-stats?type=most-reactions');
+        if (reactionsRes.ok) {
+          const data = await reactionsRes.json();
+          const reactionsHtml = `
+            <div style="padding: 16px; background: rgba(139,47,255,.08); border-left: 3px solid var(--teal); border-radius: 2px;">
+              <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                ${data.avatar_url ? `<img src="${data.avatar_url}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;">` : ''}
+                <div>
+                  <div style="font-weight: 600; color: var(--text);">${getDisplayName(data)}</div>
+                  <div style="color: var(--text2); font-size: .9rem;">💬 ${data.message}</div>
+                </div>
+              </div>
+              <div style="color: var(--star); font-family: 'Orbitron', monospace; font-weight: 600;">⭐ ${data.reactions} reactions</div>
+            </div>
+          `;
+          document.getElementById('reactions-card').innerHTML = reactionsHtml;
         }
       } catch (error) {
         document.getElementById('error-container').innerHTML = `
