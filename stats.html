@@ -10,11 +10,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #02000a;
-      --bg2: #06041a;
-      --card: #0a0818;
-      --border: #1a1540;
+      --bg: #0a0015;
+      --bg2: #0f001f;
+      --card: #110025;
+      --border: #2a0d4a;
       --teal: #00ffe7;
+      --electric-blue: #00d9ff;
+      --neon-purple: #d900ff;
+      --neon-pink: #ff0099;
+      --glow-blue: rgba(0, 217, 255, 0.4);
+      --glow-purple: rgba(217, 0, 255, 0.4);
+      --glow-pink: rgba(255, 0, 153, 0.4);
       --text: #f0e8ff;
       --text2: #7a6faa;
       --star: #ffd200;
@@ -37,8 +43,9 @@
       left: 0;
       right: 0;
       height: 64px;
-      background: rgba(2,0,10,.95);
-      border-bottom: 1px solid var(--border);
+      background: rgba(10, 0, 21, .98);
+      border-bottom: 2px solid var(--neon-purple);
+      box-shadow: 0 0 20px rgba(217, 0, 255, 0.3);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -53,6 +60,7 @@
       letter-spacing: 3px;
       color: var(--text);
       text-decoration: none;
+      text-shadow: 0 0 10px rgba(0, 217, 255, 0.5), 0 0 20px rgba(217, 0, 255, 0.3);
     }
 
     nav a {
@@ -60,10 +68,13 @@
       text-decoration: none;
       margin-left: 32px;
       font-size: .9rem;
-      transition: color .3s;
+      transition: all .3s;
     }
 
-    nav a:hover { color: var(--teal); }
+    nav a:hover {
+      color: var(--electric-blue);
+      text-shadow: 0 0 10px rgba(0, 217, 255, 0.8), 0 0 20px rgba(0, 217, 255, 0.5);
+    }
 
     .container {
       max-width: 1100px;
@@ -92,16 +103,18 @@
     }
 
     .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(17, 0, 37, 0.9), rgba(17, 0, 37, 0.7));
+      border: 2px solid var(--neon-purple);
       padding: 32px;
-      border-radius: 4px;
+      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
       transition: all .3s;
+      box-shadow: inset 0 0 20px rgba(217, 0, 255, 0.1), 0 0 20px rgba(217, 0, 255, 0.2);
     }
 
     .stat-card:hover {
-      border-color: var(--teal);
-      box-shadow: 0 0 20px rgba(0,255,231,.15);
+      border-color: var(--electric-blue);
+      box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.15), 0 0 30px rgba(0, 217, 255, 0.4), 0 0 60px rgba(217, 0, 255, 0.3);
+      transform: translateY(-5px);
     }
 
     .stat-label {
@@ -117,8 +130,9 @@
       font-family: 'Orbitron', monospace;
       font-size: 2rem;
       font-weight: 700;
-      color: var(--teal);
+      color: var(--electric-blue);
       margin-bottom: 4px;
+      text-shadow: 0 0 10px rgba(0, 217, 255, 0.8), 0 0 20px rgba(0, 217, 255, 0.5);
     }
 
     .stat-detail {
@@ -127,11 +141,12 @@
     }
 
     .leaderboard {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(17, 0, 37, 0.85), rgba(17, 0, 37, 0.65));
+      border: 2px solid var(--neon-pink);
       padding: 32px;
-      border-radius: 4px;
+      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
       margin-bottom: 32px;
+      box-shadow: inset 0 0 20px rgba(255, 0, 153, 0.1), 0 0 25px rgba(255, 0, 153, 0.25);
     }
 
     .leaderboard h2 {
@@ -139,6 +154,7 @@
       font-size: 1.4rem;
       margin-bottom: 24px;
       color: var(--text);
+      text-shadow: 0 0 10px rgba(217, 0, 255, 0.6), 0 0 20px rgba(217, 0, 255, 0.3);
     }
 
     .leaderboard-list {
@@ -151,17 +167,26 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 16px;
-      background: rgba(139,47,255,.08);
-      border-left: 3px solid var(--teal);
+      background: linear-gradient(90deg, rgba(217, 0, 255, 0.15), rgba(0, 217, 255, 0.05));
+      border-left: 4px solid var(--electric-blue);
       border-radius: 2px;
+      transition: all .3s;
+      box-shadow: 0 0 15px rgba(217, 0, 255, 0.1);
+    }
+
+    .leaderboard-item:hover {
+      background: linear-gradient(90deg, rgba(217, 0, 255, 0.25), rgba(0, 217, 255, 0.15));
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3), 0 0 30px rgba(217, 0, 255, 0.2);
+      transform: translateX(5px);
     }
 
     .rank {
       font-family: 'Orbitron', monospace;
       font-weight: 700;
-      color: var(--teal);
+      color: var(--neon-pink);
       margin-right: 16px;
       min-width: 32px;
+      text-shadow: 0 0 8px rgba(255, 0, 153, 0.6);
     }
 
     .member-name {
@@ -171,9 +196,10 @@
 
     .member-stat {
       font-family: 'Orbitron', monospace;
-      color: var(--star);
+      color: var(--neon-purple);
       font-weight: 600;
       font-size: .9rem;
+      text-shadow: 0 0 8px rgba(217, 0, 255, 0.6);
     }
 
     .loading {
@@ -183,12 +209,14 @@
     }
 
     .error {
-      background: rgba(255,45,107,.1);
-      border: 1px solid rgba(255,45,107,.3);
-      color: #ff2d6b;
+      background: rgba(255, 0, 153, .15);
+      border: 2px solid var(--neon-pink);
+      color: var(--neon-pink);
       padding: 16px;
       border-radius: 4px;
       margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(255, 0, 153, 0.3);
+      text-shadow: 0 0 8px rgba(255, 0, 153, 0.4);
     }
 
     @media (max-width: 768px) {
