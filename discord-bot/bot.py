@@ -93,23 +93,6 @@ def init_database():
         )
     ''')
 
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS member_stats (
-            user_id BIGINT,
-            guild_id BIGINT,
-            PRIMARY KEY (user_id, guild_id),
-            username VARCHAR(255),
-            nickname VARCHAR(255),
-            avatar_url VARCHAR(500),
-            join_date TIMESTAMP,
-            message_count INT DEFAULT 0,
-            gif_count INT DEFAULT 0,
-            image_count INT DEFAULT 0,
-            voice_time_seconds INT DEFAULT 0,
-            last_updated TIMESTAMP DEFAULT NOW()
-        )
-    ''')
-
     conn.commit()
     cur.close()
     conn.close()
@@ -134,11 +117,7 @@ async def on_ready():
         track_voice_activity.start()
 
 @bot.event
-async def on_raw_message_create(payload):
-    print(f"[RAW MESSAGE] Guild: {payload.guild_id}, User: {payload.user_id}")
-
-@bot.listen('on_message')
-async def on_message_handler(message):
+async def on_message(message):
     print(f"[EVENT FIRED] on_message called for: {message.author}")
 
     if message.author == bot.user:
