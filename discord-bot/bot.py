@@ -133,6 +133,10 @@ async def on_ready():
     if not track_voice_activity.is_running():
         track_voice_activity.start()
 
+@bot.event
+async def on_raw_message_create(payload):
+    print(f"[RAW MESSAGE] Guild: {payload.guild_id}, User: {payload.user_id}")
+
 @bot.listen('on_message')
 async def on_message_handler(message):
     print(f"[EVENT FIRED] on_message called for: {message.author}")
@@ -541,5 +545,5 @@ async def track_voice_activity():
     conn.close()
 
 # Run bot
-if __name__ == "__main__":
-    bot.run(DISCORD_TOKEN)
+print("[STARTUP] Starting bot with token...")
+bot.run(DISCORD_TOKEN)
