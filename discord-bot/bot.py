@@ -41,13 +41,16 @@ def init_database():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS member_stats (
-            user_id BIGINT PRIMARY KEY,
+            user_id BIGINT,
             guild_id BIGINT,
+            PRIMARY KEY (user_id, guild_id),
             username VARCHAR(255),
             nickname VARCHAR(255),
             avatar_url VARCHAR(500),
             join_date TIMESTAMP,
             message_count INT DEFAULT 0,
+            gif_count INT DEFAULT 0,
+            image_count INT DEFAULT 0,
             voice_time_seconds INT DEFAULT 0,
             last_updated TIMESTAMP DEFAULT NOW()
         )
