@@ -6,3 +6,4 @@
 /.vs/slnx.sqlite
 /node_modules/
 /.tools/
+__pycache__/
