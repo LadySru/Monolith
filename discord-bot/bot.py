@@ -116,10 +116,10 @@ def init_database():
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
-    print(f"Bot intents: {bot.intents}")
-    print(f"Bot intents.message_content: {bot.intents.message_content}")
-    print(f"Bot intents.guilds: {bot.intents.guilds}")
+    print(f'✅ {bot.user} has connected to Discord!', flush=True)
+    print(f"✅ Bot intents loaded", flush=True)
+    print(f"✅ message_content: {bot.intents.message_content}", flush=True)
+    print(f"✅ Ready to track messages", flush=True)
     init_database()
 
     # Sync commands with Discord
