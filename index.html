@@ -453,6 +453,11 @@
       .server-info { flex-direction: column; gap: 12px; }
       .channels-grid { grid-template-columns: 1fr; }
       .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
+      /* Open Beta ribbon — bigger & readable on mobile */
+      .game-ribbon { font-size: .65rem; letter-spacing: 1px; padding: 5px 10px 5px 12px; }
+      .game-card.invincible-card .game-ribbon { font-size: .65rem; padding: 7px 10px; }
+      .invincible-top-tail span { font-size: .55rem; letter-spacing: 1px; }
+      .invincible-bottom-tail { font-size: .58rem; letter-spacing: 1.2px; }
     }
     /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
     .game-card-wrapper {
@@ -503,6 +508,7 @@
       transform: translateX(4px);
     }
     .sequel-indicator.active {
+      opacity: 1;
       color: var(--green);
       text-shadow: 0 0 12px rgba(57,255,138,.5);
       transform: translateX(8px) rotate(90deg);
@@ -519,6 +525,8 @@
         font-size: 1rem;
         bottom: 10px;
         right: 10px;
+        /* Always visible on touch screens so users can tap to toggle */
+        opacity: 0.75;
       }
     }
 
