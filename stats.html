@@ -50,31 +50,39 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 48px;
-      z-index: 100;
+      z-index: 200;
       backdrop-filter: blur(10px);
     }
-
-    nav .logo {
+    .nav-l { display: flex; align-items: center; gap: 12px; }
+    .nav-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--teal); }
+    .nav-name { font-family: 'Orbitron', monospace; font-weight: 900; font-size: .9rem; color: var(--text); letter-spacing: 2px; text-decoration: none; }
+    .nav-name span { color: var(--teal); }
+    .nav-r { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+    .nav-link { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s, text-shadow .2s; }
+    .nav-link:hover, .nav-link.active { color: var(--teal); text-shadow: 0 0 10px rgba(0,255,231,.35); }
+    .nav-cta {
       font-family: 'Orbitron', monospace;
-      font-size: 1.1rem;
-      letter-spacing: 3px;
-      color: var(--text);
+      font-size: .58rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
       text-decoration: none;
-      text-shadow: 0 0 10px rgba(0, 217, 255, 0.5), 0 0 20px rgba(217, 0, 255, 0.3);
+      border: 1px solid rgba(0,255,231,.35);
+      padding: 7px 14px;
+      clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+      transition: background .2s, transform .2s, box-shadow .2s;
     }
-
-    nav a {
-      color: var(--text2);
-      text-decoration: none;
-      margin-left: 32px;
-      font-size: .9rem;
-      transition: all .3s;
-    }
-
-    nav a:hover {
-      color: var(--electric-blue);
-      text-shadow: 0 0 10px rgba(0, 217, 255, 0.8), 0 0 20px rgba(0, 217, 255, 0.5);
-    }
+    .nav-cta:hover { background: rgba(0,255,231,0.12); transform: translateY(-1px); box-shadow: 0 0 12px rgba(0,255,231,.25); }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; z-index: 201; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--teal); transition: all .3s; }
+    .nav-hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
+    .nav-hamburger.active span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+    .nav-mobile { display: none; position: fixed; top: 64px; left: 0; right: 0; background: rgba(2,0,10,.98); border-bottom: 1px solid rgba(0,255,231,.12); padding: 16px 20px; flex-direction: column; gap: 0; z-index: 199; max-height: calc(100vh - 64px); overflow-y: auto; }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile .nav-link { font-family: 'Orbitron', monospace; font-size: .72rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; padding: 14px 0; border-bottom: 1px solid var(--border); width: 100%; display: block; }
+    .nav-mobile .nav-link:hover, .nav-mobile .nav-link.active { color: var(--teal); }
+    .nav-mobile .nav-cta { margin-top: 14px; justify-content: center; clip-path: none; border-radius: 2px; display: flex; }
 
     .container {
       max-width: 1100px;
@@ -224,19 +232,41 @@
       h1 { font-size: 2rem; }
       .stats-grid { grid-template-columns: 1fr; }
       nav { padding: 0 20px; }
+      .nav-hamburger { display: flex; }
+      .nav-r > :not(.nav-hamburger) { display: none; }
     }
   </style>
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo">◆ Monolith Social ◆</a>
-    <div>
-      <a href="index.html">Home</a>
-      <a href="arcade.html">Arcade</a>
-      <a href="quiz.html">Quiz</a>
-      <a href="reviews.html">Reviews</a>
+    <div class="nav-l">
+      <a href="index.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;">
+        <img src="avatar.jpg" class="nav-av" alt="" onerror="this.style.display='none'"/>
+        <span class="nav-name">Monolith <span>Social</span></span>
+      </a>
     </div>
+    <div class="nav-r">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="arcade.html" class="nav-link">Arcade</a>
+      <a href="quiz.html" class="nav-link">Quiz</a>
+      <a href="reviews.html" class="nav-link">Reviews</a>
+      <a href="index.html#features" class="nav-link">Features</a>
+      <a href="stats.html" class="nav-link active">Community Appreciation</a>
+      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="nav-mobile" id="nav-mobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="arcade.html" class="nav-link">Arcade</a>
+    <a href="quiz.html" class="nav-link">Quiz</a>
+    <a href="reviews.html" class="nav-link">Reviews</a>
+    <a href="index.html#features" class="nav-link">Features</a>
+    <a href="stats.html" class="nav-link active">Community Appreciation</a>
+    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+  </div>
 
   <div class="container">
     <h1>Community Appreciation</h1>
@@ -399,6 +429,22 @@
 
     loadStats();
     setInterval(loadStats, 60000); // Refresh every minute
+
+    // Nav hamburger toggle
+    const hamburger = document.getElementById('nav-hamburger');
+    const navMobile = document.getElementById('nav-mobile');
+    if (hamburger && navMobile) {
+      hamburger.addEventListener('click', () => {
+        navMobile.classList.toggle('open');
+        hamburger.classList.toggle('active');
+      });
+      navMobile.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navMobile.classList.remove('open');
+          hamburger.classList.remove('active');
+        });
+      });
+    }
   </script>
 </body>
 </html>
