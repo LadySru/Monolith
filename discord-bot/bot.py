@@ -11,6 +11,7 @@ load_dotenv()
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL')
+GUILD_ID = int(os.getenv('GUILD_ID', '863475027214598173'))
 
 # Validate environment variables
 if not DISCORD_TOKEN:
@@ -123,10 +124,13 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     init_database()
 
-    # Sync commands with Discord
+    # Sync commands to the guild instantly (guild sync is immediate,
+    # global sync can take up to an hour to propagate)
     try:
-        synced = await bot.tree.sync()
-        print(f"[COMMANDS] Synced {len(synced)} command(s)")
+        guild_obj = discord.Object(id=GUILD_ID)
+        bot.tree.copy_global_to(guild=guild_obj)
+        synced = await bot.tree.sync(guild=guild_obj)
+        print(f"[COMMANDS] Synced {len(synced)} command(s) to guild {GUILD_ID}")
     except Exception as e:
         print(f"[ERROR] Error syncing commands: {e}")
 
