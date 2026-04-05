@@ -32,12 +32,21 @@ def get_db_connection():
     return conn
 
 # Initialize database schema
+def _safe_alter(cur, sql):
+    """Run an ALTER TABLE using a savepoint so a failure doesn't abort the transaction."""
+    cur.execute('SAVEPOINT safe_alter')
+    try:
+        cur.execute(sql)
+        cur.execute('RELEASE SAVEPOINT safe_alter')
+    except Exception:
+        cur.execute('ROLLBACK TO SAVEPOINT safe_alter')
+
 def init_database():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Create member_stats table with composite primary key for multi-guild support
+        # Create member_stats table
         cur.execute('''
             CREATE TABLE IF NOT EXISTS member_stats (
                 user_id BIGINT NOT NULL,
@@ -56,23 +65,12 @@ def init_database():
             )
         ''')
 
-        # Add missing columns if they don't exist
-        try:
-            cur.execute('ALTER TABLE member_stats ADD COLUMN gif_count INT DEFAULT 0')
-        except:
-            pass
+        # Migrate member_stats: add columns introduced after initial deploy
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN gif_count INT DEFAULT 0')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
 
-        try:
-            cur.execute('ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
-        except:
-            pass
-
-        try:
-            cur.execute('ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
-        except:
-            pass
-
-        # Create message_reactions table for tracking most-reacted messages
+        # Create message_reactions table
         cur.execute('''
             CREATE TABLE IF NOT EXISTS message_reactions (
                 message_id BIGINT NOT NULL,
@@ -92,12 +90,12 @@ def init_database():
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_guild ON message_reactions(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_count ON message_reactions(reaction_count DESC)')
 
-        # Create voice_sessions table with guild_id for proper tracking
+        # Create voice_sessions table
         cur.execute('''
             CREATE TABLE IF NOT EXISTS voice_sessions (
                 id SERIAL PRIMARY KEY,
                 user_id BIGINT NOT NULL,
-                guild_id BIGINT NOT NULL,
+                guild_id BIGINT NOT NULL DEFAULT 0,
                 session_start TIMESTAMP NOT NULL,
                 session_end TIMESTAMP,
                 duration_seconds INT
@@ -105,12 +103,9 @@ def init_database():
         ''')
 
         # Migrate voice_sessions: add guild_id if table existed without it
-        try:
-            cur.execute('ALTER TABLE voice_sessions ADD COLUMN guild_id BIGINT NOT NULL DEFAULT 0')
-        except:
-            conn.rollback()
+        _safe_alter(cur, 'ALTER TABLE voice_sessions ADD COLUMN guild_id BIGINT NOT NULL DEFAULT 0')
 
-        # Create indexes for faster queries
+        # Create indexes
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_guild ON voice_sessions(guild_id)')
