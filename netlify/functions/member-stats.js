@@ -1,5 +1,7 @@
 const { neon } = require('@netlify/neon');
 
+const GUILD_ID = BigInt("863475027214598173");
+
 const handler = async (event) => {
   try {
     const sql = neon(process.env.NETLIFY_DATABASE_URL);
@@ -11,7 +13,7 @@ const handler = async (event) => {
     if (statType === 'profile' && userId) {
       const result = await sql`
         SELECT user_id, username, message_count, voice_time_seconds, join_date
-        FROM member_stats WHERE user_id = ${parseInt(userId)}
+        FROM member_stats WHERE user_id = ${BigInt(userId)} AND guild_id = ${GUILD_ID}
       `;
 
       if (!result || result.length === 0) {
@@ -42,11 +44,13 @@ const handler = async (event) => {
     if (statType === 'leaderboard') {
       const topMessages = await sql`
         SELECT username, message_count FROM member_stats
+        WHERE guild_id = ${GUILD_ID}
         ORDER BY message_count DESC LIMIT 10
       `;
 
       const topVoice = await sql`
         SELECT username, voice_time_seconds FROM member_stats
+        WHERE guild_id = ${GUILD_ID}
         ORDER BY voice_time_seconds DESC LIMIT 10
       `;
 
@@ -69,6 +73,7 @@ const handler = async (event) => {
     if (statType === 'oldest') {
       const result = await sql`
         SELECT username, nickname, avatar_url, join_date FROM member_stats
+        WHERE guild_id = ${GUILD_ID}
         ORDER BY join_date ASC LIMIT 1
       `;
 
@@ -95,7 +100,7 @@ const handler = async (event) => {
     if (statType === 'most-gifs') {
       const result = await sql`
         SELECT username, nickname, avatar_url, gif_count FROM member_stats
-        WHERE gif_count > 0
+        WHERE guild_id = ${GUILD_ID} AND gif_count > 0
         ORDER BY gif_count DESC LIMIT 5
       `;
 
@@ -116,7 +121,7 @@ const handler = async (event) => {
     if (statType === 'most-images') {
       const result = await sql`
         SELECT username, nickname, avatar_url, image_count FROM member_stats
-        WHERE image_count > 0
+        WHERE guild_id = ${GUILD_ID} AND image_count > 0
         ORDER BY image_count DESC LIMIT 5
       `;
 
@@ -137,6 +142,7 @@ const handler = async (event) => {
     if (statType === 'most-reactions') {
       const result = await sql`
         SELECT username, nickname, avatar_url, message_content, reaction_count FROM message_reactions
+        WHERE guild_id = ${GUILD_ID}
         ORDER BY reaction_count DESC LIMIT 1
       `;
 

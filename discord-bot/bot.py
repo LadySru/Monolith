@@ -48,6 +48,7 @@ def init_database():
                 join_date TIMESTAMP,
                 message_count INT DEFAULT 0,
                 gif_count INT DEFAULT 0,
+                image_count INT DEFAULT 0,
                 reaction_count INT DEFAULT 0,
                 voice_time_seconds INT DEFAULT 0,
                 last_updated TIMESTAMP DEFAULT NOW(),
@@ -65,6 +66,31 @@ def init_database():
             cur.execute('ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
         except:
             pass
+
+        try:
+            cur.execute('ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
+        except:
+            pass
+
+        # Create message_reactions table for tracking most-reacted messages
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS message_reactions (
+                message_id BIGINT NOT NULL,
+                guild_id BIGINT NOT NULL,
+                channel_id BIGINT NOT NULL,
+                user_id BIGINT NOT NULL,
+                username VARCHAR(255),
+                nickname VARCHAR(255),
+                avatar_url VARCHAR(500),
+                message_content TEXT,
+                reaction_count INT DEFAULT 0,
+                last_updated TIMESTAMP DEFAULT NOW(),
+                PRIMARY KEY (message_id, guild_id)
+            )
+        ''')
+
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_guild ON message_reactions(guild_id)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_count ON message_reactions(reaction_count DESC)')
 
         # Create voice_sessions table with guild_id for proper tracking
         cur.execute('''
@@ -129,27 +155,41 @@ async def on_message(message):
         member = message.guild.get_member(message.author.id)
         nickname = member.nick if member and member.nick else None
         avatar_url = str(message.author.display_avatar.url) if message.author.display_avatar else None
+        # Use server join date, not Discord account creation date
+        join_date = member.joined_at if member and member.joined_at else message.author.created_at
 
-        # Check for gifs in content or attachments
+        # Check for gifs and images in content, attachments, and embeds (Tenor/Giphy)
         gif_count = 0
+        image_count = 0
+        IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
         if '.gif' in message.content.lower():
             gif_count = message.content.lower().count('.gif')
         for attachment in message.attachments:
-            if attachment.filename.lower().endswith('.gif'):
+            fname = attachment.filename.lower()
+            if fname.endswith('.gif'):
+                gif_count += 1
+            elif fname.endswith(IMAGE_EXTS):
+                image_count += 1
+        # Count Tenor/Giphy GIFs sent as embeds
+        for embed in message.embeds:
+            url = (embed.url or '').lower()
+            proxy = (embed.thumbnail.proxy_url if embed.thumbnail else '') or ''
+            if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
                 gif_count += 1
 
         # Upsert member stats with proper guild isolation
         cur.execute('''
-            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, gif_count, join_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, NOW())
+            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, gif_count, image_count, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
             ON CONFLICT (user_id, guild_id) DO UPDATE SET
                 message_count = member_stats.message_count + 1,
                 gif_count = member_stats.gif_count + %s,
+                image_count = member_stats.image_count + %s,
                 username = %s,
                 nickname = COALESCE(%s, member_stats.nickname),
                 avatar_url = COALESCE(%s, member_stats.avatar_url),
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, message.author.created_at, gif_count, str(message.author), nickname, avatar_url))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url))
 
         conn.commit()
         cur.close()
@@ -200,13 +240,15 @@ async def on_voice_state_update(member, before, after):
             total_voice_seconds = result[0] if result else 0
 
             # Upsert member stats with proper voice time
+            # Use server join date, not Discord account creation date
+            voice_join_date = member.joined_at if member.joined_at else member.created_at
             cur.execute('''
                 INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
                 VALUES (%s, %s, %s, %s, %s, NOW())
                 ON CONFLICT (user_id, guild_id) DO UPDATE SET
                     voice_time_seconds = %s,
                     last_updated = NOW()
-            ''', (member.id, member.guild.id, str(member), total_voice_seconds, member.created_at, total_voice_seconds))
+            ''', (member.id, member.guild.id, str(member), total_voice_seconds, voice_join_date, total_voice_seconds))
 
             conn.commit()
             print(f"[VOICE] {member} left voice in {member.guild.name} - Total: {total_voice_seconds}s")
@@ -215,6 +257,94 @@ async def on_voice_state_update(member, before, after):
         conn.close()
     except Exception as e:
         print(f"[ERROR] Failed to track voice state: {e}")
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user.bot:
+        return
+    if not reaction.message.guild:
+        return
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        guild_id = reaction.message.guild.id
+        message = reaction.message
+        member = reaction.message.guild.get_member(user.id)
+        nickname = member.nick if member and member.nick else None
+        avatar_url = str(user.display_avatar.url) if user.display_avatar else None
+
+        # Increment reaction_count for the user who reacted
+        # Use server join date, not Discord account creation date
+        reaction_join_date = member.joined_at if member and member.joined_at else user.created_at
+        cur.execute('''
+            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, reaction_count, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
+            ON CONFLICT (user_id, guild_id) DO UPDATE SET
+                reaction_count = member_stats.reaction_count + 1,
+                last_updated = NOW()
+        ''', (user.id, guild_id, str(user), nickname, avatar_url, reaction_join_date))
+
+        # Track total reactions on the message itself
+        total_reactions = sum(r.count for r in message.reactions)
+        msg_content = message.content[:500] if message.content else None
+        msg_author = reaction.message.guild.get_member(message.author.id)
+        author_nick = msg_author.nick if msg_author and msg_author.nick else None
+        author_avatar = str(message.author.display_avatar.url) if message.author.display_avatar else None
+
+        cur.execute('''
+            INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            ON CONFLICT (message_id, guild_id) DO UPDATE SET
+                reaction_count = %s,
+                last_updated = NOW()
+        ''', (message.id, guild_id, message.channel.id, message.author.id, str(message.author), author_nick, author_avatar, msg_content, total_reactions, total_reactions))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[REACTION] {user} reacted in {reaction.message.guild.name}")
+    except Exception as e:
+        print(f"[ERROR] Failed to track reaction add: {e}")
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    if user.bot:
+        return
+    if not reaction.message.guild:
+        return
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        guild_id = reaction.message.guild.id
+        message = reaction.message
+
+        # Decrement reaction_count for the user who removed the reaction
+        cur.execute('''
+            UPDATE member_stats SET
+                reaction_count = GREATEST(reaction_count - 1, 0),
+                last_updated = NOW()
+            WHERE user_id = %s AND guild_id = %s
+        ''', (user.id, guild_id))
+
+        # Update total reactions on the message
+        total_reactions = sum(r.count for r in message.reactions)
+        cur.execute('''
+            UPDATE message_reactions SET
+                reaction_count = %s,
+                last_updated = NOW()
+            WHERE message_id = %s AND guild_id = %s
+        ''', (total_reactions, message.id, guild_id))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[REACTION] {user} removed reaction in {reaction.message.guild.name}")
+    except Exception as e:
+        print(f"[ERROR] Failed to track reaction remove: {e}")
 
 @bot.tree.command(name="stats", description="View your member statistics")
 async def stats(interaction: discord.Interaction):
@@ -448,8 +578,12 @@ async def import_history(interaction: discord.Interaction):
                 'join_date': member.joined_at,
                 'messages': 0,
                 'gifs': 0,
+                'images': 0,
                 'reactions': 0
             }
+
+        # Track message reaction counts for message_reactions table
+        message_reaction_data = {}
 
         # Iterate through all channels
         total_messages = 0
@@ -465,18 +599,38 @@ async def import_history(interaction: discord.Interaction):
                     if message.author.id in user_data:
                         user_data[message.author.id]['messages'] += 1
 
-                        # Count gifs
+                        # Count gifs and images
+                        IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
                         if '.gif' in message.content.lower():
                             user_data[message.author.id]['gifs'] += message.content.lower().count('.gif')
                         for attachment in message.attachments:
-                            if attachment.filename.lower().endswith('.gif'):
+                            fname = attachment.filename.lower()
+                            if fname.endswith('.gif'):
                                 user_data[message.author.id]['gifs'] += 1
+                            elif fname.endswith(IMAGE_EXTS):
+                                user_data[message.author.id]['images'] += 1
 
-                    # Track reactions
+                    # Track reactions per user and per message
+                    total_msg_reactions = 0
                     for reaction in message.reactions:
+                        total_msg_reactions += reaction.count
                         async for user in reaction.users():
                             if user.id in user_data:
                                 user_data[user.id]['reactions'] += 1
+
+                    # Record message reaction count if it has any reactions
+                    if total_msg_reactions > 0 and message.author.id in user_data:
+                        author_data = user_data[message.author.id]
+                        message_reaction_data[message.id] = {
+                            'guild_id': guild_id,
+                            'channel_id': channel.id,
+                            'user_id': message.author.id,
+                            'username': author_data['username'],
+                            'nickname': author_data['nickname'],
+                            'avatar_url': author_data['avatar_url'],
+                            'message_content': message.content[:500] if message.content else None,
+                            'reaction_count': total_msg_reactions,
+                        }
 
                     # Progress update every 500 messages
                     if total_messages % 500 == 0:
@@ -491,20 +645,34 @@ async def import_history(interaction: discord.Interaction):
         for user_id, data in user_data.items():
             cur.execute('''
                 INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                         message_count, gif_count, reaction_count, join_date, last_updated)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                                         message_count, gif_count, image_count, reaction_count, join_date, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
                 ON CONFLICT (user_id, guild_id) DO UPDATE SET
                     message_count = %s,
                     gif_count = %s,
+                    image_count = %s,
                     reaction_count = %s,
                     username = %s,
                     nickname = COALESCE(%s, member_stats.nickname),
                     avatar_url = COALESCE(%s, member_stats.avatar_url),
                     last_updated = NOW()
             ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
-                  data['messages'], data['gifs'], data['reactions'], data['join_date'],
-                  data['messages'], data['gifs'], data['reactions'],
+                  data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date'],
+                  data['messages'], data['gifs'], data['images'], data['reactions'],
                   data['username'], data['nickname'], data['avatar_url']))
+
+        # Insert/update message reaction data
+        print(f"[IMPORT] Storing {len(message_reaction_data)} message reaction records...")
+        for message_id, data in message_reaction_data.items():
+            cur.execute('''
+                INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                ON CONFLICT (message_id, guild_id) DO UPDATE SET
+                    reaction_count = %s,
+                    last_updated = NOW()
+            ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
+                  data['username'], data['nickname'], data['avatar_url'],
+                  data['message_content'], data['reaction_count'], data['reaction_count']))
 
         conn.commit()
         cur.close()
@@ -515,6 +683,7 @@ async def import_history(interaction: discord.Interaction):
         embed = discord.Embed(title="✅ History Import Complete", color=discord.Color.green())
         embed.add_field(name="Total Messages Scanned", value=str(total_messages), inline=False)
         embed.add_field(name="Total Users Tracked", value=str(len(user_data)), inline=False)
+        embed.add_field(name="Messages with Reactions", value=str(len(message_reaction_data)), inline=False)
         embed.add_field(name="Status", value="All member statistics have been loaded!", inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -522,6 +691,40 @@ async def import_history(interaction: discord.Interaction):
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
         await interaction.followup.send(f"❌ Import failed: {str(e)}", ephemeral=True)
+
+@bot.tree.command(name="fix-join-dates", description="Fix join dates to use server join date (Admin only)")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def fix_join_dates(interaction: discord.Interaction):
+    """Correct any join_dates that were incorrectly set to Discord account creation date"""
+    try:
+        await interaction.response.defer()
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        fixed = 0
+
+        for member in interaction.guild.members:
+            if not member.joined_at:
+                continue
+            cur.execute('''
+                UPDATE member_stats SET join_date = %s, last_updated = NOW()
+                WHERE user_id = %s AND guild_id = %s
+            ''', (member.joined_at, member.id, interaction.guild.id))
+            if cur.rowcount > 0:
+                fixed += 1
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        embed = discord.Embed(title="✅ Join Dates Fixed", color=discord.Color.green())
+        embed.add_field(name="Members Updated", value=str(fixed), inline=False)
+        embed.add_field(name="Status", value="All join dates now reflect server join date, not Discord account creation.", inline=False)
+        await interaction.followup.send(embed=embed)
+
+    except Exception as e:
+        print(f"[ERROR] fix-join-dates failed: {e}")
+        await interaction.followup.send(f"❌ Failed: {str(e)}", ephemeral=True)
 
 @tasks.loop(minutes=30)
 async def track_voice_activity():
