@@ -104,6 +104,12 @@ def init_database():
             )
         ''')
 
+        # Migrate voice_sessions: add guild_id if table existed without it
+        try:
+            cur.execute('ALTER TABLE voice_sessions ADD COLUMN guild_id BIGINT NOT NULL DEFAULT 0')
+        except:
+            conn.rollback()
+
         # Create indexes for faster queries
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
