@@ -155,8 +155,10 @@ async def on_message(message):
         member = message.guild.get_member(message.author.id)
         nickname = member.nick if member and member.nick else None
         avatar_url = str(message.author.display_avatar.url) if message.author.display_avatar else None
+        # Use server join date, not Discord account creation date
+        join_date = member.joined_at if member and member.joined_at else message.author.created_at
 
-        # Check for gifs and images in content or attachments
+        # Check for gifs and images in content, attachments, and embeds (Tenor/Giphy)
         gif_count = 0
         image_count = 0
         IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
@@ -168,6 +170,12 @@ async def on_message(message):
                 gif_count += 1
             elif fname.endswith(IMAGE_EXTS):
                 image_count += 1
+        # Count Tenor/Giphy GIFs sent as embeds
+        for embed in message.embeds:
+            url = (embed.url or '').lower()
+            proxy = (embed.thumbnail.proxy_url if embed.thumbnail else '') or ''
+            if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
+                gif_count += 1
 
         # Upsert member stats with proper guild isolation
         cur.execute('''
@@ -181,7 +189,7 @@ async def on_message(message):
                 nickname = COALESCE(%s, member_stats.nickname),
                 avatar_url = COALESCE(%s, member_stats.avatar_url),
                 last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, message.author.created_at, gif_count, image_count, str(message.author), nickname, avatar_url))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url))
 
         conn.commit()
         cur.close()
@@ -232,13 +240,15 @@ async def on_voice_state_update(member, before, after):
             total_voice_seconds = result[0] if result else 0
 
             # Upsert member stats with proper voice time
+            # Use server join date, not Discord account creation date
+            voice_join_date = member.joined_at if member.joined_at else member.created_at
             cur.execute('''
                 INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
                 VALUES (%s, %s, %s, %s, %s, NOW())
                 ON CONFLICT (user_id, guild_id) DO UPDATE SET
                     voice_time_seconds = %s,
                     last_updated = NOW()
-            ''', (member.id, member.guild.id, str(member), total_voice_seconds, member.created_at, total_voice_seconds))
+            ''', (member.id, member.guild.id, str(member), total_voice_seconds, voice_join_date, total_voice_seconds))
 
             conn.commit()
             print(f"[VOICE] {member} left voice in {member.guild.name} - Total: {total_voice_seconds}s")
@@ -266,13 +276,15 @@ async def on_reaction_add(reaction, user):
         avatar_url = str(user.display_avatar.url) if user.display_avatar else None
 
         # Increment reaction_count for the user who reacted
+        # Use server join date, not Discord account creation date
+        reaction_join_date = member.joined_at if member and member.joined_at else user.created_at
         cur.execute('''
             INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, reaction_count, join_date, last_updated)
             VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
             ON CONFLICT (user_id, guild_id) DO UPDATE SET
                 reaction_count = member_stats.reaction_count + 1,
                 last_updated = NOW()
-        ''', (user.id, guild_id, str(user), nickname, avatar_url, user.created_at))
+        ''', (user.id, guild_id, str(user), nickname, avatar_url, reaction_join_date))
 
         # Track total reactions on the message itself
         total_reactions = sum(r.count for r in message.reactions)
@@ -679,6 +691,40 @@ async def import_history(interaction: discord.Interaction):
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
         await interaction.followup.send(f"❌ Import failed: {str(e)}", ephemeral=True)
+
+@bot.tree.command(name="fix-join-dates", description="Fix join dates to use server join date (Admin only)")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def fix_join_dates(interaction: discord.Interaction):
+    """Correct any join_dates that were incorrectly set to Discord account creation date"""
+    try:
+        await interaction.response.defer()
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        fixed = 0
+
+        for member in interaction.guild.members:
+            if not member.joined_at:
+                continue
+            cur.execute('''
+                UPDATE member_stats SET join_date = %s, last_updated = NOW()
+                WHERE user_id = %s AND guild_id = %s
+            ''', (member.joined_at, member.id, interaction.guild.id))
+            if cur.rowcount > 0:
+                fixed += 1
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        embed = discord.Embed(title="✅ Join Dates Fixed", color=discord.Color.green())
+        embed.add_field(name="Members Updated", value=str(fixed), inline=False)
+        embed.add_field(name="Status", value="All join dates now reflect server join date, not Discord account creation.", inline=False)
+        await interaction.followup.send(embed=embed)
+
+    except Exception as e:
+        print(f"[ERROR] fix-join-dates failed: {e}")
+        await interaction.followup.send(f"❌ Failed: {str(e)}", ephemeral=True)
 
 @tasks.loop(minutes=30)
 async def track_voice_activity():
