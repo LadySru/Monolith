@@ -3,290 +3,93 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Community Stats — Member statistics and leaderboards"/>
-  <title>Community Stats — Monolith Social</title>
+  <meta name="description" content="Monolith Community Appreciation — Member statistics and leaderboards"/>
+  <title>Community Appreciation — Monolith Social</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="shared.css"/>
   <style>
-    :root {
-      --bg: #0a0015;
-      --bg2: #0f001f;
-      --card: #110025;
-      --border: #2a0d4a;
-      --teal: #00ffe7;
-      --electric-blue: #00d9ff;
-      --neon-purple: #d900ff;
-      --neon-pink: #ff0099;
-      --glow-blue: rgba(0, 217, 255, 0.4);
-      --glow-purple: rgba(217, 0, 255, 0.4);
-      --glow-pink: rgba(255, 0, 153, 0.4);
-      --text: #f0e8ff;
-      --text2: #7a6faa;
-      --star: #ffd200;
-      --font-jp: "Yu Gothic UI", "Yu Gothic", "YuGothic", sans-serif;
-    }
+    /* ── Page hero ── */
+    .page-hero{position:relative;padding:120px 0 60px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,47,255,.18) 0%,transparent 60%);border-bottom:1px solid var(--border);}
+    .page-hero h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(2rem,5vw,3.5rem);color:var(--text);letter-spacing:3px;margin-bottom:10px;}
+    .page-hero h1 span{color:var(--teal);}
+    .page-hero p{color:var(--text2);font-size:1rem;font-weight:300;}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: linear-gradient(rgba(10,0,21,0.70), rgba(10,0,21,0.70)), url('bg-room.gif');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-jp);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+    /* ── Stats grid ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;margin-bottom:48px;}
+    .stat-card{background:linear-gradient(135deg,rgba(17,0,37,0.9),rgba(17,0,37,0.7));border:2px solid var(--neon-purple);padding:32px;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,15px 100%,0 calc(100% - 15px));transition:all .3s;box-shadow:inset 0 0 20px rgba(217,0,255,0.1),0 0 20px rgba(217,0,255,0.2);}
+    .stat-card:hover{border-color:var(--electric-blue);box-shadow:inset 0 0 20px rgba(0,217,255,0.15),0 0 30px rgba(0,217,255,0.4),0 0 60px rgba(217,0,255,0.3);transform:translateY(-5px);}
+    .stat-label{font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
+    .stat-value{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:var(--electric-blue);margin-bottom:4px;text-shadow:0 0 10px rgba(0,217,255,0.8),0 0 20px rgba(0,217,255,0.5);}
+    .stat-detail{font-size:.9rem;color:var(--text2);}
 
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: rgba(10, 0, 21, .98);
-      border-bottom: 2px solid var(--neon-purple);
-      box-shadow: 0 0 20px rgba(217, 0, 255, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 48px;
-      z-index: 200;
-      backdrop-filter: blur(10px);
-    }
-    .nav-l { display: flex; align-items: center; gap: 12px; }
-    .nav-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--teal); }
-    .nav-name { font-family: 'Orbitron', monospace; font-weight: 900; font-size: .9rem; color: var(--text); letter-spacing: 2px; text-decoration: none; }
-    .nav-name span { color: var(--teal); }
-    .nav-r { display: flex; align-items: center; gap: 16px; margin-left: auto; }
-    .nav-link { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s, text-shadow .2s; }
-    .nav-link:hover, .nav-link.active { color: var(--teal); text-shadow: 0 0 10px rgba(0,255,231,.35); }
-    .nav-cta {
-      font-family: 'Orbitron', monospace;
-      font-size: .58rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--teal);
-      text-decoration: none;
-      border: 1px solid rgba(0,255,231,.35);
-      padding: 7px 14px;
-      clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
-      transition: background .2s, transform .2s, box-shadow .2s;
-    }
-    .nav-cta:hover { background: rgba(0,255,231,0.12); transform: translateY(-1px); box-shadow: 0 0 12px rgba(0,255,231,.25); }
-    .nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; z-index: 201; }
-    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--teal); transition: all .3s; }
-    .nav-hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
-    .nav-hamburger.active span:nth-child(2) { opacity: 0; }
-    .nav-hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
-    .nav-mobile { display: none; position: fixed; top: 64px; left: 0; right: 0; background: rgba(2,0,10,.98); border-bottom: 1px solid rgba(0,255,231,.12); padding: 16px 20px; flex-direction: column; gap: 0; z-index: 199; max-height: calc(100vh - 64px); overflow-y: auto; }
-    .nav-mobile.open { display: flex; }
-    .nav-mobile .nav-link { font-family: 'Orbitron', monospace; font-size: .72rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; padding: 14px 0; border-bottom: 1px solid var(--border); width: 100%; display: block; }
-    .nav-mobile .nav-link:hover, .nav-mobile .nav-link.active { color: var(--teal); }
-    .nav-mobile .nav-cta { margin-top: 14px; justify-content: center; clip-path: none; border-radius: 2px; display: flex; }
+    /* ── Leaderboards ── */
+    .leaderboard{background:linear-gradient(135deg,rgba(17,0,37,0.85),rgba(17,0,37,0.65));border:2px solid var(--neon-pink);padding:32px;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,15px 100%,0 calc(100% - 15px));margin-bottom:32px;box-shadow:inset 0 0 20px rgba(255,0,153,0.1),0 0 25px rgba(255,0,153,0.25);}
+    .leaderboard h2{font-family:'Orbitron',monospace;font-size:1.4rem;margin-bottom:24px;color:var(--text);text-shadow:0 0 10px rgba(217,0,255,0.6),0 0 20px rgba(217,0,255,0.3);}
+    .leaderboard-list{display:grid;gap:12px;}
+    .leaderboard-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(90deg,rgba(217,0,255,0.15),rgba(0,217,255,0.05));border-left:4px solid var(--electric-blue);border-radius:2px;transition:all .3s;box-shadow:0 0 15px rgba(217,0,255,0.1);}
+    .leaderboard-item:hover{background:linear-gradient(90deg,rgba(217,0,255,0.25),rgba(0,217,255,0.15));box-shadow:0 0 20px rgba(0,217,255,0.3),0 0 30px rgba(217,0,255,0.2);transform:translateX(5px);}
+    .rank{font-family:'Orbitron',monospace;font-weight:700;color:var(--neon-pink);margin-right:16px;min-width:32px;text-shadow:0 0 8px rgba(255,0,153,0.6);}
+    .member-name{flex:1;font-size:.95rem;}
+    .member-stat{font-family:'Orbitron',monospace;color:var(--neon-purple);font-weight:600;font-size:.9rem;text-shadow:0 0 8px rgba(217,0,255,0.6);}
+    .lb-loading{text-align:center;padding:32px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;}
+    .lb-error{background:rgba(255,0,153,.15);border:2px solid var(--neon-pink);color:var(--neon-pink);padding:16px;margin-bottom:24px;}
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 120px 48px 80px;
-    }
-
-    h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: 2.8rem;
-      margin-bottom: 12px;
-      letter-spacing: 1px;
-    }
-
-    .subtitle {
-      color: var(--text2);
-      font-size: 1rem;
-      margin-bottom: 48px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-      margin-bottom: 64px;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, rgba(17, 0, 37, 0.9), rgba(17, 0, 37, 0.7));
-      border: 2px solid var(--neon-purple);
-      padding: 32px;
-      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-      transition: all .3s;
-      box-shadow: inset 0 0 20px rgba(217, 0, 255, 0.1), 0 0 20px rgba(217, 0, 255, 0.2);
-    }
-
-    .stat-card:hover {
-      border-color: var(--electric-blue);
-      box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.15), 0 0 30px rgba(0, 217, 255, 0.4), 0 0 60px rgba(217, 0, 255, 0.3);
-      transform: translateY(-5px);
-    }
-
-    .stat-label {
-      font-family: 'Orbitron', monospace;
-      font-size: .7rem;
-      letter-spacing: 2px;
-      color: var(--text2);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-family: 'Orbitron', monospace;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--electric-blue);
-      margin-bottom: 4px;
-      text-shadow: 0 0 10px rgba(0, 217, 255, 0.8), 0 0 20px rgba(0, 217, 255, 0.5);
-    }
-
-    .stat-detail {
-      font-size: .9rem;
-      color: var(--text2);
-    }
-
-    .leaderboard {
-      background: linear-gradient(135deg, rgba(17, 0, 37, 0.85), rgba(17, 0, 37, 0.65));
-      border: 2px solid var(--neon-pink);
-      padding: 32px;
-      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-      margin-bottom: 32px;
-      box-shadow: inset 0 0 20px rgba(255, 0, 153, 0.1), 0 0 25px rgba(255, 0, 153, 0.25);
-    }
-
-    .leaderboard h2 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.4rem;
-      margin-bottom: 24px;
-      color: var(--text);
-      text-shadow: 0 0 10px rgba(217, 0, 255, 0.6), 0 0 20px rgba(217, 0, 255, 0.3);
-    }
-
-    .leaderboard-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .leaderboard-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      background: linear-gradient(90deg, rgba(217, 0, 255, 0.15), rgba(0, 217, 255, 0.05));
-      border-left: 4px solid var(--electric-blue);
-      border-radius: 2px;
-      transition: all .3s;
-      box-shadow: 0 0 15px rgba(217, 0, 255, 0.1);
-    }
-
-    .leaderboard-item:hover {
-      background: linear-gradient(90deg, rgba(217, 0, 255, 0.25), rgba(0, 217, 255, 0.15));
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3), 0 0 30px rgba(217, 0, 255, 0.2);
-      transform: translateX(5px);
-    }
-
-    .rank {
-      font-family: 'Orbitron', monospace;
-      font-weight: 700;
-      color: var(--neon-pink);
-      margin-right: 16px;
-      min-width: 32px;
-      text-shadow: 0 0 8px rgba(255, 0, 153, 0.6);
-    }
-
-    .member-name {
-      flex: 1;
-      font-size: .95rem;
-    }
-
-    .member-stat {
-      font-family: 'Orbitron', monospace;
-      color: var(--neon-purple);
-      font-weight: 600;
-      font-size: .9rem;
-      text-shadow: 0 0 8px rgba(217, 0, 255, 0.6);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 48px;
-      color: var(--text2);
-    }
-
-    .error {
-      background: rgba(255, 0, 153, .15);
-      border: 2px solid var(--neon-pink);
-      color: var(--neon-pink);
-      padding: 16px;
-      border-radius: 4px;
-      margin-bottom: 24px;
-      box-shadow: 0 0 20px rgba(255, 0, 153, 0.3);
-      text-shadow: 0 0 8px rgba(255, 0, 153, 0.4);
-    }
-
-    @media (max-width: 768px) {
-      .container { padding: 100px 20px 60px; }
-      h1 { font-size: 2rem; }
-      .stats-grid { grid-template-columns: 1fr; }
-      nav { padding: 0 20px; }
-      .nav-hamburger { display: flex; }
-      .nav-r > :not(.nav-hamburger) { display: none; }
-    }
+    @media(max-width:768px){.stats-grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <nav>
-    <div class="nav-l">
-      <a href="index.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;">
-        <img src="avatar.jpg" class="nav-av" alt="" onerror="this.style.display='none'"/>
-        <span class="nav-name">Monolith <span>Social</span></span>
-      </a>
-    </div>
-    <div class="nav-r">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="arcade.html" class="nav-link">Arcade</a>
-      <a href="quiz.html" class="nav-link">Quiz</a>
-      <a href="reviews.html" class="nav-link">Reviews</a>
-      <a href="index.html#features" class="nav-link">Features</a>
-      <a href="stats.html" class="nav-link active">Community Appreciation</a>
-      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
-    </div>
-    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-  <div class="nav-mobile" id="nav-mobile">
+<div id="cur"></div>
+<canvas id="seasons-canvas" style="position:fixed;inset:0;z-index:10;pointer-events:none;width:100%;height:100%;"></canvas>
+<div id="season-badge"></div>
+
+<nav>
+  <div class="nav-l">
+    <a href="index.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;">
+      <img src="avatar.jpg" class="nav-av" alt="" onerror="this.style.display='none'"/>
+      <span class="nav-name">Monolith <span>Social</span></span>
+    </a>
+  </div>
+  <div class="nav-r">
     <a href="index.html" class="nav-link">Home</a>
     <a href="arcade.html" class="nav-link">Arcade</a>
     <a href="quiz.html" class="nav-link">Quiz</a>
     <a href="reviews.html" class="nav-link">Reviews</a>
     <a href="index.html#features" class="nav-link">Features</a>
     <a href="stats.html" class="nav-link active">Community Appreciation</a>
-    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
   </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile" id="nav-mobile">
+  <a href="index.html" class="nav-link">Home</a>
+  <a href="arcade.html" class="nav-link">Arcade</a>
+  <a href="quiz.html" class="nav-link">Quiz</a>
+  <a href="reviews.html" class="nav-link">Reviews</a>
+  <a href="index.html#features" class="nav-link">Features</a>
+  <a href="stats.html" class="nav-link active">Community Appreciation</a>
+  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+</div>
 
-  <div class="container">
-    <h1>Community Appreciation</h1>
-    <p class="subtitle">Member statistics and leaderboards</p>
+<div class="page-hero">
+  <div class="wrap">
+    <h1>👑 Community <span>Appreciation</span></h1>
+    <p>Member statistics and leaderboards</p>
+  </div>
+</div>
 
+<section class="section-pad">
+  <div class="wrap">
     <div id="error-container"></div>
 
-    <!-- Oldest Member Card -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">👑 Oldest Member</div>
         <div class="stat-value" id="oldest-member">—</div>
         <div class="stat-detail" id="oldest-date">Loading...</div>
       </div>
-
       <div class="stat-card">
         <div class="stat-label">📊 Total Members Tracked</div>
         <div class="stat-value" id="total-members">—</div>
@@ -294,162 +97,136 @@
       </div>
     </div>
 
-    <!-- Leaderboards -->
     <div class="leaderboard">
       <h2>🏆 Top Messagers</h2>
       <div class="leaderboard-list" id="messages-leaderboard">
-        <div class="loading">Loading leaderboard...</div>
+        <div class="lb-loading">Loading leaderboard...</div>
       </div>
     </div>
 
     <div class="leaderboard">
       <h2>🎤 Top Voice Chatters</h2>
       <div class="leaderboard-list" id="voice-leaderboard">
-        <div class="loading">Loading leaderboard...</div>
+        <div class="lb-loading">Loading leaderboard...</div>
       </div>
     </div>
 
-    <!-- Media Leaderboards -->
     <div class="leaderboard">
       <h2>🎬 Most GIFs Sent</h2>
       <div class="leaderboard-list" id="gifs-leaderboard">
-        <div class="loading">Loading...</div>
+        <div class="lb-loading">Loading...</div>
       </div>
     </div>
 
     <div class="leaderboard">
       <h2>🖼️ Most Images Sent</h2>
       <div class="leaderboard-list" id="images-leaderboard">
-        <div class="loading">Loading...</div>
+        <div class="lb-loading">Loading...</div>
       </div>
     </div>
 
-    <!-- Most Reacted Message -->
     <div class="leaderboard">
       <h2>🎉 Most Reacted Message</h2>
       <div id="reactions-card">
-        <div class="loading">Loading...</div>
+        <div class="lb-loading">Loading...</div>
       </div>
     </div>
   </div>
+</section>
 
-  <script>
-    function getDisplayName(member) {
-      return member.nickname || member.username || 'Unknown';
-    }
+<footer>
+  <div class="footer-l">
+    <img src="avatar.jpg" class="footer-av" alt="" onerror="this.style.display='none'"/>
+    <div class="footer-name">Monolith <span>Social</span></div>
+  </div>
+  <p class="footer-copy">© 2026 Monolith Social · discord.gg/pnRCbEAtTk</p>
+</footer>
 
-    async function loadStats() {
-      try {
-        // Load oldest member
-        const oldestRes = await fetch('/.netlify/functions/member-stats?type=oldest');
-        if (oldestRes.ok) {
-          const oldest = await oldestRes.json();
-          document.getElementById('oldest-member').textContent = getDisplayName(oldest);
-          const joinDate = new Date(oldest.join_date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
-          document.getElementById('oldest-date').textContent = `Joined ${joinDate}`;
-        }
+<script src="shared.js"></script>
+<script>
+  function getDisplayName(member) {
+    return member.nickname || member.username || 'Unknown';
+  }
 
-        // Load leaderboards
-        const leaderboardRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
-        if (leaderboardRes.ok) {
-          const data = await leaderboardRes.json();
-
-          // Messages leaderboard
-          const messagesHtml = data.top_messages.map((member, i) => `
-            <div class="leaderboard-item">
-              <div class="rank">#${i + 1}</div>
-              <div class="member-name">${getDisplayName(member)}</div>
-              <div class="member-stat">${member.count} messages</div>
-            </div>
-          `).join('');
-          document.getElementById('messages-leaderboard').innerHTML = messagesHtml || '<div class="loading">No data yet</div>';
-
-          // Voice leaderboard
-          const voiceHtml = data.top_voice.map((member, i) => `
-            <div class="leaderboard-item">
-              <div class="rank">#${i + 1}</div>
-              <div class="member-name">${getDisplayName(member)}</div>
-              <div class="member-stat">${member.hours}h voice</div>
-            </div>
-          `).join('');
-          document.getElementById('voice-leaderboard').innerHTML = voiceHtml || '<div class="loading">No data yet</div>';
-        }
-
-        // Load GIFs leaderboard
-        const gifsRes = await fetch('/.netlify/functions/member-stats?type=most-gifs');
-        if (gifsRes.ok) {
-          const data = await gifsRes.json();
-          const gifsHtml = data.top_gifs.map((member, i) => `
-            <div class="leaderboard-item">
-              <div class="rank">#${i + 1}</div>
-              <div class="member-name">${getDisplayName(member)}</div>
-              <div class="member-stat">${member.count} GIFs</div>
-            </div>
-          `).join('');
-          document.getElementById('gifs-leaderboard').innerHTML = gifsHtml || '<div class="loading">No GIFs shared yet</div>';
-        }
-
-        // Load images leaderboard
-        const imagesRes = await fetch('/.netlify/functions/member-stats?type=most-images');
-        if (imagesRes.ok) {
-          const data = await imagesRes.json();
-          const imagesHtml = data.top_images.map((member, i) => `
-            <div class="leaderboard-item">
-              <div class="rank">#${i + 1}</div>
-              <div class="member-name">${getDisplayName(member)}</div>
-              <div class="member-stat">${member.count} Images</div>
-            </div>
-          `).join('');
-          document.getElementById('images-leaderboard').innerHTML = imagesHtml || '<div class="loading">No images shared yet</div>';
-        }
-
-        // Load most reacted message
-        const reactionsRes = await fetch('/.netlify/functions/member-stats?type=most-reactions');
-        if (reactionsRes.ok) {
-          const data = await reactionsRes.json();
-          const reactionsHtml = `
-            <div style="padding: 16px; background: rgba(139,47,255,.08); border-left: 3px solid var(--teal); border-radius: 2px;">
-              <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                ${data.avatar_url ? `<img src="${data.avatar_url}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;">` : ''}
-                <div>
-                  <div style="font-weight: 600; color: var(--text);">${getDisplayName(data)}</div>
-                  <div style="color: var(--text2); font-size: .9rem;">💬 ${data.message}</div>
-                </div>
-              </div>
-              <div style="color: var(--star); font-family: 'Orbitron', monospace; font-weight: 600;">⭐ ${data.reactions} reactions</div>
-            </div>
-          `;
-          document.getElementById('reactions-card').innerHTML = reactionsHtml;
-        }
-      } catch (error) {
-        document.getElementById('error-container').innerHTML = `
-          <div class="error">Error loading stats: ${error.message}</div>
-        `;
-      }
-    }
-
-    loadStats();
-    setInterval(loadStats, 60000); // Refresh every minute
-
-    // Nav hamburger toggle
-    const hamburger = document.getElementById('nav-hamburger');
-    const navMobile = document.getElementById('nav-mobile');
-    if (hamburger && navMobile) {
-      hamburger.addEventListener('click', () => {
-        navMobile.classList.toggle('open');
-        hamburger.classList.toggle('active');
-      });
-      navMobile.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          navMobile.classList.remove('open');
-          hamburger.classList.remove('active');
+  async function loadStats() {
+    try {
+      const oldestRes = await fetch('/.netlify/functions/member-stats?type=oldest');
+      if (oldestRes.ok) {
+        const oldest = await oldestRes.json();
+        document.getElementById('oldest-member').textContent = getDisplayName(oldest);
+        const joinDate = new Date(oldest.join_date).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
         });
-      });
+        document.getElementById('oldest-date').textContent = `Joined ${joinDate}`;
+      }
+
+      const leaderboardRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
+      if (leaderboardRes.ok) {
+        const data = await leaderboardRes.json();
+        const messagesHtml = data.top_messages.map((m, i) => `
+          <div class="leaderboard-item">
+            <div class="rank">#${i + 1}</div>
+            <div class="member-name">${getDisplayName(m)}</div>
+            <div class="member-stat">${m.count} messages</div>
+          </div>`).join('');
+        document.getElementById('messages-leaderboard').innerHTML = messagesHtml || '<div class="lb-loading">No data yet</div>';
+
+        const voiceHtml = data.top_voice.map((m, i) => `
+          <div class="leaderboard-item">
+            <div class="rank">#${i + 1}</div>
+            <div class="member-name">${getDisplayName(m)}</div>
+            <div class="member-stat">${m.hours}h voice</div>
+          </div>`).join('');
+        document.getElementById('voice-leaderboard').innerHTML = voiceHtml || '<div class="lb-loading">No data yet</div>';
+      }
+
+      const gifsRes = await fetch('/.netlify/functions/member-stats?type=most-gifs');
+      if (gifsRes.ok) {
+        const data = await gifsRes.json();
+        const html = data.top_gifs.map((m, i) => `
+          <div class="leaderboard-item">
+            <div class="rank">#${i + 1}</div>
+            <div class="member-name">${getDisplayName(m)}</div>
+            <div class="member-stat">${m.count} GIFs</div>
+          </div>`).join('');
+        document.getElementById('gifs-leaderboard').innerHTML = html || '<div class="lb-loading">No GIFs shared yet</div>';
+      }
+
+      const imagesRes = await fetch('/.netlify/functions/member-stats?type=most-images');
+      if (imagesRes.ok) {
+        const data = await imagesRes.json();
+        const html = data.top_images.map((m, i) => `
+          <div class="leaderboard-item">
+            <div class="rank">#${i + 1}</div>
+            <div class="member-name">${getDisplayName(m)}</div>
+            <div class="member-stat">${m.count} images</div>
+          </div>`).join('');
+        document.getElementById('images-leaderboard').innerHTML = html || '<div class="lb-loading">No images shared yet</div>';
+      }
+
+      const reactionsRes = await fetch('/.netlify/functions/member-stats?type=most-reactions');
+      if (reactionsRes.ok) {
+        const data = await reactionsRes.json();
+        document.getElementById('reactions-card').innerHTML = `
+          <div style="padding:16px;background:rgba(139,47,255,.08);border-left:3px solid var(--teal);border-radius:2px;">
+            <div style="display:flex;align-items:center;margin-bottom:12px;">
+              ${data.avatar_url ? `<img src="${data.avatar_url}" style="width:40px;height:40px;border-radius:50%;margin-right:12px;">` : ''}
+              <div>
+                <div style="font-weight:600;color:var(--text);">${getDisplayName(data)}</div>
+                <div style="color:var(--text2);font-size:.9rem;">💬 ${data.message}</div>
+              </div>
+            </div>
+            <div style="color:var(--star);font-family:'Orbitron',monospace;font-weight:600;">⭐ ${data.reactions} reactions</div>
+          </div>`;
+      }
+    } catch (error) {
+      document.getElementById('error-container').innerHTML =
+        `<div class="lb-error">Error loading stats: ${error.message}</div>`;
     }
-  </script>
+  }
+
+  loadStats();
+  setInterval(loadStats, 60000);
+</script>
 </body>
 </html>
