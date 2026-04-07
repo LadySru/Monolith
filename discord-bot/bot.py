@@ -614,6 +614,12 @@ async def import_history(interaction: discord.Interaction):
                                 user_data[message.author.id]['gifs'] += 1
                             elif fname.endswith(IMAGE_EXTS):
                                 user_data[message.author.id]['images'] += 1
+                        # Count Tenor/Giphy GIFs sent as embeds
+                        for embed in message.embeds:
+                            url = (embed.url or '').lower()
+                            proxy = (embed.thumbnail.proxy_url if embed.thumbnail else '') or ''
+                            if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
+                                user_data[message.author.id]['gifs'] += 1
 
                     # Track reactions per user and per message
                     total_msg_reactions = 0
