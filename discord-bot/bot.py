@@ -592,44 +592,40 @@ async def import_history(interaction: discord.Interaction):
 
         # Iterate through all channels
         total_messages = 0
+        IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
+
         for channel in interaction.guild.text_channels:
             if not channel.permissions_for(interaction.guild.me).read_message_history:
                 continue
 
+            channel_count = 0
             try:
                 async for message in channel.history(limit=None):
                     total_messages += 1
+                    channel_count += 1
 
-                    # Track message
                     if message.author.id in user_data:
                         user_data[message.author.id]['messages'] += 1
 
-                        # Count gifs and images
-                        IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
+                        # GIFs: content links
                         if '.gif' in message.content.lower():
                             user_data[message.author.id]['gifs'] += message.content.lower().count('.gif')
+                        # GIFs/images: attachments
                         for attachment in message.attachments:
                             fname = attachment.filename.lower()
                             if fname.endswith('.gif'):
                                 user_data[message.author.id]['gifs'] += 1
                             elif fname.endswith(IMAGE_EXTS):
                                 user_data[message.author.id]['images'] += 1
-                        # Count Tenor/Giphy GIFs sent as embeds
+                        # GIFs: Tenor/Giphy embeds
                         for embed in message.embeds:
                             url = (embed.url or '').lower()
                             proxy = (embed.thumbnail.proxy_url if embed.thumbnail else '') or ''
                             if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
                                 user_data[message.author.id]['gifs'] += 1
 
-                    # Track reactions per user and per message
-                    total_msg_reactions = 0
-                    for reaction in message.reactions:
-                        total_msg_reactions += reaction.count
-                        async for user in reaction.users():
-                            if user.id in user_data:
-                                user_data[user.id]['reactions'] += 1
-
-                    # Record message reaction count if it has any reactions
+                    # Use reaction.count (already fetched with the message — no extra API calls)
+                    total_msg_reactions = sum(r.count for r in message.reactions)
                     if total_msg_reactions > 0 and message.author.id in user_data:
                         author_data = user_data[message.author.id]
                         message_reaction_data[message.id] = {
@@ -643,15 +639,34 @@ async def import_history(interaction: discord.Interaction):
                             'reaction_count': total_msg_reactions,
                         }
 
-                    # Progress update every 500 messages
-                    if total_messages % 500 == 0:
+                    if total_messages % 1000 == 0:
                         print(f"[IMPORT] Processed {total_messages} messages...")
+                        await interaction.followup.send(f"⏳ Processing... {total_messages} messages scanned so far.", ephemeral=True)
 
             except discord.Forbidden:
                 print(f"[IMPORT] No permission to read history in #{channel.name}")
                 continue
+            except Exception as e:
+                print(f"[IMPORT] Error in #{channel.name}: {e}")
+                continue
 
-        # Insert/update all user data into database
+            print(f"[IMPORT] #{channel.name}: {channel_count} messages")
+
+            # Commit in batches per channel so a crash doesn't lose everything
+            if message_reaction_data:
+                for message_id, data in message_reaction_data.items():
+                    cur.execute('''
+                        INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT (message_id, guild_id) DO UPDATE SET
+                            reaction_count = %s, last_updated = NOW()
+                    ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
+                          data['username'], data['nickname'], data['avatar_url'],
+                          data['message_content'], data['reaction_count'], data['reaction_count']))
+                conn.commit()
+                message_reaction_data.clear()
+
+        # Insert/update all user stats
         print(f"[IMPORT] Storing {len(user_data)} user records...")
         for user_id, data in user_data.items():
             cur.execute('''
@@ -662,28 +677,14 @@ async def import_history(interaction: discord.Interaction):
                     message_count = %s,
                     gif_count = %s,
                     image_count = %s,
-                    reaction_count = %s,
                     username = %s,
                     nickname = COALESCE(%s, member_stats.nickname),
                     avatar_url = COALESCE(%s, member_stats.avatar_url),
                     last_updated = NOW()
             ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
                   data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date'],
-                  data['messages'], data['gifs'], data['images'], data['reactions'],
+                  data['messages'], data['gifs'], data['images'],
                   data['username'], data['nickname'], data['avatar_url']))
-
-        # Insert/update message reaction data
-        print(f"[IMPORT] Storing {len(message_reaction_data)} message reaction records...")
-        for message_id, data in message_reaction_data.items():
-            cur.execute('''
-                INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (message_id, guild_id) DO UPDATE SET
-                    reaction_count = %s,
-                    last_updated = NOW()
-            ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
-                  data['username'], data['nickname'], data['avatar_url'],
-                  data['message_content'], data['reaction_count'], data['reaction_count']))
 
         conn.commit()
         cur.close()
