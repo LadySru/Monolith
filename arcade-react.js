@@ -5,7 +5,6 @@
   const e = React.createElement;
   const games = [
     { id: 'snake', label: '🐍 Neon Snake' },
-    { id: 'silhouette', label: '🎌 Anime Guesser' },
     { id: 'tap', label: '🦭 Seal Sky Dash' }
   ];
 
