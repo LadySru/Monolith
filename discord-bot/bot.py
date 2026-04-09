@@ -91,10 +91,14 @@ def init_database():
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_guild ON message_reactions(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_count ON message_reactions(reaction_count DESC)')
 
-        # Migration: add channel_id if the table was created without it
+        # Migrations: add columns if the table was created without them
         cur.execute('''
             ALTER TABLE message_reactions
             ADD COLUMN IF NOT EXISTS channel_id BIGINT
+        ''')
+        cur.execute('''
+            ALTER TABLE message_reactions
+            ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW()
         ''')
 
         # Create voice_sessions table
