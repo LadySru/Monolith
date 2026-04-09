@@ -696,7 +696,7 @@ async def import_history(interaction: discord.Interaction):
             try:
                 cur.execute('''
                     UPDATE member_stats SET
-                        message_count = %s,
+                        message_count = GREATEST(message_count, %s),
                         gif_count     = %s,
                         image_count   = %s,
                         username      = %s,
