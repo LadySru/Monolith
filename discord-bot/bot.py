@@ -599,6 +599,7 @@ async def import_history(interaction: discord.Interaction):
 
         # Track message reaction counts for message_reactions table
         message_reaction_data = {}
+        reaction_errors = 0
 
         # Iterate through all channels
         total_messages = 0
@@ -663,7 +664,6 @@ async def import_history(interaction: discord.Interaction):
             print(f"[IMPORT] #{channel.name}: {channel_count} messages")
 
             # Commit per-channel; each row gets its own savepoint so one bad row never aborts the batch
-            reaction_errors = 0
             if message_reaction_data:
                 for message_id, data in message_reaction_data.items():
                     cur.execute('SAVEPOINT rx')
