@@ -239,10 +239,8 @@
     .channels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
     .channel-tag { background: rgba(139,47,255,0.08); border: 1px solid rgba(0,255,231,.15); padding: 12px 16px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: .9rem; color: var(--text); text-align: center; transition: all .3s; position: relative; overflow: visible; cursor: pointer; }
     .channel-tag:hover { border-color: var(--teal); background: rgba(0,255,231,.08); box-shadow: 0 0 12px rgba(0,255,231,.1); }
-    @keyframes emoji-confetti { 0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1;} 100%{transform:translate(var(--ex),var(--ey)) rotate(var(--er)) scale(.4);opacity:0;} }
-    @keyframes emoji-tiktok { 0%{transform:translate(-50%,0) scale(.5);opacity:0;} 20%{transform:translate(-50%,-10px) scale(1.2);opacity:1;} 60%{transform:translate(-50%,-40px) scale(1);opacity:1;} 100%{transform:translate(-50%,-90px) scale(.7);opacity:0;} }
-    .emoji-particle { position:fixed; pointer-events:none; z-index:9999; font-size:1.4rem; line-height:1; animation:emoji-confetti .9s ease-out forwards; }
-    .emoji-tiktok { position:fixed; pointer-events:none; z-index:9999; font-size:2rem; line-height:1; animation:emoji-tiktok .8s ease-out forwards; }
+    @keyframes emoji-rise { 0%{transform:translateY(0) translateX(var(--ex)) scale(var(--es));opacity:1;} 70%{opacity:1;} 100%{transform:translateY(var(--ey)) translateX(calc(var(--ex) * 1.4)) scale(calc(var(--es) * .5));opacity:0;} }
+    .emoji-rise { position:fixed; pointer-events:none; z-index:9999; line-height:1; animation:emoji-rise var(--ed) cubic-bezier(.2,.8,.4,1) forwards; }
 
     /* ═══════ GAMES ═══════ */
     #games { background: var(--bg); border-top: 1px solid var(--border); }
@@ -1039,50 +1037,57 @@
   <script src="particle-controls.js" defer="defer"></script>
   <script>
   (function(){
-    var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.matchMedia('(pointer:coarse)').matches;
     function getEmoji(el){ var m = el.textContent.match(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u); return m ? m[0] : '✨'; }
-    function spawnConfetti(el, emoji){
-      var r = el.getBoundingClientRect();
-      var cx = r.left + r.width/2, cy = r.top + r.height/2;
-      for(var i=0;i<12;i++){
+
+    function spawnBurst(x, y, emoji, count){
+      for(var i=0;i<count;i++){
         var p = document.createElement('span');
-        p.className = 'emoji-particle';
+        p.className = 'emoji-rise';
+        var spread = (Math.random()-0.5) * (60 + count*4);  // wider spread at higher counts
+        var rise = 80 + Math.random() * (80 + count*6);      // higher rise at higher counts
+        var size = 1.2 + Math.random() * 0.8 + (count > 6 ? 0.4 : 0);
+        var dur = (0.7 + Math.random()*0.5) + 's';
         p.textContent = emoji;
-        var angle = (i/12)*Math.PI*2, dist = 60+Math.random()*80;
-        p.style.cssText = 'left:'+cx+'px;top:'+cy+'px;--ex:'+(Math.cos(angle)*dist)+'px;--ey:'+(Math.sin(angle)*dist+40)+'px;--er:'+(Math.random()*360-180)+'deg;animation-duration:'+(0.7+Math.random()*0.5)+'s;animation-delay:'+(Math.random()*0.15)+'s;';
+        p.style.cssText = 'left:'+x+'px;top:'+y+'px;font-size:'+size+'rem;--ex:'+spread+'px;--ey:-'+rise+'px;--es:'+size+';--ed:'+dur+';animation-delay:'+(Math.random()*0.12)+'s;';
         document.body.appendChild(p);
         p.addEventListener('animationend',function(){this.remove();});
       }
     }
-    function spawnTikTok(e, el, emoji){
-      var r = el.getBoundingClientRect();
-      var x = (e.touches ? e.touches[0].clientX : r.left+r.width/2);
-      var y = (e.touches ? e.touches[0].clientY : r.top+r.height/2);
-      for(var i=0;i<3;i++){
-        (function(delay){
-          setTimeout(function(){
-            var p = document.createElement('span');
-            p.className = 'emoji-tiktok';
-            p.textContent = emoji;
-            p.style.cssText = 'left:'+(x+(Math.random()*30-15))+'px;top:'+y+'px;font-size:'+(1.6+Math.random())+'rem;animation-delay:0s;';
-            document.body.appendChild(p);
-            p.addEventListener('animationend',function(){this.remove();});
-          }, delay);
-        })(i*120);
-      }
-    }
+
     document.querySelectorAll('.channel-tag').forEach(function(el){
       var emoji = getEmoji(el);
-      if(isMobile){
-        el.addEventListener('touchstart', function(e){ spawnTikTok(e, el, emoji); }, {passive:true});
-      } else {
-        var interval = null;
-        el.addEventListener('mouseenter', function(){
-          spawnConfetti(el, emoji);
-          interval = setInterval(function(){ spawnConfetti(el, emoji); }, 800);
-        });
-        el.addEventListener('mouseleave', function(){ clearInterval(interval); });
+      var heat = 0, lastClick = 0, decayTimer = null;
+
+      function fire(x, y){
+        var now = Date.now();
+        var gap = now - lastClick;
+        lastClick = now;
+        // rapid taps/clicks build heat (max 8), slow inputs cool it
+        if(gap < 400) heat = Math.min(heat + 1.2, 8);
+        else heat = Math.max(heat - 1, 0);
+        var count = Math.round(2 + heat * 1.5);  // 2 at cold, up to ~14 at max heat
+        spawnBurst(x, y, emoji, count);
+        clearTimeout(decayTimer);
+        decayTimer = setTimeout(function(){ heat = 0; }, 1200);
       }
+
+      // desktop click + hold (fires repeatedly while held)
+      var holdTimer = null;
+      el.addEventListener('mousedown', function(e){
+        var r = el.getBoundingClientRect();
+        fire(r.left + r.width/2, r.top);
+        holdTimer = setInterval(function(){
+          var r2 = el.getBoundingClientRect();
+          fire(r2.left + r2.width/2, r2.top);
+        }, 180);
+      });
+      document.addEventListener('mouseup', function(){ clearInterval(holdTimer); });
+
+      // mobile tap
+      el.addEventListener('touchstart', function(e){
+        var t = e.touches[0];
+        fire(t.clientX, t.clientY);
+      }, {passive:true});
     });
   })();
   </script>
