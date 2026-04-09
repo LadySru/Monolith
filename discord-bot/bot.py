@@ -192,19 +192,26 @@ async def on_message(message):
             if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
                 gif_count += 1
 
-        # Upsert member stats with proper guild isolation
+        # Upsert member stats — UPDATE first, INSERT if no existing row
         cur.execute('''
-            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, message_count, gif_count, image_count, join_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
-            ON CONFLICT (user_id, guild_id) DO UPDATE SET
-                message_count = member_stats.message_count + 1,
-                gif_count = member_stats.gif_count + %s,
-                image_count = member_stats.image_count + %s,
-                username = %s,
-                nickname = COALESCE(%s, member_stats.nickname),
-                avatar_url = COALESCE(%s, member_stats.avatar_url),
-                last_updated = NOW()
-        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url, gif_count, image_count, join_date, gif_count, image_count, str(message.author), nickname, avatar_url))
+            UPDATE member_stats SET
+                message_count = message_count + 1,
+                gif_count     = gif_count + %s,
+                image_count   = image_count + %s,
+                username      = %s,
+                nickname      = COALESCE(%s, nickname),
+                avatar_url    = COALESCE(%s, avatar_url),
+                last_updated  = NOW()
+            WHERE user_id = %s AND guild_id = %s
+        ''', (gif_count, image_count, str(message.author), nickname, avatar_url,
+              message.author.id, message.guild.id))
+        if cur.rowcount == 0:
+            cur.execute('''
+                INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
+                                         message_count, gif_count, image_count, join_date, last_updated)
+                VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
+            ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url,
+                  gif_count, image_count, join_date))
 
         conn.commit()
         cur.close()
@@ -254,16 +261,16 @@ async def on_voice_state_update(member, before, after):
             result = cur.fetchone()
             total_voice_seconds = result[0] if result else 0
 
-            # Upsert member stats with proper voice time
-            # Use server join date, not Discord account creation date
             voice_join_date = member.joined_at if member.joined_at else member.created_at
             cur.execute('''
-                INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (user_id, guild_id) DO UPDATE SET
-                    voice_time_seconds = %s,
-                    last_updated = NOW()
-            ''', (member.id, member.guild.id, str(member), total_voice_seconds, voice_join_date, total_voice_seconds))
+                UPDATE member_stats SET voice_time_seconds = %s, last_updated = NOW()
+                WHERE user_id = %s AND guild_id = %s
+            ''', (total_voice_seconds, member.id, member.guild.id))
+            if cur.rowcount == 0:
+                cur.execute('''
+                    INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
+                    VALUES (%s, %s, %s, %s, %s, NOW())
+                ''', (member.id, member.guild.id, str(member), total_voice_seconds, voice_join_date))
 
             conn.commit()
             print(f"[VOICE] {member} left voice in {member.guild.name} - Total: {total_voice_seconds}s")
@@ -290,16 +297,16 @@ async def on_reaction_add(reaction, user):
         nickname = member.nick if member and member.nick else None
         avatar_url = str(user.display_avatar.url) if user.display_avatar else None
 
-        # Increment reaction_count for the user who reacted
-        # Use server join date, not Discord account creation date
         reaction_join_date = member.joined_at if member and member.joined_at else user.created_at
         cur.execute('''
-            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, reaction_count, join_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
-            ON CONFLICT (user_id, guild_id) DO UPDATE SET
-                reaction_count = member_stats.reaction_count + 1,
-                last_updated = NOW()
-        ''', (user.id, guild_id, str(user), nickname, avatar_url, reaction_join_date))
+            UPDATE member_stats SET reaction_count = reaction_count + 1, last_updated = NOW()
+            WHERE user_id = %s AND guild_id = %s
+        ''', (user.id, guild_id))
+        if cur.rowcount == 0:
+            cur.execute('''
+                INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url, reaction_count, join_date, last_updated)
+                VALUES (%s, %s, %s, %s, %s, 1, %s, NOW())
+            ''', (user.id, guild_id, str(user), nickname, avatar_url, reaction_join_date))
 
         # Track total reactions on the message itself
         total_reactions = sum(r.count for r in message.reactions)
@@ -309,12 +316,14 @@ async def on_reaction_add(reaction, user):
         author_avatar = str(message.author.display_avatar.url) if message.author.display_avatar else None
 
         cur.execute('''
-            INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-            ON CONFLICT (message_id, guild_id) DO UPDATE SET
-                reaction_count = %s,
-                last_updated = NOW()
-        ''', (message.id, guild_id, message.channel.id, message.author.id, str(message.author), author_nick, author_avatar, msg_content, total_reactions, total_reactions))
+            UPDATE message_reactions SET reaction_count = %s, last_updated = NOW()
+            WHERE message_id = %s AND guild_id = %s
+        ''', (total_reactions, message.id, guild_id))
+        if cur.rowcount == 0:
+            cur.execute('''
+                INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            ''', (message.id, guild_id, message.channel.id, message.author.id, str(message.author), author_nick, author_avatar, msg_content, total_reactions))
 
         conn.commit()
         cur.close()
@@ -666,22 +675,17 @@ async def import_history(interaction: discord.Interaction):
             # Commit per-channel; each row gets its own savepoint so one bad row never aborts the batch
             if message_reaction_data:
                 for message_id, data in message_reaction_data.items():
-                    cur.execute('SAVEPOINT rx')
-                    try:
+                    cur.execute('''
+                        UPDATE message_reactions SET reaction_count = %s, last_updated = NOW()
+                        WHERE message_id = %s AND guild_id = %s
+                    ''', (data['reaction_count'], message_id, data['guild_id']))
+                    if cur.rowcount == 0:
                         cur.execute('''
                             INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                            ON CONFLICT (message_id, guild_id) DO UPDATE SET
-                                reaction_count = EXCLUDED.reaction_count, last_updated = NOW()
                         ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
                               data['username'], data['nickname'], data['avatar_url'],
                               data['message_content'], data['reaction_count']))
-                        cur.execute('RELEASE SAVEPOINT rx')
-                    except Exception as row_err:
-                        cur.execute('ROLLBACK TO SAVEPOINT rx')
-                        reaction_errors += 1
-                        if reaction_errors <= 3:
-                            print(f"[IMPORT] Skipped reaction row: {row_err}")
                 conn.commit()
                 message_reaction_data.clear()
 
@@ -689,25 +693,28 @@ async def import_history(interaction: discord.Interaction):
         print(f"[IMPORT] Storing {len(user_data)} user records...")
         stat_errors = 0
         for user_id, data in user_data.items():
-            cur.execute('SAVEPOINT ms')
             try:
                 cur.execute('''
-                    INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                             message_count, gif_count, image_count, reaction_count, join_date, last_updated)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                    ON CONFLICT (user_id, guild_id) DO UPDATE SET
-                        message_count = EXCLUDED.message_count,
-                        gif_count     = EXCLUDED.gif_count,
-                        image_count   = EXCLUDED.image_count,
-                        username      = EXCLUDED.username,
-                        nickname      = COALESCE(EXCLUDED.nickname, member_stats.nickname),
-                        avatar_url    = COALESCE(EXCLUDED.avatar_url, member_stats.avatar_url),
+                    UPDATE member_stats SET
+                        message_count = %s,
+                        gif_count     = %s,
+                        image_count   = %s,
+                        username      = %s,
+                        nickname      = COALESCE(%s, nickname),
+                        avatar_url    = COALESCE(%s, avatar_url),
                         last_updated  = NOW()
-                ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
-                      data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date']))
-                cur.execute('RELEASE SAVEPOINT ms')
+                    WHERE user_id = %s AND guild_id = %s
+                ''', (data['messages'], data['gifs'], data['images'],
+                      data['username'], data['nickname'], data['avatar_url'],
+                      user_id, guild_id))
+                if cur.rowcount == 0:
+                    cur.execute('''
+                        INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
+                                                 message_count, gif_count, image_count, reaction_count, join_date, last_updated)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
+                          data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date']))
             except Exception as row_err:
-                cur.execute('ROLLBACK TO SAVEPOINT ms')
                 stat_errors += 1
                 if stat_errors <= 3:
                     print(f"[IMPORT] Skipped stat row for {user_id}: {row_err}")
@@ -725,7 +732,11 @@ async def import_history(interaction: discord.Interaction):
             embed.add_field(name="Skipped Rows", value=f"{stat_errors} stats · {reaction_errors} reactions (duplicates/errors)", inline=False)
         embed.add_field(name="Status", value="All member statistics have been loaded!", inline=False)
 
-        await interaction.followup.send(embed=embed)
+        try:
+            await interaction.followup.send(embed=embed)
+        except Exception:
+            # Interaction token expired (Discord 15-min limit) — data is already saved
+            print("[IMPORT] Note: interaction token expired before completion embed could be sent. Data was saved successfully.")
 
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
