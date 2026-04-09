@@ -725,7 +725,11 @@ async def import_history(interaction: discord.Interaction):
             embed.add_field(name="Skipped Rows", value=f"{stat_errors} stats · {reaction_errors} reactions (duplicates/errors)", inline=False)
         embed.add_field(name="Status", value="All member statistics have been loaded!", inline=False)
 
-        await interaction.followup.send(embed=embed)
+        try:
+            await interaction.followup.send(embed=embed)
+        except Exception:
+            # Interaction token expired (Discord 15-min limit) — data is already saved
+            print("[IMPORT] Note: interaction token expired before completion embed could be sent. Data was saved successfully.")
 
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
