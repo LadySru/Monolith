@@ -47,7 +47,7 @@ def init_database():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Create member_stats table
+        # ── member_stats ──────────────────────────────────────────────────────
         cur.execute('''
             CREATE TABLE IF NOT EXISTS member_stats (
                 user_id BIGINT NOT NULL,
@@ -61,57 +61,49 @@ def init_database():
                 image_count INT DEFAULT 0,
                 reaction_count INT DEFAULT 0,
                 voice_time_seconds INT DEFAULT 0,
-                last_updated TIMESTAMP DEFAULT NOW(),
-                PRIMARY KEY (user_id, guild_id)
+                last_updated TIMESTAMP DEFAULT NOW()
             )
         ''')
-
-        # Migrate member_stats: add columns introduced after initial deploy
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN gif_count INT DEFAULT 0')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
-
-        # Ensure PRIMARY KEY exists on member_stats (tables created before PKs were added)
-        _safe_alter(cur, '''
-            DO $$ BEGIN
-                ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id);
-            EXCEPTION WHEN others THEN NULL;
-            END $$
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN voice_time_seconds INT DEFAULT 0')
+        # Remove duplicate rows before adding PK (keep the row with most messages)
+        cur.execute('''
+            DELETE FROM member_stats a USING member_stats b
+            WHERE a.ctid < b.ctid
+              AND a.user_id = b.user_id AND a.guild_id = b.guild_id
         ''')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id)')
 
-        # Create message_reactions table
+        # ── message_reactions ─────────────────────────────────────────────────
         cur.execute('''
             CREATE TABLE IF NOT EXISTS message_reactions (
                 message_id BIGINT NOT NULL,
                 guild_id BIGINT NOT NULL,
-                channel_id BIGINT NOT NULL,
-                user_id BIGINT NOT NULL,
+                user_id BIGINT,
                 username VARCHAR(255),
                 nickname VARCHAR(255),
                 avatar_url VARCHAR(500),
                 message_content TEXT,
                 reaction_count INT DEFAULT 0,
-                last_updated TIMESTAMP DEFAULT NOW(),
-                PRIMARY KEY (message_id, guild_id)
+                last_updated TIMESTAMP DEFAULT NOW()
             )
         ''')
-
+        _safe_alter(cur, 'ALTER TABLE message_reactions ADD COLUMN channel_id BIGINT')
+        _safe_alter(cur, 'ALTER TABLE message_reactions ADD COLUMN last_updated TIMESTAMP DEFAULT NOW()')
+        _safe_alter(cur, 'ALTER TABLE message_reactions ADD COLUMN user_id BIGINT')
+        # Remove duplicates before adding PK
+        cur.execute('''
+            DELETE FROM message_reactions a USING message_reactions b
+            WHERE a.ctid < b.ctid
+              AND a.message_id = b.message_id AND a.guild_id = b.guild_id
+        ''')
+        _safe_alter(cur, 'ALTER TABLE message_reactions ADD PRIMARY KEY (message_id, guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_guild ON message_reactions(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_count ON message_reactions(reaction_count DESC)')
 
-        # Migrations: add columns if the table was created without them
-        cur.execute('ALTER TABLE message_reactions ADD COLUMN IF NOT EXISTS channel_id BIGINT')
-        cur.execute('ALTER TABLE message_reactions ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW()')
-
-        # Ensure PRIMARY KEY exists on message_reactions
-        _safe_alter(cur, '''
-            DO $$ BEGIN
-                ALTER TABLE message_reactions ADD PRIMARY KEY (message_id, guild_id);
-            EXCEPTION WHEN others THEN NULL;
-            END $$
-        ''')
-
-        # Create voice_sessions table
+        # ── voice_sessions ────────────────────────────────────────────────────
         cur.execute('''
             CREATE TABLE IF NOT EXISTS voice_sessions (
                 id SERIAL PRIMARY KEY,
@@ -122,11 +114,9 @@ def init_database():
                 duration_seconds INT
             )
         ''')
-
-        # Migrate voice_sessions: add guild_id if table existed without it
         _safe_alter(cur, 'ALTER TABLE voice_sessions ADD COLUMN guild_id BIGINT NOT NULL DEFAULT 0')
 
-        # Create indexes
+        # ── indexes ───────────────────────────────────────────────────────────
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_guild ON voice_sessions(guild_id)')
@@ -672,39 +662,55 @@ async def import_history(interaction: discord.Interaction):
 
             print(f"[IMPORT] #{channel.name}: {channel_count} messages")
 
-            # Commit in batches per channel so a crash doesn't lose everything
+            # Commit per-channel; each row gets its own savepoint so one bad row never aborts the batch
+            reaction_errors = 0
             if message_reaction_data:
                 for message_id, data in message_reaction_data.items():
-                    cur.execute('''
-                        INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                        ON CONFLICT (message_id, guild_id) DO UPDATE SET
-                            reaction_count = %s, last_updated = NOW()
-                    ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
-                          data['username'], data['nickname'], data['avatar_url'],
-                          data['message_content'], data['reaction_count'], data['reaction_count']))
+                    cur.execute('SAVEPOINT rx')
+                    try:
+                        cur.execute('''
+                            INSERT INTO message_reactions (message_id, guild_id, channel_id, user_id, username, nickname, avatar_url, message_content, reaction_count, last_updated)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                            ON CONFLICT (message_id, guild_id) DO UPDATE SET
+                                reaction_count = EXCLUDED.reaction_count, last_updated = NOW()
+                        ''', (message_id, data['guild_id'], data['channel_id'], data['user_id'],
+                              data['username'], data['nickname'], data['avatar_url'],
+                              data['message_content'], data['reaction_count']))
+                        cur.execute('RELEASE SAVEPOINT rx')
+                    except Exception as row_err:
+                        cur.execute('ROLLBACK TO SAVEPOINT rx')
+                        reaction_errors += 1
+                        if reaction_errors <= 3:
+                            print(f"[IMPORT] Skipped reaction row: {row_err}")
                 conn.commit()
                 message_reaction_data.clear()
 
-        # Insert/update all user stats
+        # Insert/update all user stats (per-row savepoints)
         print(f"[IMPORT] Storing {len(user_data)} user records...")
+        stat_errors = 0
         for user_id, data in user_data.items():
-            cur.execute('''
-                INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                         message_count, gif_count, image_count, reaction_count, join_date, last_updated)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (user_id, guild_id) DO UPDATE SET
-                    message_count = %s,
-                    gif_count = %s,
-                    image_count = %s,
-                    username = %s,
-                    nickname = COALESCE(%s, member_stats.nickname),
-                    avatar_url = COALESCE(%s, member_stats.avatar_url),
-                    last_updated = NOW()
-            ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
-                  data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date'],
-                  data['messages'], data['gifs'], data['images'],
-                  data['username'], data['nickname'], data['avatar_url']))
+            cur.execute('SAVEPOINT ms')
+            try:
+                cur.execute('''
+                    INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
+                                             message_count, gif_count, image_count, reaction_count, join_date, last_updated)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    ON CONFLICT (user_id, guild_id) DO UPDATE SET
+                        message_count = EXCLUDED.message_count,
+                        gif_count     = EXCLUDED.gif_count,
+                        image_count   = EXCLUDED.image_count,
+                        username      = EXCLUDED.username,
+                        nickname      = COALESCE(EXCLUDED.nickname, member_stats.nickname),
+                        avatar_url    = COALESCE(EXCLUDED.avatar_url, member_stats.avatar_url),
+                        last_updated  = NOW()
+                ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
+                      data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date']))
+                cur.execute('RELEASE SAVEPOINT ms')
+            except Exception as row_err:
+                cur.execute('ROLLBACK TO SAVEPOINT ms')
+                stat_errors += 1
+                if stat_errors <= 3:
+                    print(f"[IMPORT] Skipped stat row for {user_id}: {row_err}")
 
         conn.commit()
         cur.close()
@@ -713,9 +719,10 @@ async def import_history(interaction: discord.Interaction):
         print(f"[IMPORT] Import complete! Processed {total_messages} messages from {len(user_data)} users")
 
         embed = discord.Embed(title="✅ History Import Complete", color=discord.Color.green())
-        embed.add_field(name="Total Messages Scanned", value=str(total_messages), inline=False)
-        embed.add_field(name="Total Users Tracked", value=str(len(user_data)), inline=False)
-        embed.add_field(name="Messages with Reactions", value=str(len(message_reaction_data)), inline=False)
+        embed.add_field(name="Messages Scanned", value=str(total_messages), inline=True)
+        embed.add_field(name="Users Tracked", value=str(len(user_data)), inline=True)
+        if stat_errors or reaction_errors:
+            embed.add_field(name="Skipped Rows", value=f"{stat_errors} stats · {reaction_errors} reactions (duplicates/errors)", inline=False)
         embed.add_field(name="Status", value="All member statistics have been loaded!", inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -723,6 +730,17 @@ async def import_history(interaction: discord.Interaction):
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
         await interaction.followup.send(f"❌ Import failed: {str(e)}", ephemeral=True)
+
+@bot.tree.command(name="verify-schema", description="Check and repair the database schema (Admin only)")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def verify_schema(interaction: discord.Interaction):
+    """Re-run all schema migrations without restarting the bot"""
+    await interaction.response.defer(ephemeral=True)
+    try:
+        init_database()
+        await interaction.followup.send("✅ Schema verified and repaired. Safe to run `/import-history` now.", ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Schema repair failed: {str(e)}", ephemeral=True)
 
 @bot.tree.command(name="fix-join-dates", description="Fix join dates to use server join date (Admin only)")
 @discord.app_commands.checks.has_permissions(administrator=True)
