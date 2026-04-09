@@ -71,6 +71,14 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
 
+        # Ensure PRIMARY KEY exists on member_stats (tables created before PKs were added)
+        _safe_alter(cur, '''
+            DO $$ BEGIN
+                ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id);
+            EXCEPTION WHEN others THEN NULL;
+            END $$
+        ''')
+
         # Create message_reactions table
         cur.execute('''
             CREATE TABLE IF NOT EXISTS message_reactions (
@@ -92,13 +100,15 @@ def init_database():
         cur.execute('CREATE INDEX IF NOT EXISTS idx_message_reactions_count ON message_reactions(reaction_count DESC)')
 
         # Migrations: add columns if the table was created without them
-        cur.execute('''
-            ALTER TABLE message_reactions
-            ADD COLUMN IF NOT EXISTS channel_id BIGINT
-        ''')
-        cur.execute('''
-            ALTER TABLE message_reactions
-            ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW()
+        cur.execute('ALTER TABLE message_reactions ADD COLUMN IF NOT EXISTS channel_id BIGINT')
+        cur.execute('ALTER TABLE message_reactions ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW()')
+
+        # Ensure PRIMARY KEY exists on message_reactions
+        _safe_alter(cur, '''
+            DO $$ BEGIN
+                ALTER TABLE message_reactions ADD PRIMARY KEY (message_id, guild_id);
+            EXCEPTION WHEN others THEN NULL;
+            END $$
         ''')
 
         # Create voice_sessions table
