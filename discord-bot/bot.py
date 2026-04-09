@@ -68,6 +68,10 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN reaction_count INT DEFAULT 0')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN image_count INT DEFAULT 0')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN voice_time_seconds INT DEFAULT 0')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN last_updated TIMESTAMP DEFAULT NOW()')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN join_date TIMESTAMP')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN nickname VARCHAR(255)')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
         # Remove duplicate rows before adding PK (keep the row with most messages)
         cur.execute('''
             DELETE FROM member_stats a USING member_stats b
