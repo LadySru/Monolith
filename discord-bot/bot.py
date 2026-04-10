@@ -594,9 +594,7 @@ async def import_history(interaction: discord.Interaction):
         # Initialize user data dict
         user_data = {}
 
-        # Get all members and their join dates
         print(f"[IMPORT] Starting message history import for {interaction.guild.name}")
-        await interaction.followup.send(f"📚 Starting history import for **{interaction.guild.name}**...")
 
         for member in interaction.guild.members:
             user_data[member.id] = {
@@ -614,14 +612,27 @@ async def import_history(interaction: discord.Interaction):
         message_reaction_data = {}
         reaction_errors = 0
 
-        # Iterate through all channels
         total_messages = 0
         IMAGE_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff')
 
-        for channel in interaction.guild.text_channels:
-            if not channel.permissions_for(interaction.guild.me).read_message_history:
-                continue
+        # Pre-count accessible channels for the progress bar
+        accessible_channels = [ch for ch in interaction.guild.text_channels
+                                if ch.permissions_for(interaction.guild.me).read_message_history]
+        total_channels = len(accessible_channels)
+        channels_done = 0
+        skipped_channels = []
 
+        def _bar(done, total, width=12):
+            filled = int(width * done / max(total, 1))
+            return '█' * filled + '░' * (width - filled)
+
+        # Send ONE progress message — edited in place throughout the import
+        progress_msg = await interaction.followup.send(
+            f"📊 **Import started** — {total_channels} channels to scan\n"
+            f"`[{'░' * 12}]` 0%  •  0 messages"
+        )
+
+        for channel in accessible_channels:
             channel_count = 0
             try:
                 async for message in channel.history(limit=None):
@@ -631,24 +642,20 @@ async def import_history(interaction: discord.Interaction):
                     if message.author.id in user_data:
                         user_data[message.author.id]['messages'] += 1
 
-                        # GIFs: content links
                         if '.gif' in message.content.lower():
                             user_data[message.author.id]['gifs'] += message.content.lower().count('.gif')
-                        # GIFs/images: attachments
                         for attachment in message.attachments:
                             fname = attachment.filename.lower()
                             if fname.endswith('.gif'):
                                 user_data[message.author.id]['gifs'] += 1
                             elif fname.endswith(IMAGE_EXTS):
                                 user_data[message.author.id]['images'] += 1
-                        # GIFs: Tenor/Giphy embeds
                         for embed in message.embeds:
                             url = (embed.url or '').lower()
                             proxy = (embed.thumbnail.proxy_url if embed.thumbnail else '') or ''
                             if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
                                 user_data[message.author.id]['gifs'] += 1
 
-                    # Use reaction.count (already fetched with the message — no extra API calls)
                     total_msg_reactions = sum(r.count for r in message.reactions)
                     if total_msg_reactions > 0 and message.author.id in user_data:
                         author_data = user_data[message.author.id]
@@ -663,18 +670,26 @@ async def import_history(interaction: discord.Interaction):
                             'reaction_count': total_msg_reactions,
                         }
 
-                    if total_messages % 1000 == 0:
-                        print(f"[IMPORT] Processed {total_messages} messages...")
-                        await interaction.followup.send(f"⏳ Processing... {total_messages} messages scanned so far.", ephemeral=True)
-
             except discord.Forbidden:
+                skipped_channels.append(channel.name)
                 print(f"[IMPORT] No permission to read history in #{channel.name}")
                 continue
             except Exception as e:
                 print(f"[IMPORT] Error in #{channel.name}: {e}")
                 continue
 
-            print(f"[IMPORT] #{channel.name}: {channel_count} messages")
+            channels_done += 1
+            pct = int(100 * channels_done / max(total_channels, 1))
+            bar = _bar(channels_done, total_channels)
+            print(f"[IMPORT] #{channel.name}: {channel_count} messages ({pct}%)")
+            try:
+                await progress_msg.edit(content=(
+                    f"📊 **Importing...** ({channels_done}/{total_channels} channels)\n"
+                    f"`[{bar}]` {pct}%  •  {total_messages:,} messages\n"
+                    f"✅ #{channel.name} — {channel_count:,} msgs"
+                ))
+            except Exception:
+                pass  # token expired — keep going, data is still saving
 
             # Commit per-channel; each row gets its own savepoint so one bad row never aborts the batch
             if message_reaction_data:
@@ -730,17 +745,20 @@ async def import_history(interaction: discord.Interaction):
         print(f"[IMPORT] Import complete! Processed {total_messages} messages from {len(user_data)} users")
 
         embed = discord.Embed(title="✅ History Import Complete", color=discord.Color.green())
-        embed.add_field(name="Messages Scanned", value=str(total_messages), inline=True)
+        embed.add_field(name="Messages Scanned", value=f"{total_messages:,}", inline=True)
         embed.add_field(name="Users Tracked", value=str(len(user_data)), inline=True)
+        embed.add_field(name="Channels Scanned", value=str(channels_done), inline=True)
         if stat_errors or reaction_errors:
-            embed.add_field(name="Skipped Rows", value=f"{stat_errors} stats · {reaction_errors} reactions (duplicates/errors)", inline=False)
+            embed.add_field(name="Skipped Rows", value=f"{stat_errors} stats · {reaction_errors} reactions", inline=False)
+        if skipped_channels:
+            embed.add_field(name="Skipped Channels", value=", ".join(f"#{c}" for c in skipped_channels[:10]), inline=False)
         embed.add_field(name="Status", value="All member statistics have been loaded!", inline=False)
 
         try:
-            await interaction.followup.send(embed=embed)
+            # Edit the progress message into the final result embed
+            await progress_msg.edit(content=None, embed=embed)
         except Exception:
-            # Interaction token expired (Discord 15-min limit) — data is already saved
-            print("[IMPORT] Note: interaction token expired before completion embed could be sent. Data was saved successfully.")
+            print("[IMPORT] Note: interaction token expired before completion embed. Data was saved successfully.")
 
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
