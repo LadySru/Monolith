@@ -29,8 +29,26 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 
 # Database connection
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(
+        DATABASE_URL,
+        keepalives=1,
+        keepalives_idle=30,       # send keepalive after 30 s idle
+        keepalives_interval=10,   # retry every 10 s
+        keepalives_count=5,       # drop after 5 failed probes
+    )
     return conn
+
+def _ensure_connection(conn):
+    """Return a live connection, reconnecting if the SSL link was dropped."""
+    try:
+        conn.cursor().execute('SELECT 1')
+        return conn
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return get_db_connection()
 
 # Initialize database schema
 def _safe_alter(cur, sql):
@@ -693,6 +711,9 @@ async def import_history(interaction: discord.Interaction):
 
             # Commit per-channel; each row gets its own savepoint so one bad row never aborts the batch
             if message_reaction_data:
+                # Reconnect if the SSL link was dropped during the channel.history() fetch
+                conn = _ensure_connection(conn)
+                cur = conn.cursor(cursor_factory=RealDictCursor)
                 for message_id, data in message_reaction_data.items():
                     cur.execute('''
                         UPDATE message_reactions SET reaction_count = %s, last_updated = NOW()
@@ -710,6 +731,8 @@ async def import_history(interaction: discord.Interaction):
 
         # Insert/update all user stats (per-row savepoints)
         print(f"[IMPORT] Storing {len(user_data)} user records...")
+        conn = _ensure_connection(conn)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
         stat_errors = 0
         for user_id, data in user_data.items():
             try:
@@ -762,7 +785,11 @@ async def import_history(interaction: discord.Interaction):
 
     except Exception as e:
         print(f"[ERROR] Import history failed: {e}")
-        await interaction.followup.send(f"❌ Import failed: {str(e)}", ephemeral=True)
+        try:
+            await interaction.followup.send(f"❌ Import failed: {str(e)}", ephemeral=True)
+        except Exception:
+            # Interaction token expired (15-min limit) — error already logged above
+            print("[IMPORT] Could not send error to Discord (interaction token expired).")
 
 @bot.tree.command(name="verify-schema", description="Check and repair the database schema (Admin only)")
 @discord.app_commands.checks.has_permissions(administrator=True)
