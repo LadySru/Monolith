@@ -23,17 +23,30 @@
     .stat-value{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:var(--electric-blue);margin-bottom:4px;text-shadow:0 0 10px rgba(0,217,255,0.8),0 0 20px rgba(0,217,255,0.5);}
     .stat-detail{font-size:.9rem;color:var(--text2);}
 
-    /* ── Leaderboards ── */
-    .leaderboard{background:linear-gradient(135deg,rgba(17,0,37,0.85),rgba(17,0,37,0.65));border:2px solid var(--neon-pink);padding:32px;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 15px,100% 100%,15px 100%,0 calc(100% - 15px));margin-bottom:32px;box-shadow:inset 0 0 20px rgba(255,0,153,0.1),0 0 25px rgba(255,0,153,0.25);}
-    .leaderboard h2{font-family:'Orbitron',monospace;font-size:1.4rem;margin-bottom:24px;color:var(--text);text-shadow:0 0 10px rgba(217,0,255,0.6),0 0 20px rgba(217,0,255,0.3);}
-    .leaderboard-list{display:grid;gap:12px;}
-    .leaderboard-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(90deg,rgba(217,0,255,0.15),rgba(0,217,255,0.05));border-left:4px solid var(--electric-blue);border-radius:2px;transition:all .3s;box-shadow:0 0 15px rgba(217,0,255,0.1);}
-    .leaderboard-item:hover{background:linear-gradient(90deg,rgba(217,0,255,0.25),rgba(0,217,255,0.15));box-shadow:0 0 20px rgba(0,217,255,0.3),0 0 30px rgba(217,0,255,0.2);transform:translateX(5px);}
-    .rank{font-family:'Orbitron',monospace;font-weight:700;color:var(--neon-pink);margin-right:16px;min-width:32px;text-shadow:0 0 8px rgba(255,0,153,0.6);}
-    .member-name{flex:1;font-size:.95rem;}
-    .member-stat{font-family:'Orbitron',monospace;color:var(--neon-purple);font-weight:600;font-size:.9rem;text-shadow:0 0 8px rgba(217,0,255,0.6);}
-    .lb-loading{text-align:center;padding:32px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;}
-    .lb-error{background:rgba(255,0,153,.15);border:2px solid var(--neon-pink);color:var(--neon-pink);padding:16px;margin-bottom:24px;}
+    /* ── Leaderboard rows ── */
+    .lb-wrap{max-width:860px;margin:0 auto;}
+    .lb-header{display:flex;align-items:center;padding:0 16px 12px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:8px;}
+    .lb-header .lbh-name{flex:1;margin-left:72px;}
+    .lb-header .lbh-stat{width:90px;text-align:right;}
+    .lb-row{display:flex;align-items:center;padding:10px 16px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);margin-bottom:6px;transition:background .2s,border-color .2s;}
+    .lb-row:hover{background:rgba(139,47,255,.12);border-color:rgba(139,47,255,.35);}
+    .lb-rank{width:28px;font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;color:var(--text2);margin-right:8px;text-align:center;}
+    .lb-rank.gold{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,.6);}
+    .lb-rank.silver{color:#c0c0c0;text-shadow:0 0 8px rgba(192,192,192,.5);}
+    .lb-rank.bronze{color:#cd7f32;text-shadow:0 0 8px rgba(205,127,50,.5);}
+    .lb-av{width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:12px;border:2px solid rgba(139,47,255,.4);flex-shrink:0;background:rgba(139,47,255,.2);}
+    .lb-av-placeholder{width:36px;height:36px;border-radius:50%;margin-right:12px;background:linear-gradient(135deg,rgba(139,47,255,.4),rgba(0,217,255,.2));display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--text2);flex-shrink:0;border:2px solid rgba(139,47,255,.3);}
+    .lb-name{flex:1;font-size:.95rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .lb-stat{width:90px;text-align:right;font-family:'Orbitron',monospace;font-size:.8rem;color:var(--text2);font-weight:500;}
+    .lb-badge{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:700;font-size:.75rem;margin-left:12px;flex-shrink:0;background:conic-gradient(var(--neon-purple) calc(var(--pct,60)*1%),rgba(255,255,255,.08) 0);position:relative;}
+    .lb-badge::before{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--bg);}
+    .lb-badge span{position:relative;z-index:1;color:var(--text);}
+    .lb-loading{text-align:center;padding:40px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:2px;}
+    .lb-error{background:rgba(255,0,153,.1);border:1px solid rgba(255,0,153,.4);color:var(--neon-pink);padding:16px;border-radius:8px;margin-bottom:16px;font-size:.9rem;}
+    .lb-section{margin-bottom:48px;}
+    .lb-section h2{font-family:'Orbitron',monospace;font-size:1rem;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .lb-section h2 span{color:var(--neon-purple);}
+    @media(max-width:600px){.lb-stat{display:none;}.lb-header .lbh-stat{display:none;}}
 
     @media(max-width:768px){.stats-grid{grid-template-columns:1fr;}}
   </style>
@@ -81,10 +94,37 @@
 </div>
 
 <section class="section-pad">
-  <div class="wrap" style="text-align:center;padding:80px 0;">
-    <div style="font-size:3rem;margin-bottom:24px;">🔧</div>
-    <div style="font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:700;color:var(--teal);letter-spacing:3px;margin-bottom:16px;">THIS IS IN PROGRESS</div>
-    <div style="font-family:'Orbitron',monospace;font-size:.75rem;color:var(--text2);letter-spacing:2px;">Stay tuned!</div>
+  <div class="wrap">
+    <div id="error-container"></div>
+    <div class="lb-wrap">
+
+      <!-- Messages leaderboard -->
+      <div class="lb-section">
+        <h2>💬 Top <span>Messagers</span></h2>
+        <div class="lb-header">
+          <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
+          <div class="lbh-name">Member</div>
+          <div class="lbh-stat">Messages</div>
+          <div class="lbh-stat">Voice</div>
+          <div style="width:52px;"></div>
+        </div>
+        <div id="messages-leaderboard"><div class="lb-loading">LOADING...</div></div>
+      </div>
+
+      <!-- GIFs leaderboard -->
+      <div class="lb-section">
+        <h2>🎬 GIF <span>Masters</span></h2>
+        <div class="lb-header">
+          <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
+          <div class="lbh-name">Member</div>
+          <div class="lbh-stat">GIFs</div>
+          <div class="lbh-stat">Images</div>
+          <div style="width:52px;"></div>
+        </div>
+        <div id="gifs-leaderboard"><div class="lb-loading">LOADING...</div></div>
+      </div>
+
+    </div>
   </div>
 </section>
 
@@ -98,80 +138,65 @@
 
 <script src="shared.js"></script>
 <script>
-  function getDisplayName(member) {
-    return member.nickname || member.username || 'Unknown';
+  function displayName(m) { return m.nickname || m.username || 'Unknown'; }
+
+  function fmt(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+    if (n >= 1000)    return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
+
+  function rankClass(i) {
+    return i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+  }
+
+  function avatar(m) {
+    if (m.avatar_url) return `<img class="lb-av" src="${m.avatar_url}" alt="" onerror="this.outerHTML='<div class=\\'lb-av-placeholder\\'>${displayName(m).charAt(0).toUpperCase()}</div>'">`;
+    return `<div class="lb-av-placeholder">${displayName(m).charAt(0).toUpperCase()}</div>`;
+  }
+
+  function badge(rank) {
+    // progress ring fills proportionally from #1 (100%) down
+    const pct = Math.max(10, 100 - (rank - 1) * 9);
+    return `<div class="lb-badge" style="--pct:${pct}"><span>${rank}</span></div>`;
+  }
+
+  function buildRow(m, i, stat1, stat2) {
+    return `
+      <div class="lb-row">
+        <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
+        ${avatar(m)}
+        <div class="lb-name">${displayName(m)}</div>
+        <div class="lb-stat">${stat1}</div>
+        <div class="lb-stat">${stat2}</div>
+        ${badge(i + 1)}
+      </div>`;
   }
 
   async function loadStats() {
     try {
-      const oldestRes = await fetch('/.netlify/functions/member-stats?type=oldest');
-      if (oldestRes.ok) {
-        const oldest = await oldestRes.json();
-        document.getElementById('oldest-member').textContent = getDisplayName(oldest);
-        const joinDate = new Date(oldest.join_date).toLocaleDateString('en-US', {
-          year: 'numeric', month: 'long', day: 'numeric'
-        });
-        document.getElementById('oldest-date').textContent = `Joined ${joinDate}`;
-      }
-
-      const leaderboardRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
-      if (leaderboardRes.ok) {
-        const data = await leaderboardRes.json();
-        const messagesHtml = data.top_messages.map((m, i) => `
-          <div class="leaderboard-item">
-            <div class="rank">#${i + 1}</div>
-            <div class="member-name">${getDisplayName(m)}</div>
-            <div class="member-stat">${m.count} messages</div>
-          </div>`).join('');
-        document.getElementById('messages-leaderboard').innerHTML = messagesHtml || '<div class="lb-loading">No data yet</div>';
-
-        const voiceHtml = data.top_voice.map((m, i) => `
-          <div class="leaderboard-item">
-            <div class="rank">#${i + 1}</div>
-            <div class="member-name">${getDisplayName(m)}</div>
-            <div class="member-stat">${m.hours}h voice</div>
-          </div>`).join('');
-        document.getElementById('voice-leaderboard').innerHTML = voiceHtml || '<div class="lb-loading">No data yet</div>';
+      const lbRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
+      if (lbRes.ok) {
+        const data = await lbRes.json();
+        const html = data.top_messages.map((m, i) => {
+          const voiceH = Math.floor((m.voice_seconds || 0) / 3600);
+          return buildRow(m, i, fmt(m.count) + ' msgs', voiceH ? voiceH + 'h voice' : '—');
+        }).join('');
+        document.getElementById('messages-leaderboard').innerHTML = html || '<div class="lb-loading">No data yet</div>';
       }
 
       const gifsRes = await fetch('/.netlify/functions/member-stats?type=most-gifs');
-      if (gifsRes.ok) {
-        const data = await gifsRes.json();
-        const html = data.top_gifs.map((m, i) => `
-          <div class="leaderboard-item">
-            <div class="rank">#${i + 1}</div>
-            <div class="member-name">${getDisplayName(m)}</div>
-            <div class="member-stat">${m.count} GIFs</div>
-          </div>`).join('');
+      const imgsRes = await fetch('/.netlify/functions/member-stats?type=most-images');
+      if (gifsRes.ok && imgsRes.ok) {
+        const gifsData = await gifsRes.json();
+        const imgsData = await imgsRes.json();
+        // merge by username
+        const imgMap = {};
+        (imgsData.top_images || []).forEach(m => { imgMap[m.username] = m.count; });
+        const html = gifsData.top_gifs.map((m, i) =>
+          buildRow(m, i, fmt(m.count) + ' GIFs', fmt(imgMap[m.username] || 0) + ' imgs')
+        ).join('');
         document.getElementById('gifs-leaderboard').innerHTML = html || '<div class="lb-loading">No GIFs shared yet</div>';
-      }
-
-      const imagesRes = await fetch('/.netlify/functions/member-stats?type=most-images');
-      if (imagesRes.ok) {
-        const data = await imagesRes.json();
-        const html = data.top_images.map((m, i) => `
-          <div class="leaderboard-item">
-            <div class="rank">#${i + 1}</div>
-            <div class="member-name">${getDisplayName(m)}</div>
-            <div class="member-stat">${m.count} images</div>
-          </div>`).join('');
-        document.getElementById('images-leaderboard').innerHTML = html || '<div class="lb-loading">No images shared yet</div>';
-      }
-
-      const reactionsRes = await fetch('/.netlify/functions/member-stats?type=most-reactions');
-      if (reactionsRes.ok) {
-        const data = await reactionsRes.json();
-        document.getElementById('reactions-card').innerHTML = `
-          <div style="padding:16px;background:rgba(139,47,255,.08);border-left:3px solid var(--teal);border-radius:2px;">
-            <div style="display:flex;align-items:center;margin-bottom:12px;">
-              ${data.avatar_url ? `<img src="${data.avatar_url}" style="width:40px;height:40px;border-radius:50%;margin-right:12px;">` : ''}
-              <div>
-                <div style="font-weight:600;color:var(--text);">${getDisplayName(data)}</div>
-                <div style="color:var(--text2);font-size:.9rem;">💬 ${data.message}</div>
-              </div>
-            </div>
-            <div style="color:var(--star);font-family:'Orbitron',monospace;font-weight:600;">⭐ ${data.reactions} reactions</div>
-          </div>`;
       }
     } catch (error) {
       document.getElementById('error-container').innerHTML =
