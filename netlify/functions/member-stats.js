@@ -64,7 +64,7 @@ const handler = async (event) => {
       `;
       const topOldest = await sql`
         SELECT username, nickname, avatar_url, join_date FROM member_stats
-        WHERE guild_id = ${GUILD_ID} AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+        WHERE guild_id = ${GUILD_ID} AND join_date IS NOT NULL AND is_bot IS NOT TRUE AND in_server = TRUE
         ORDER BY join_date ASC LIMIT 5
       `;
 
