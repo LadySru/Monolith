@@ -50,6 +50,24 @@ def _ensure_connection(conn):
             pass
         return get_db_connection()
 
+# In-memory sticky cache: {channel_id: {'guild_id', 'content', 'last_message_id'}}
+_sticky: dict = {}
+
+def _load_stickies():
+    """Refresh the sticky cache from the DB."""
+    global _sticky
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute('SELECT channel_id, guild_id, content, last_message_id FROM sticky_messages')
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        _sticky = {int(r['channel_id']): dict(r) for r in rows}
+        print(f"[STICKY] Loaded {len(_sticky)} sticky channel(s)")
+    except Exception as e:
+        print(f"[STICKY] Failed to load stickies: {e}")
+
 # Initialize database schema
 def _safe_alter(cur, sql):
     """Run an ALTER TABLE using a savepoint so a failure doesn't abort the transaction."""
@@ -164,6 +182,17 @@ def init_database():
         ''')
         _safe_alter(cur, 'ALTER TABLE voice_sessions ADD COLUMN guild_id BIGINT NOT NULL DEFAULT 0')
 
+        # ── sticky_messages ───────────────────────────────────────────────────
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS sticky_messages (
+                channel_id BIGINT NOT NULL,
+                guild_id   BIGINT NOT NULL,
+                content    TEXT NOT NULL,
+                last_message_id BIGINT,
+                PRIMARY KEY (channel_id, guild_id)
+            )
+        ''')
+
         # ── indexes ───────────────────────────────────────────────────────────
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
@@ -231,6 +260,8 @@ async def on_ready():
         track_voice_activity.start()
         print("[VOICE] Voice activity tracking started")
 
+    _load_stickies()
+
 @bot.event
 async def on_message(message):
     print(f"[MESSAGE] {message.author} in #{message.channel}: {message.content[:50]}")
@@ -297,6 +328,34 @@ async def on_message(message):
         print(f"[TRACKED] {message.author} in {message.guild.name} - message count updated")
     except Exception as e:
         print(f"[ERROR] Failed to track message: {e}")
+
+    # ── Sticky message handler ──────────────────────────────────────────────
+    sticky = _sticky.get(message.channel.id)
+    if sticky:
+        try:
+            # Delete the previous sticky post if we still have it
+            if sticky.get('last_message_id'):
+                try:
+                    old = await message.channel.fetch_message(sticky['last_message_id'])
+                    await old.delete()
+                except (discord.NotFound, discord.Forbidden):
+                    pass
+
+            new_msg = await message.channel.send(sticky['content'])
+
+            # Update cache and DB with the new message ID
+            sticky['last_message_id'] = new_msg.id
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                'UPDATE sticky_messages SET last_message_id = %s WHERE channel_id = %s AND guild_id = %s',
+                (new_msg.id, message.channel.id, message.guild.id)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"[STICKY] Error in #{message.channel.name}: {e}")
 
     await bot.process_commands(message)
 
@@ -834,6 +893,89 @@ async def import_history(interaction: discord.Interaction):
         except Exception:
             # Interaction token expired (15-min limit) — error already logged above
             print("[IMPORT] Could not send error to Discord (interaction token expired).")
+
+@bot.tree.command(name="sticky-set", description="Set a sticky message in a channel — max 2 channels (Admin only)")
+@discord.app_commands.describe(channel="Channel to pin the sticky in", message="Message to keep at the bottom")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def sticky_set(interaction: discord.Interaction, channel: discord.TextChannel, message: str):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        # Enforce 2-channel limit per guild
+        existing = [cid for cid, s in _sticky.items() if s['guild_id'] == interaction.guild.id]
+        if channel.id not in existing and len(existing) >= 2:
+            await interaction.followup.send(
+                "❌ You can only have sticky messages in **2 channels** at a time. "
+                "Remove one with `/sticky-remove` first.", ephemeral=True)
+            return
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO sticky_messages (channel_id, guild_id, content, last_message_id)
+            VALUES (%s, %s, %s, NULL)
+            ON CONFLICT (channel_id, guild_id) DO UPDATE SET content = EXCLUDED.content, last_message_id = NULL
+        ''', (channel.id, interaction.guild.id, message))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        _load_stickies()
+
+        # Post the sticky immediately
+        sticky = _sticky.get(channel.id)
+        if sticky:
+            new_msg = await channel.send(message)
+            sticky['last_message_id'] = new_msg.id
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE sticky_messages SET last_message_id = %s WHERE channel_id = %s AND guild_id = %s',
+                        (new_msg.id, channel.id, interaction.guild.id))
+            conn.commit()
+            cur.close()
+            conn.close()
+
+        await interaction.followup.send(f"✅ Sticky set in {channel.mention}.", ephemeral=True)
+        print(f"[STICKY] Set in #{channel.name}")
+    except Exception as e:
+        print(f"[ERROR] sticky-set failed: {e}")
+        await interaction.followup.send(f"❌ Failed: {e}", ephemeral=True)
+
+
+@bot.tree.command(name="sticky-remove", description="Remove the sticky message from a channel (Admin only)")
+@discord.app_commands.describe(channel="Channel to remove the sticky from")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def sticky_remove(interaction: discord.Interaction, channel: discord.TextChannel):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        sticky = _sticky.get(channel.id)
+        if not sticky or sticky['guild_id'] != interaction.guild.id:
+            await interaction.followup.send(f"❌ No sticky set in {channel.mention}.", ephemeral=True)
+            return
+
+        # Delete the last posted sticky message if it still exists
+        if sticky.get('last_message_id'):
+            try:
+                old = await channel.fetch_message(sticky['last_message_id'])
+                await old.delete()
+            except (discord.NotFound, discord.Forbidden):
+                pass
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM sticky_messages WHERE channel_id = %s AND guild_id = %s',
+                    (channel.id, interaction.guild.id))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        _sticky.pop(channel.id, None)
+
+        await interaction.followup.send(f"✅ Sticky removed from {channel.mention}.", ephemeral=True)
+        print(f"[STICKY] Removed from #{channel.name}")
+    except Exception as e:
+        print(f"[ERROR] sticky-remove failed: {e}")
+        await interaction.followup.send(f"❌ Failed: {e}", ephemeral=True)
+
 
 @bot.tree.command(name="verify-schema", description="Check and repair the database schema (Admin only)")
 @discord.app_commands.checks.has_permissions(administrator=True)
