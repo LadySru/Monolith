@@ -168,6 +168,16 @@ def init_database():
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_guild ON voice_sessions(guild_id)')
 
+        # Mark known excluded accounts so they never appear in leaderboards
+        EXCLUDED_NAMES = [
+            'AFK Bot#3192', 'Jockie Music#8158', 'Invite Tracker#0478',
+            'Mudae#0807', 'Mr.Seal#4245', 'Moon Baiser#8784',
+        ]
+        cur.execute(
+            'UPDATE member_stats SET is_bot = TRUE WHERE username = ANY(%s)',
+            (EXCLUDED_NAMES,)
+        )
+
         conn.commit()
         cur.close()
         conn.close()
