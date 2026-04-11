@@ -91,6 +91,7 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN nickname VARCHAR(255)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_booster BOOLEAN DEFAULT FALSE')
         # Detect whether the existing PK is wrong (user_id-only instead of composite)
         cur.execute('''
             SELECT array_agg(a.attname::text) AS cols
@@ -197,6 +198,21 @@ async def on_ready():
                 cur.close()
                 conn.close()
                 print(f"[DATABASE] Marked {len(bot_ids)} bot account(s) as excluded")
+
+            # Sync booster status — reset all, then set current boosters
+            booster_ids = [m.id for m in guild.premium_subscribers]
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE member_stats SET is_booster = FALSE WHERE guild_id = %s', (guild.id,))
+            if booster_ids:
+                cur.execute(
+                    'UPDATE member_stats SET is_booster = TRUE WHERE user_id = ANY(%s) AND guild_id = %s',
+                    (booster_ids, guild.id)
+                )
+            conn.commit()
+            cur.close()
+            conn.close()
+            print(f"[DATABASE] Synced {len(booster_ids)} server booster(s)")
     except Exception as e:
         print(f"[DATABASE] Bot sync warning: {e}")
 

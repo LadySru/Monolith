@@ -23,6 +23,20 @@
     .stat-value{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:var(--electric-blue);margin-bottom:4px;text-shadow:0 0 10px rgba(0,217,255,0.8),0 0 20px rgba(0,217,255,0.5);}
     .stat-detail{font-size:.9rem;color:var(--text2);}
 
+    /* ── Booster banner ── */
+    .booster-section{background:linear-gradient(135deg,rgba(255,115,250,.07),rgba(139,47,255,.10));border-top:1px solid rgba(255,115,250,.2);border-bottom:1px solid rgba(255,115,250,.2);padding:36px 0;}
+    .booster-inner{max-width:860px;margin:0 auto;text-align:center;}
+    .booster-title{font-family:'Orbitron',monospace;font-size:.75rem;letter-spacing:3px;color:#ff73fa;text-transform:uppercase;margin-bottom:6px;}
+    .booster-msg{font-size:1rem;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+    .booster-msg strong{color:var(--text);}
+    .booster-list{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+    .booster-chip{display:flex;align-items:center;gap:8px;background:rgba(255,115,250,.08);border:1px solid rgba(255,115,250,.25);border-radius:999px;padding:6px 14px 6px 6px;transition:background .2s;}
+    .booster-chip:hover{background:rgba(255,115,250,.18);}
+    .booster-chip img{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,115,250,.5);object-fit:cover;}
+    .booster-chip .bav{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,115,250,.5);background:linear-gradient(135deg,rgba(255,115,250,.3),rgba(139,47,255,.3));display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#ff73fa;}
+    .booster-chip span{font-size:.85rem;color:var(--text);font-weight:500;}
+    .booster-chip .nitro{font-size:.8rem;margin-right:2px;}
+
     /* ── Leaderboard rows ── */
     .lb-wrap{max-width:860px;margin:0 auto;}
     .lb-header{display:flex;align-items:center;padding:0 16px 12px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:8px;}
@@ -90,6 +104,14 @@
   <div class="wrap">
     <h1>💜 Member <span>Luv</span></h1>
     <p>Member statistics and leaderboards</p>
+  </div>
+</div>
+
+<div class="booster-section" id="booster-section" style="display:none;">
+  <div class="booster-inner">
+    <div class="booster-title">💗 Server Boosters</div>
+    <p class="booster-msg">A heartfelt thank you to the incredible members who boosted Monolith Social — <strong>your support unlocked our very own Server Tag!</strong></p>
+    <div class="booster-list" id="booster-list"></div>
   </div>
 </div>
 
@@ -194,6 +216,24 @@
       </div>`;
   }
 
+  async function loadBoosters() {
+    try {
+      const res = await fetch('/.netlify/functions/member-stats?type=boosters');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.boosters || data.boosters.length === 0) return;
+      document.getElementById('booster-section').style.display = '';
+      document.getElementById('booster-list').innerHTML = data.boosters.map(m => {
+        const name = m.nickname || m.username || 'Unknown';
+        const initial = name.charAt(0).toUpperCase();
+        const av = m.avatar_url
+          ? `<img src="${m.avatar_url}" alt="" onerror="this.outerHTML='<div class=\\'bav\\'>${initial}</div>'">`
+          : `<div class="bav">${initial}</div>`;
+        return `<div class="booster-chip"><span class="nitro">💗</span>${av}<span>${name}</span></div>`;
+      }).join('');
+    } catch (_) {}
+  }
+
   async function loadStats() {
     try {
       const res = await fetch('/.netlify/functions/member-stats?type=leaderboard');
@@ -228,7 +268,9 @@
   }
 
   loadStats();
+  loadBoosters();
   setInterval(loadStats, 60000);
+  setInterval(loadBoosters, 300000);
 </script>
 </body>
 </html>
