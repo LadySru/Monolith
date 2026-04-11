@@ -124,6 +124,32 @@
         <div id="gifs-leaderboard"><div class="lb-loading">LOADING...</div></div>
       </div>
 
+      <!-- Reaction Kings -->
+      <div class="lb-section">
+        <h2>⭐ Reaction <span>Kings</span></h2>
+        <div class="lb-header">
+          <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
+          <div class="lbh-name">Member</div>
+          <div class="lbh-stat">Reactions</div>
+          <div class="lbh-stat"></div>
+          <div style="width:52px;"></div>
+        </div>
+        <div id="reactions-leaderboard"><div class="lb-loading">LOADING...</div></div>
+      </div>
+
+      <!-- Top Voice Chatters -->
+      <div class="lb-section">
+        <h2>🎤 Top Voice <span>Chatters</span></h2>
+        <div class="lb-header">
+          <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
+          <div class="lbh-name">Member</div>
+          <div class="lbh-stat">Hours</div>
+          <div class="lbh-stat"></div>
+          <div style="width:52px;"></div>
+        </div>
+        <div id="voice-leaderboard"><div class="lb-loading">LOADING...</div></div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -175,29 +201,33 @@
 
   async function loadStats() {
     try {
-      const lbRes = await fetch('/.netlify/functions/member-stats?type=leaderboard');
-      if (lbRes.ok) {
-        const data = await lbRes.json();
-        const html = data.top_messages.map((m, i) => {
+      const res = await fetch('/.netlify/functions/member-stats?type=leaderboard');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      document.getElementById('messages-leaderboard').innerHTML =
+        (data.top_messages || []).map((m, i) => {
           const voiceH = Math.floor((m.voice_seconds || 0) / 3600);
           return buildRow(m, i, fmt(m.count) + ' msgs', voiceH ? voiceH + 'h voice' : '—');
-        }).join('');
-        document.getElementById('messages-leaderboard').innerHTML = html || '<div class="lb-loading">No data yet</div>';
-      }
+        }).join('') || '<div class="lb-loading">No data yet</div>';
 
-      const gifsRes = await fetch('/.netlify/functions/member-stats?type=most-gifs');
-      const imgsRes = await fetch('/.netlify/functions/member-stats?type=most-images');
-      if (gifsRes.ok && imgsRes.ok) {
-        const gifsData = await gifsRes.json();
-        const imgsData = await imgsRes.json();
-        // merge by username
-        const imgMap = {};
-        (imgsData.top_images || []).forEach(m => { imgMap[m.username] = m.count; });
-        const html = gifsData.top_gifs.map((m, i) =>
-          buildRow(m, i, fmt(m.count) + ' GIFs', fmt(imgMap[m.username] || 0) + ' imgs')
-        ).join('');
-        document.getElementById('gifs-leaderboard').innerHTML = html || '<div class="lb-loading">No GIFs shared yet</div>';
-      }
+      document.getElementById('gifs-leaderboard').innerHTML =
+        (data.top_gifs || []).map((m, i) =>
+          buildRow(m, i, fmt(m.count) + ' GIFs', fmt(m.images || 0) + ' imgs')
+        ).join('') || '<div class="lb-loading">No GIFs shared yet</div>';
+
+      document.getElementById('reactions-leaderboard').innerHTML =
+        (data.top_reactions || []).map((m, i) =>
+          buildRow(m, i, fmt(m.count) + ' reactions', '')
+        ).join('') || '<div class="lb-loading">No reactions yet</div>';
+
+      document.getElementById('voice-leaderboard').innerHTML =
+        (data.top_voice || []).map((m, i) => {
+          const h = Math.floor((m.seconds || 0) / 3600);
+          const min = Math.floor(((m.seconds || 0) % 3600) / 60);
+          return buildRow(m, i, h + 'h ' + min + 'm', '');
+        }).join('') || '<div class="lb-loading">No voice activity yet</div>';
+
     } catch (error) {
       document.getElementById('error-container').innerHTML =
         `<div class="lb-error">Error loading stats: ${error.message}</div>`;
