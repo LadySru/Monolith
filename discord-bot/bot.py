@@ -465,12 +465,16 @@ async def leaderboard(interaction: discord.Interaction):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
+        # Exclude bot accounts from all leaderboard queries
+        bot_ids = [m.id for m in interaction.guild.members if m.bot] or [0]
+
         # Messages leaderboard
         cur.execute('''
             SELECT username, nickname, message_count FROM member_stats
             WHERE guild_id = %s AND message_count > 0
+              AND user_id != ALL(%s)
             ORDER BY message_count DESC LIMIT 10
-        ''', (interaction.guild.id,))
+        ''', (interaction.guild.id, bot_ids))
 
         top_messages = cur.fetchall()
 
@@ -478,8 +482,9 @@ async def leaderboard(interaction: discord.Interaction):
         cur.execute('''
             SELECT username, nickname, gif_count FROM member_stats
             WHERE guild_id = %s AND gif_count > 0
+              AND user_id != ALL(%s)
             ORDER BY gif_count DESC LIMIT 10
-        ''', (interaction.guild.id,))
+        ''', (interaction.guild.id, bot_ids))
 
         top_gifs = cur.fetchall()
 
@@ -487,8 +492,9 @@ async def leaderboard(interaction: discord.Interaction):
         cur.execute('''
             SELECT username, nickname, reaction_count FROM member_stats
             WHERE guild_id = %s AND reaction_count > 0
+              AND user_id != ALL(%s)
             ORDER BY reaction_count DESC LIMIT 10
-        ''', (interaction.guild.id,))
+        ''', (interaction.guild.id, bot_ids))
 
         top_reactions = cur.fetchall()
 
@@ -496,8 +502,9 @@ async def leaderboard(interaction: discord.Interaction):
         cur.execute('''
             SELECT username, nickname, voice_time_seconds FROM member_stats
             WHERE guild_id = %s AND voice_time_seconds > 0
+              AND user_id != ALL(%s)
             ORDER BY voice_time_seconds DESC LIMIT 10
-        ''', (interaction.guild.id,))
+        ''', (interaction.guild.id, bot_ids))
 
         top_voice = cur.fetchall()
 
