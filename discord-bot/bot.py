@@ -583,6 +583,11 @@ async def leaderboard(interaction: discord.Interaction):
             ORDER BY voice_time_seconds DESC LIMIT 10''', (g,))
         top_voice = cur.fetchall()
 
+        cur.execute('''SELECT username, nickname, join_date FROM member_stats
+            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+            ORDER BY join_date ASC LIMIT 5''', (g,))
+        top_oldest = cur.fetchall()
+
         cur.close()
         conn.close()
 
@@ -607,6 +612,13 @@ async def leaderboard(interaction: discord.Interaction):
         voice_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['voice_time_seconds']//3600}h"
                                 for i, row in enumerate(top_voice)])
         embed.add_field(name="🎤 Top Voice Chatters", value=voice_text or "No data yet", inline=False)
+
+        oldest_text = "\n".join([
+            f"{i+1}. {row['nickname'] or row['username']}: {row['join_date'].strftime('%b %d, %Y')} "
+            f"({(datetime.now(row['join_date'].tzinfo) - row['join_date']).days} days)"
+            for i, row in enumerate(top_oldest)
+        ])
+        embed.add_field(name="👑 Longest-Standing Members", value=oldest_text or "No data yet", inline=False)
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
@@ -664,7 +676,7 @@ async def profile(interaction: discord.Interaction, member: discord.Member):
         print(f"[ERROR] /profile command failed: {e}")
         await interaction.response.send_message("Failed to retrieve profile.", ephemeral=True)
 
-@bot.tree.command(name="oldest", description="View the oldest member in the server")
+@bot.tree.command(name="oldest", description="View the longest-standing members in the server")
 async def oldest(interaction: discord.Interaction):
     try:
         conn = get_db_connection()
@@ -672,32 +684,37 @@ async def oldest(interaction: discord.Interaction):
 
         cur.execute('''
             SELECT username, nickname, avatar_url, join_date FROM member_stats
-            WHERE guild_id = %s
-            ORDER BY join_date ASC LIMIT 1
+            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+            ORDER BY join_date ASC LIMIT 5
         ''', (interaction.guild.id,))
 
-        oldest_member = cur.fetchone()
+        oldest_members = cur.fetchall()
         cur.close()
         conn.close()
 
-        if not oldest_member:
+        if not oldest_members:
             await interaction.response.send_message("No member data available.", ephemeral=True)
             return
 
-        display_name = oldest_member['nickname'] or oldest_member['username']
+        embed = discord.Embed(title="👑 Oldest Members", color=discord.Color.green())
 
-        embed = discord.Embed(title="👑 Oldest Member", color=discord.Color.green())
-        embed.add_field(name="Member", value=display_name, inline=False)
-        embed.add_field(name="Username", value=oldest_member['username'], inline=True)
-        embed.add_field(name="Joined", value=oldest_member['join_date'].strftime("%B %d, %Y"), inline=True)
+        for i, m in enumerate(oldest_members):
+            display_name = m['nickname'] or m['username']
+            join_date = m['join_date']
+            if join_date:
+                days = (datetime.now(join_date.tzinfo) - join_date).days
+                date_str = f"{join_date.strftime('%B %d, %Y')} ({days} days)"
+            else:
+                date_str = "Unknown"
+            embed.add_field(name=f"#{i+1} {display_name}", value=f"Member Since: {date_str}", inline=False)
 
-        if oldest_member['avatar_url']:
-            embed.set_thumbnail(url=oldest_member['avatar_url'])
+        if oldest_members[0]['avatar_url']:
+            embed.set_thumbnail(url=oldest_members[0]['avatar_url'])
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
         print(f"[ERROR] /oldest command failed: {e}")
-        await interaction.response.send_message("Failed to retrieve oldest member.", ephemeral=True)
+        await interaction.response.send_message("Failed to retrieve oldest members.", ephemeral=True)
 
 @bot.tree.command(name="import-history", description="Import message history (Admin only)")
 @discord.app_commands.checks.has_permissions(administrator=True)
