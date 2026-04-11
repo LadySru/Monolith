@@ -4,6 +4,6 @@
     "builder": "dockerfile"
   },
   "deploy": {
-    "startCommand": "python discord-bot/bot.py"
+    "startCommand": "python -u discord-bot/bot.py"
   }
 }
