@@ -100,6 +100,9 @@ def init_database():
         ''')
         pk_row = cur.fetchone()
         pk_cols = sorted(pk_row[0]) if pk_row and pk_row[0] else []
+        # Backfill any NULL guild_ids left by old schema versions
+        cur.execute('UPDATE member_stats SET guild_id = %s WHERE guild_id IS NULL', (GUILD_ID,))
+
         if pk_cols and pk_cols != sorted(['user_id', 'guild_id']):
             # Wrong PK — drop it, deduplicate, then add the correct composite PK
             print("[DATABASE] Migrating member_stats PK from user_id-only to (user_id, guild_id)")
