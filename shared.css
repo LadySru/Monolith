@@ -31,7 +31,7 @@
 /* ═══════ RESET ═══════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { background: linear-gradient(rgba(10,0,21,0.70), rgba(10,0,21,0.70)), url('bg-room.gif'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; background-color: var(--bg); color: var(--text); font-family: var(--font-jp); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: auto; }
+body { background: linear-gradient(rgba(10,0,21,0.85), rgba(10,0,21,0.85)), url('bg-room.gif'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; background-color: var(--bg); color: var(--text); font-family: var(--font-jp); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: auto; }
 body * { font-family: var(--font-jp) !important; }
 
 /* ═══════ CURSOR ═══════ */
