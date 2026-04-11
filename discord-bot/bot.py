@@ -90,13 +90,34 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN join_date TIMESTAMP')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN nickname VARCHAR(255)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
-        # Remove duplicate rows before adding PK (keep the row with most messages)
+        # Detect whether the existing PK is wrong (user_id-only instead of composite)
         cur.execute('''
-            DELETE FROM member_stats a USING member_stats b
-            WHERE a.ctid < b.ctid
-              AND a.user_id = b.user_id AND a.guild_id = b.guild_id
+            SELECT array_agg(a.attname::text) AS cols
+            FROM pg_index i
+            JOIN pg_class c  ON c.oid = i.indrelid
+            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = ANY(i.indkey)
+            WHERE c.relname = 'member_stats' AND i.indisprimary
         ''')
-        _safe_alter(cur, 'ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id)')
+        pk_row = cur.fetchone()
+        pk_cols = sorted(pk_row[0]) if pk_row and pk_row[0] else []
+        if pk_cols and pk_cols != sorted(['user_id', 'guild_id']):
+            # Wrong PK — drop it, deduplicate, then add the correct composite PK
+            print("[DATABASE] Migrating member_stats PK from user_id-only to (user_id, guild_id)")
+            cur.execute('ALTER TABLE member_stats DROP CONSTRAINT member_stats_pkey')
+            cur.execute('''
+                DELETE FROM member_stats a USING member_stats b
+                WHERE a.ctid < b.ctid
+                  AND a.user_id = b.user_id AND a.guild_id = b.guild_id
+            ''')
+            cur.execute('ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id)')
+        else:
+            # Normal path — deduplicate then add PK if missing
+            cur.execute('''
+                DELETE FROM member_stats a USING member_stats b
+                WHERE a.ctid < b.ctid
+                  AND a.user_id = b.user_id AND a.guild_id = b.guild_id
+            ''')
+            _safe_alter(cur, 'ALTER TABLE member_stats ADD PRIMARY KEY (user_id, guild_id)')
 
         # ── message_reactions ─────────────────────────────────────────────────
         cur.execute('''
@@ -214,26 +235,21 @@ async def on_message(message):
             if 'tenor.com' in url or 'giphy.com' in url or proxy.endswith('.gif'):
                 gif_count += 1
 
-        # Upsert member stats — UPDATE first, INSERT if no existing row
+        # Atomic upsert — single statement, no race condition
         cur.execute('''
-            UPDATE member_stats SET
-                message_count = message_count + 1,
-                gif_count     = gif_count + %s,
-                image_count   = image_count + %s,
-                username      = %s,
-                nickname      = COALESCE(%s, nickname),
-                avatar_url    = COALESCE(%s, avatar_url),
+            INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
+                                     message_count, gif_count, image_count, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
+            ON CONFLICT (user_id, guild_id) DO UPDATE SET
+                message_count = member_stats.message_count + 1,
+                gif_count     = member_stats.gif_count + EXCLUDED.gif_count,
+                image_count   = member_stats.image_count + EXCLUDED.image_count,
+                username      = EXCLUDED.username,
+                nickname      = COALESCE(EXCLUDED.nickname, member_stats.nickname),
+                avatar_url    = COALESCE(EXCLUDED.avatar_url, member_stats.avatar_url),
                 last_updated  = NOW()
-            WHERE user_id = %s AND guild_id = %s
-        ''', (gif_count, image_count, str(message.author), nickname, avatar_url,
-              message.author.id, message.guild.id))
-        if cur.rowcount == 0:
-            cur.execute('''
-                INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                         message_count, gif_count, image_count, join_date, last_updated)
-                VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
-            ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url,
-                  gif_count, image_count, join_date))
+        ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url,
+              gif_count, image_count, join_date))
 
         conn.commit()
         cur.close()
