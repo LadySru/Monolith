@@ -110,6 +110,7 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_booster BOOLEAN DEFAULT FALSE')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN in_server BOOLEAN DEFAULT TRUE')
         # Detect whether the existing PK is wrong (user_id-only instead of composite)
         cur.execute('''
             SELECT array_agg(a.attname::text) AS cols
@@ -242,6 +243,21 @@ async def on_ready():
             cur.close()
             conn.close()
             print(f"[DATABASE] Synced {len(booster_ids)} server booster(s)")
+
+            # Sync in_server — only non-bot current members are TRUE; everyone else FALSE
+            current_ids = [m.id for m in guild.members if not m.bot]
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE member_stats SET in_server = FALSE WHERE guild_id = %s', (guild.id,))
+            if current_ids:
+                cur.execute(
+                    'UPDATE member_stats SET in_server = TRUE WHERE user_id = ANY(%s) AND guild_id = %s',
+                    (current_ids, guild.id)
+                )
+            conn.commit()
+            cur.close()
+            conn.close()
+            print(f"[DATABASE] Synced in_server for {len(current_ids)} current member(s)")
     except Exception as e:
         print(f"[DATABASE] Bot sync warning: {e}")
 
@@ -261,6 +277,40 @@ async def on_ready():
         print("[VOICE] Voice activity tracking started")
 
     _load_stickies()
+
+@bot.event
+async def on_member_join(member):
+    if member.bot:
+        return
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'UPDATE member_stats SET in_server = TRUE WHERE user_id = %s AND guild_id = %s',
+            (member.id, member.guild.id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[MEMBER] {member} joined — marked in_server=TRUE")
+    except Exception as e:
+        print(f"[ERROR] on_member_join failed: {e}")
+
+@bot.event
+async def on_member_remove(member):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'UPDATE member_stats SET in_server = FALSE WHERE user_id = %s AND guild_id = %s',
+            (member.id, member.guild.id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f"[MEMBER] {member} left — marked in_server=FALSE")
+    except Exception as e:
+        print(f"[ERROR] on_member_remove failed: {e}")
 
 @bot.event
 async def on_message(message):
@@ -584,7 +634,7 @@ async def leaderboard(interaction: discord.Interaction):
         top_voice = cur.fetchall()
 
         cur.execute('''SELECT username, nickname, join_date FROM member_stats
-            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE AND in_server = TRUE
             ORDER BY join_date ASC LIMIT 5''', (g,))
         top_oldest = cur.fetchall()
 
@@ -684,7 +734,7 @@ async def oldest(interaction: discord.Interaction):
 
         cur.execute('''
             SELECT username, nickname, avatar_url, join_date FROM member_stats
-            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE AND in_server = TRUE
             ORDER BY join_date ASC LIMIT 5
         ''', (interaction.guild.id,))
 
