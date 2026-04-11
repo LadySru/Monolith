@@ -27,7 +27,7 @@
     .lb-wrap{max-width:860px;margin:0 auto;}
     .lb-header{display:flex;align-items:center;padding:0 16px 12px;color:var(--text2);font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:8px;}
     .lb-header .lbh-name{flex:1;margin-left:72px;}
-    .lb-header .lbh-stat{width:90px;text-align:right;}
+    .lb-header .lbh-stat{width:120px;text-align:right;}
     .lb-row{display:flex;align-items:center;padding:10px 16px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);margin-bottom:6px;transition:background .2s,border-color .2s;}
     .lb-row:hover{background:rgba(139,47,255,.12);border-color:rgba(139,47,255,.35);}
     .lb-rank{width:28px;font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;color:var(--text2);margin-right:8px;text-align:center;}
@@ -37,7 +37,7 @@
     .lb-av{width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:12px;border:2px solid rgba(139,47,255,.4);flex-shrink:0;background:rgba(139,47,255,.2);}
     .lb-av-placeholder{width:36px;height:36px;border-radius:50%;margin-right:12px;background:linear-gradient(135deg,rgba(139,47,255,.4),rgba(0,217,255,.2));display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--text2);flex-shrink:0;border:2px solid rgba(139,47,255,.3);}
     .lb-name{flex:1;font-size:.95rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .lb-stat{width:90px;text-align:right;font-family:'Orbitron',monospace;font-size:.8rem;color:var(--text2);font-weight:500;}
+    .lb-stat{width:120px;text-align:right;font-family:'Orbitron',monospace;font-size:.85rem;color:var(--electric-blue);font-weight:600;text-shadow:0 0 8px rgba(0,217,255,.4);}
     .lb-badge{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:700;font-size:.75rem;margin-left:12px;flex-shrink:0;background:conic-gradient(var(--neon-purple) calc(var(--pct,60)*1%),rgba(255,255,255,.08) 0);position:relative;}
     .lb-badge::before{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--bg);}
     .lb-badge span{position:relative;z-index:1;color:var(--text);}
@@ -105,7 +105,6 @@
           <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
           <div class="lbh-name">Member</div>
           <div class="lbh-stat">Messages</div>
-          <div class="lbh-stat">Voice</div>
           <div style="width:52px;"></div>
         </div>
         <div id="messages-leaderboard"><div class="lb-loading">LOADING...</div></div>
@@ -117,8 +116,7 @@
         <div class="lb-header">
           <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
           <div class="lbh-name">Member</div>
-          <div class="lbh-stat">GIFs</div>
-          <div class="lbh-stat">Images</div>
+          <div class="lbh-stat">GIFs Sent</div>
           <div style="width:52px;"></div>
         </div>
         <div id="gifs-leaderboard"><div class="lb-loading">LOADING...</div></div>
@@ -131,7 +129,6 @@
           <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
           <div class="lbh-name">Member</div>
           <div class="lbh-stat">Reactions</div>
-          <div class="lbh-stat"></div>
           <div style="width:52px;"></div>
         </div>
         <div id="reactions-leaderboard"><div class="lb-loading">LOADING...</div></div>
@@ -143,8 +140,7 @@
         <div class="lb-header">
           <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
           <div class="lbh-name">Member</div>
-          <div class="lbh-stat">Hours</div>
-          <div class="lbh-stat"></div>
+          <div class="lbh-stat">Minutes in VC</div>
           <div style="width:52px;"></div>
         </div>
         <div id="voice-leaderboard"><div class="lb-loading">LOADING...</div></div>
@@ -187,14 +183,13 @@
     return `<div class="lb-badge" style="--pct:${pct}"><span>${rank}</span></div>`;
   }
 
-  function buildRow(m, i, stat1, stat2) {
+  function buildRow(m, i, stat) {
     return `
       <div class="lb-row">
         <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
         ${avatar(m)}
         <div class="lb-name">${displayName(m)}</div>
-        <div class="lb-stat">${stat1}</div>
-        <div class="lb-stat">${stat2}</div>
+        <div class="lb-stat">${stat}</div>
         ${badge(i + 1)}
       </div>`;
   }
@@ -206,26 +201,24 @@
       const data = await res.json();
 
       document.getElementById('messages-leaderboard').innerHTML =
-        (data.top_messages || []).map((m, i) => {
-          const voiceH = Math.floor((m.voice_seconds || 0) / 3600);
-          return buildRow(m, i, fmt(m.count) + ' msgs', voiceH ? voiceH + 'h voice' : '—');
-        }).join('') || '<div class="lb-loading">No data yet</div>';
+        (data.top_messages || []).map((m, i) =>
+          buildRow(m, i, fmt(m.count) + ' messages')
+        ).join('') || '<div class="lb-loading">No data yet</div>';
 
       document.getElementById('gifs-leaderboard').innerHTML =
         (data.top_gifs || []).map((m, i) =>
-          buildRow(m, i, fmt(m.count) + ' GIFs', fmt(m.images || 0) + ' imgs')
+          buildRow(m, i, fmt(m.count) + ' GIFs sent')
         ).join('') || '<div class="lb-loading">No GIFs shared yet</div>';
 
       document.getElementById('reactions-leaderboard').innerHTML =
         (data.top_reactions || []).map((m, i) =>
-          buildRow(m, i, fmt(m.count) + ' reactions', '')
+          buildRow(m, i, fmt(m.count) + ' reactions')
         ).join('') || '<div class="lb-loading">No reactions yet</div>';
 
       document.getElementById('voice-leaderboard').innerHTML =
         (data.top_voice || []).map((m, i) => {
-          const h = Math.floor((m.seconds || 0) / 3600);
-          const min = Math.floor(((m.seconds || 0) % 3600) / 60);
-          return buildRow(m, i, h + 'h ' + min + 'm', '');
+          const mins = Math.floor((m.seconds || 0) / 60);
+          return buildRow(m, i, fmt(mins) + ' minutes');
         }).join('') || '<div class="lb-loading">No voice activity yet</div>';
 
     } catch (error) {
