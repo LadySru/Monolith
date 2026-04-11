@@ -170,6 +170,18 @@
         <div id="voice-leaderboard"><div class="lb-loading">LOADING...</div></div>
       </div>
 
+      <!-- Longest-Standing Members -->
+      <div class="lb-section">
+        <h2>👑 Longest-Standing <span>Members</span></h2>
+        <div class="lb-header">
+          <div style="width:36px;margin-right:12px;margin-left:36px;"></div>
+          <div class="lbh-name">Member</div>
+          <div class="lbh-stat">Member Since</div>
+          <div style="width:52px;"></div>
+        </div>
+        <div id="oldest-leaderboard"><div class="lb-loading">LOADING...</div></div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -262,6 +274,16 @@
           const mins = Math.floor((m.seconds || 0) / 60);
           return buildRow(m, i, fmt(mins) + ' minutes');
         }).join('') || '<div class="lb-loading">No voice activity yet</div>';
+
+      document.getElementById('oldest-leaderboard').innerHTML =
+        (data.top_oldest || []).map((m, i) => {
+          const d = m.join_date ? new Date(m.join_date) : null;
+          const label = d
+            ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              + ' (' + Math.floor((Date.now() - d) / 86400000).toLocaleString() + ' days)'
+            : 'Unknown';
+          return buildRow(m, i, label);
+        }).join('') || '<div class="lb-loading">No data yet</div>';
 
     } catch (error) {
       document.getElementById('error-container').innerHTML =

@@ -62,6 +62,11 @@ const handler = async (event) => {
         WHERE guild_id = ${GUILD_ID} AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
         ORDER BY voice_time_seconds DESC LIMIT 10
       `;
+      const topOldest = await sql`
+        SELECT username, nickname, avatar_url, join_date FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND join_date IS NOT NULL AND is_bot IS NOT TRUE
+        ORDER BY join_date ASC LIMIT 5
+      `;
 
       return {
         statusCode: 200,
@@ -70,6 +75,7 @@ const handler = async (event) => {
           top_gifs:     topGifs.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, count: r.gif_count, images: r.image_count || 0 })),
           top_reactions:topReactions.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, count: r.reaction_count })),
           top_voice:    topVoice.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, seconds: r.voice_time_seconds })),
+          top_oldest:   topOldest.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, join_date: r.join_date })),
         }),
       };
     }
