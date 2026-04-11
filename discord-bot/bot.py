@@ -91,6 +91,7 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN nickname VARCHAR(255)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_booster BOOLEAN DEFAULT FALSE')
         # Detect whether the existing PK is wrong (user_id-only instead of composite)
         cur.execute('''
             SELECT array_agg(a.attname::text) AS cols
@@ -168,16 +169,6 @@ def init_database():
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_guild ON voice_sessions(guild_id)')
 
-        # Mark known excluded accounts so they never appear in leaderboards
-        EXCLUDED_NAMES = [
-            'AFK Bot#3192', 'Jockie Music#8158', 'Invite Tracker#0478',
-            'Mudae#0807', 'Mr.Seal#4245', 'Moon Baiser#8784',
-        ]
-        cur.execute(
-            'UPDATE member_stats SET is_bot = TRUE WHERE username = ANY(%s)',
-            (EXCLUDED_NAMES,)
-        )
-
         conn.commit()
         cur.close()
         conn.close()
@@ -190,6 +181,40 @@ def init_database():
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     init_database()
+
+    # Sync is_bot flag from Discord for every guild member — catches all bots
+    # including ones imported before the is_bot column existed
+    try:
+        for guild in bot.guilds:
+            bot_ids = [m.id for m in guild.members if m.bot]
+            if bot_ids:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute(
+                    'UPDATE member_stats SET is_bot = TRUE WHERE user_id = ANY(%s) AND guild_id = %s',
+                    (bot_ids, guild.id)
+                )
+                conn.commit()
+                cur.close()
+                conn.close()
+                print(f"[DATABASE] Marked {len(bot_ids)} bot account(s) as excluded")
+
+            # Sync booster status — reset all, then set current boosters
+            booster_ids = [m.id for m in guild.premium_subscribers]
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE member_stats SET is_booster = FALSE WHERE guild_id = %s', (guild.id,))
+            if booster_ids:
+                cur.execute(
+                    'UPDATE member_stats SET is_booster = TRUE WHERE user_id = ANY(%s) AND guild_id = %s',
+                    (booster_ids, guild.id)
+                )
+            conn.commit()
+            cur.close()
+            conn.close()
+            print(f"[DATABASE] Synced {len(booster_ids)} server booster(s)")
+    except Exception as e:
+        print(f"[DATABASE] Bot sync warning: {e}")
 
     # Sync commands to the guild instantly (guild sync is immediate,
     # global sync can take up to an hour to propagate)

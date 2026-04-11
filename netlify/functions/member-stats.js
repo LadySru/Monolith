@@ -171,6 +171,21 @@ const handler = async (event) => {
       };
     }
 
+    // Get server boosters
+    if (statType === 'boosters') {
+      const result = await sql`
+        SELECT username, nickname, avatar_url FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND is_booster = TRUE
+        ORDER BY username ASC
+      `;
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          boosters: result.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url })),
+        }),
+      };
+    }
+
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Stats API ready' }),
