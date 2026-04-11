@@ -544,8 +544,8 @@ async def stats(interaction: discord.Interaction):
         embed.add_field(name="GIFs Sent", value=stats_data['gif_count'], inline=True)
         embed.add_field(name="Reactions", value=stats_data['reaction_count'], inline=True)
         embed.add_field(name="Voice Time", value=f"{voice_hours}h {voice_mins}m", inline=True)
-        embed.add_field(name="Member Since", value=stats_data['join_date'].strftime("%B %d, %Y") if stats_data['join_date'] else "Unknown", inline=True)
-        embed.add_field(name="Days in Server", value=str(days_member), inline=True)
+        member_since_val = f"{stats_data['join_date'].strftime('%B %d, %Y')} ({days_member} days)" if stats_data['join_date'] else "Unknown"
+        embed.add_field(name="Member Since", value=member_since_val, inline=True)
 
         if stats_data['avatar_url']:
             embed.set_thumbnail(url=stats_data['avatar_url'])
@@ -656,8 +656,8 @@ async def profile(interaction: discord.Interaction, member: discord.Member):
         embed.add_field(name="GIFs Sent", value=stats_data['gif_count'], inline=True)
         embed.add_field(name="Reactions", value=stats_data['reaction_count'], inline=True)
         embed.add_field(name="Voice Time", value=f"{voice_hours}h {voice_mins}m", inline=True)
-        embed.add_field(name="Member Since", value=stats_data['join_date'].strftime("%B %d, %Y") if stats_data['join_date'] else "Unknown", inline=True)
-        embed.add_field(name="Days in Server", value=str(days_member), inline=True)
+        member_since_val = f"{stats_data['join_date'].strftime('%B %d, %Y')} ({days_member} days)" if stats_data['join_date'] else "Unknown"
+        embed.add_field(name="Member Since", value=member_since_val, inline=True)
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
