@@ -44,20 +44,32 @@ const handler = async (event) => {
     if (statType === 'leaderboard') {
       const topMessages = await sql`
         SELECT username, nickname, avatar_url, message_count, voice_time_seconds FROM member_stats
-        WHERE guild_id = ${GUILD_ID} AND message_count > 0
+        WHERE guild_id = ${GUILD_ID} AND message_count > 0 AND is_bot IS NOT TRUE
         ORDER BY message_count DESC LIMIT 10
+      `;
+      const topGifs = await sql`
+        SELECT username, nickname, avatar_url, gif_count, image_count FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND gif_count > 0 AND is_bot IS NOT TRUE
+        ORDER BY gif_count DESC LIMIT 10
+      `;
+      const topReactions = await sql`
+        SELECT username, nickname, avatar_url, reaction_count FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND reaction_count > 0 AND is_bot IS NOT TRUE
+        ORDER BY reaction_count DESC LIMIT 10
+      `;
+      const topVoice = await sql`
+        SELECT username, nickname, avatar_url, voice_time_seconds FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
+        ORDER BY voice_time_seconds DESC LIMIT 10
       `;
 
       return {
         statusCode: 200,
         body: JSON.stringify({
-          top_messages: topMessages.map(row => ({
-            username: row.username,
-            nickname: row.nickname,
-            avatar_url: row.avatar_url,
-            count: row.message_count,
-            voice_seconds: row.voice_time_seconds || 0,
-          })),
+          top_messages: topMessages.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, count: r.message_count, voice_seconds: r.voice_time_seconds || 0 })),
+          top_gifs:     topGifs.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, count: r.gif_count, images: r.image_count || 0 })),
+          top_reactions:topReactions.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, count: r.reaction_count })),
+          top_voice:    topVoice.map(r => ({ username: r.username, nickname: r.nickname, avatar_url: r.avatar_url, seconds: r.voice_time_seconds })),
         }),
       };
     }

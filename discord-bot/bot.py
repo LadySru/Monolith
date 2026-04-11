@@ -90,6 +90,7 @@ def init_database():
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN join_date TIMESTAMP')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN nickname VARCHAR(255)')
         _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN avatar_url VARCHAR(500)')
+        _safe_alter(cur, 'ALTER TABLE member_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE')
         # Detect whether the existing PK is wrong (user_id-only instead of composite)
         cur.execute('''
             SELECT array_agg(a.attname::text) AS cols
@@ -199,8 +200,8 @@ async def on_ready():
 async def on_message(message):
     print(f"[MESSAGE] {message.author} in #{message.channel}: {message.content[:50]}")
 
-    if message.author == bot.user:
-        print(f"[IGNORED] Message from bot itself")
+    if message.author.bot:
+        print(f"[IGNORED] Message from bot {message.author}")
         return
 
     # Ignore DMs - only track messages in guilds
@@ -241,8 +242,8 @@ async def on_message(message):
         # Atomic upsert — single statement, no race condition
         cur.execute('''
             INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                     message_count, gif_count, image_count, join_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, NOW())
+                                     message_count, gif_count, image_count, join_date, is_bot, last_updated)
+            VALUES (%s, %s, %s, %s, %s, 1, %s, %s, %s, FALSE, NOW())
             ON CONFLICT (user_id, guild_id) DO UPDATE SET
                 message_count = member_stats.message_count + 1,
                 gif_count     = member_stats.gif_count + EXCLUDED.gif_count,
@@ -250,6 +251,7 @@ async def on_message(message):
                 username      = EXCLUDED.username,
                 nickname      = COALESCE(EXCLUDED.nickname, member_stats.nickname),
                 avatar_url    = COALESCE(EXCLUDED.avatar_url, member_stats.avatar_url),
+                is_bot        = FALSE,
                 last_updated  = NOW()
         ''', (message.author.id, message.guild.id, str(message.author), nickname, avatar_url,
               gif_count, image_count, join_date))
@@ -465,47 +467,26 @@ async def leaderboard(interaction: discord.Interaction):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        # Exclude bot accounts from all leaderboard queries
-        bot_ids = [m.id for m in interaction.guild.members if m.bot] or [0]
+        g = interaction.guild.id
 
-        # Messages leaderboard
-        cur.execute('''
-            SELECT username, nickname, message_count FROM member_stats
-            WHERE guild_id = %s AND message_count > 0
-              AND user_id != ALL(%s)
-            ORDER BY message_count DESC LIMIT 10
-        ''', (interaction.guild.id, bot_ids))
-
+        cur.execute('''SELECT username, nickname, message_count FROM member_stats
+            WHERE guild_id = %s AND message_count > 0 AND is_bot IS NOT TRUE
+            ORDER BY message_count DESC LIMIT 10''', (g,))
         top_messages = cur.fetchall()
 
-        # GIFs leaderboard
-        cur.execute('''
-            SELECT username, nickname, gif_count FROM member_stats
-            WHERE guild_id = %s AND gif_count > 0
-              AND user_id != ALL(%s)
-            ORDER BY gif_count DESC LIMIT 10
-        ''', (interaction.guild.id, bot_ids))
-
+        cur.execute('''SELECT username, nickname, gif_count FROM member_stats
+            WHERE guild_id = %s AND gif_count > 0 AND is_bot IS NOT TRUE
+            ORDER BY gif_count DESC LIMIT 10''', (g,))
         top_gifs = cur.fetchall()
 
-        # Reactions leaderboard
-        cur.execute('''
-            SELECT username, nickname, reaction_count FROM member_stats
-            WHERE guild_id = %s AND reaction_count > 0
-              AND user_id != ALL(%s)
-            ORDER BY reaction_count DESC LIMIT 10
-        ''', (interaction.guild.id, bot_ids))
-
+        cur.execute('''SELECT username, nickname, reaction_count FROM member_stats
+            WHERE guild_id = %s AND reaction_count > 0 AND is_bot IS NOT TRUE
+            ORDER BY reaction_count DESC LIMIT 10''', (g,))
         top_reactions = cur.fetchall()
 
-        # Voice time leaderboard
-        cur.execute('''
-            SELECT username, nickname, voice_time_seconds FROM member_stats
-            WHERE guild_id = %s AND voice_time_seconds > 0
-              AND user_id != ALL(%s)
-            ORDER BY voice_time_seconds DESC LIMIT 10
-        ''', (interaction.guild.id, bot_ids))
-
+        cur.execute('''SELECT username, nickname, voice_time_seconds FROM member_stats
+            WHERE guild_id = %s AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
+            ORDER BY voice_time_seconds DESC LIMIT 10''', (g,))
         top_voice = cur.fetchall()
 
         cur.close()
@@ -646,6 +627,7 @@ async def import_history(interaction: discord.Interaction):
                 'nickname': member.nick,
                 'avatar_url': str(member.display_avatar.url) if member.display_avatar else None,
                 'join_date': member.joined_at,
+                'is_bot': member.bot,
                 'messages': 0,
                 'gifs': 0,
                 'images': 0,
@@ -770,18 +752,19 @@ async def import_history(interaction: discord.Interaction):
                         username      = %s,
                         nickname      = COALESCE(%s, nickname),
                         avatar_url    = COALESCE(%s, avatar_url),
+                        is_bot        = %s,
                         last_updated  = NOW()
                     WHERE user_id = %s AND guild_id = %s
                 ''', (data['messages'], data['gifs'], data['images'],
                       data['username'], data['nickname'], data['avatar_url'],
-                      user_id, guild_id))
+                      data['is_bot'], user_id, guild_id))
                 if cur.rowcount == 0:
                     cur.execute('''
                         INSERT INTO member_stats (user_id, guild_id, username, nickname, avatar_url,
-                                                 message_count, gif_count, image_count, reaction_count, join_date, last_updated)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                                                 message_count, gif_count, image_count, reaction_count, join_date, is_bot, last_updated)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
                     ''', (user_id, guild_id, data['username'], data['nickname'], data['avatar_url'],
-                          data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date']))
+                          data['messages'], data['gifs'], data['images'], data['reactions'], data['join_date'], data['is_bot']))
             except Exception as row_err:
                 stat_errors += 1
                 if stat_errors <= 3:
