@@ -43,15 +43,9 @@ const handler = async (event) => {
     // Get leaderboard
     if (statType === 'leaderboard') {
       const topMessages = await sql`
-        SELECT username, message_count FROM member_stats
-        WHERE guild_id = ${GUILD_ID}
+        SELECT username, nickname, avatar_url, message_count, voice_time_seconds FROM member_stats
+        WHERE guild_id = ${GUILD_ID} AND message_count > 0
         ORDER BY message_count DESC LIMIT 10
-      `;
-
-      const topVoice = await sql`
-        SELECT username, voice_time_seconds FROM member_stats
-        WHERE guild_id = ${GUILD_ID}
-        ORDER BY voice_time_seconds DESC LIMIT 10
       `;
 
       return {
@@ -59,11 +53,10 @@ const handler = async (event) => {
         body: JSON.stringify({
           top_messages: topMessages.map(row => ({
             username: row.username,
+            nickname: row.nickname,
+            avatar_url: row.avatar_url,
             count: row.message_count,
-          })),
-          top_voice: topVoice.map(row => ({
-            username: row.username,
-            hours: Math.floor(row.voice_time_seconds / 3600),
+            voice_seconds: row.voice_time_seconds || 0,
           })),
         }),
       };
