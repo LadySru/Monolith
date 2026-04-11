@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY discord-bot/ ./discord-bot/
 
-CMD ["python", "discord-bot/bot.py"]
+CMD ["python", "-u", "discord-bot/bot.py"]
