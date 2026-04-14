@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
 import json
+import time
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -145,14 +146,14 @@ _SECTIONS = [
                   if r.get('join_date') else 'Unknown'),
 ]
 
-def _section_embeds(title: str, rows: list, stat_fn, *, footer: str = '') -> list[discord.Embed]:
+def _section_embeds(title: str, rows: list, stat_fn, *, ts: int = 0) -> list[discord.Embed]:
     """Build a single embed for one leaderboard section."""
     e = discord.Embed(title=title, color=_SECTION_COLOR)
 
     if not rows:
         e.description = '*No data yet*'
-        if footer:
-            e.set_footer(text=footer)
+        if ts:
+            e.set_footer(text=f'Updated <t:{ts}:f>  ·  auto-refreshes every 10 min')
         return [e]
 
     lines = []
@@ -165,15 +166,15 @@ def _section_embeds(title: str, rows: list, stat_fn, *, footer: str = '') -> lis
             stat = ''
         lines.append(f'{medal} **{name}** — {stat}')
 
+    if ts:
+        lines.append(f'\n-# Updated <t:{ts}:f>  ·  auto-refreshes every 10 min')
+
     e.description = '\n'.join(lines)
 
     # Thumbnail = #1 person's pfp
     av = rows[0].get('avatar_url')
     if av:
         e.set_thumbnail(url=av)
-
-    if footer:
-        e.set_footer(text=footer)
 
     return [e]
 
@@ -737,9 +738,9 @@ async def leaderboard(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     try:
         data = _fetch_leaderboard_data(interaction.guild.id)
-        ts   = datetime.now().strftime('%b %d, %Y at %I:%M %p')
+        now  = int(time.time())
         for title, key, stat_fn in _SECTIONS:
-            embeds = _section_embeds(title, data[key], stat_fn, footer=f'Updated {ts}')
+            embeds = _section_embeds(title, data[key], stat_fn, ts=now)
             await interaction.channel.send(embeds=embeds)
         await interaction.followup.send("✅ Leaderboard posted!", ephemeral=True)
     except Exception as e:
@@ -752,12 +753,11 @@ async def live_leaderboard(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     try:
         data = _fetch_leaderboard_data(interaction.guild.id)
-        ts   = datetime.now().strftime('%b %d, %Y at %I:%M %p')
-        footer = f'Updated {ts}  ·  auto-refreshes every 10 min'
+        now  = int(time.time())
 
         messages = []
         for title, key, stat_fn in _SECTIONS:
-            embeds = _section_embeds(title, data[key], stat_fn, footer=footer)
+            embeds = _section_embeds(title, data[key], stat_fn, ts=now)
             msg = await interaction.channel.send(embeds=embeds)
             messages.append(msg.id)
 
@@ -1230,14 +1230,13 @@ async def update_live_leaderboards():
                 continue
 
             data    = _fetch_leaderboard_data(guild_id)
-            ts      = datetime.now().strftime('%b %d, %Y at %I:%M %p')
-            footer  = f'Updated {ts}  ·  auto-refreshes every 10 min'
+            now     = int(time.time())
             msg_ids = info.get('message_ids', [])
 
             for idx, (title, key, stat_fn) in enumerate(_SECTIONS):
                 if idx >= len(msg_ids):
                     break
-                embeds = _section_embeds(title, data[key], stat_fn, footer=footer)
+                embeds = _section_embeds(title, data[key], stat_fn, ts=now)
                 msg = await channel.fetch_message(msg_ids[idx])
                 await msg.edit(embeds=embeds)
 
