@@ -61,6 +61,8 @@
     .lb-section{margin-bottom:48px;}
     .lb-section h2{font-family:'Orbitron',monospace;font-size:1rem;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
     .lb-section h2 span{color:var(--neon-purple);}
+    .lb-last-updated{font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:1.5px;color:var(--text2);text-align:right;margin-bottom:24px;opacity:.6;}
+    .lb-last-updated span{color:var(--neon-purple);opacity:1;}
     @media(max-width:600px){.lb-stat{display:none;}.lb-header .lbh-stat{display:none;}}
 
     @media(max-width:768px){.stats-grid{grid-template-columns:1fr;}}
@@ -120,6 +122,7 @@
 <section class="section-pad">
   <div class="wrap">
     <div id="error-container"></div>
+    <div class="lb-last-updated" id="lb-last-updated"></div>
     <div class="lb-wrap">
 
       <!-- Messages leaderboard -->
@@ -284,6 +287,12 @@
             : 'Unknown';
           return buildRow(m, i, label);
         }).join('') || '<div class="lb-loading">No data yet</div>';
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('lb-last-updated').innerHTML =
+        `LAST UPDATED <span>${dateStr} at ${timeStr}</span> · refreshes every 60s`;
 
     } catch (error) {
       document.getElementById('error-container').innerHTML =

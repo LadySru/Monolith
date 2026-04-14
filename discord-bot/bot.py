@@ -68,6 +68,85 @@ def _load_stickies():
     except Exception as e:
         print(f"[STICKY] Failed to load stickies: {e}")
 
+# In-memory live leaderboard cache: {guild_id: {'channel_id', 'message_id'}}
+_live_leaderboards: dict = {}
+
+def _load_live_leaderboards():
+    global _live_leaderboards
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute('SELECT guild_id, channel_id, message_id FROM live_leaderboards')
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        _live_leaderboards = {int(r['guild_id']): dict(r) for r in rows}
+        print(f"[LIVE-LB] Loaded {len(_live_leaderboards)} live leaderboard(s)")
+    except Exception as e:
+        print(f"[LIVE-LB] Failed to load live leaderboards: {e}")
+
+def _build_leaderboard_embed(guild_id: int) -> discord.Embed:
+    """Fetch stats from DB and return a fully built leaderboard embed."""
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    g = guild_id
+
+    cur.execute('''SELECT username, nickname, message_count FROM member_stats
+        WHERE guild_id = %s AND message_count > 0 AND is_bot IS NOT TRUE
+        ORDER BY message_count DESC LIMIT 10''', (g,))
+    top_messages = cur.fetchall()
+
+    cur.execute('''SELECT username, nickname, gif_count FROM member_stats
+        WHERE guild_id = %s AND gif_count > 0 AND is_bot IS NOT TRUE
+        ORDER BY gif_count DESC LIMIT 10''', (g,))
+    top_gifs = cur.fetchall()
+
+    cur.execute('''SELECT username, nickname, reaction_count FROM member_stats
+        WHERE guild_id = %s AND reaction_count > 0 AND is_bot IS NOT TRUE
+        ORDER BY reaction_count DESC LIMIT 10''', (g,))
+    top_reactions = cur.fetchall()
+
+    cur.execute('''SELECT username, nickname, voice_time_seconds FROM member_stats
+        WHERE guild_id = %s AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
+        ORDER BY voice_time_seconds DESC LIMIT 10''', (g,))
+    top_voice = cur.fetchall()
+
+    cur.execute('''SELECT username, nickname, join_date FROM member_stats
+        WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE AND in_server = TRUE
+        ORDER BY join_date ASC LIMIT 5''', (g,))
+    top_oldest = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    embed = discord.Embed(title="Community Leaderboard", color=discord.Color.gold())
+
+    messages_text = "\n".join([f"{i+1}. {r['nickname'] or r['username']}: {r['message_count']} messages"
+                               for i, r in enumerate(top_messages)])
+    embed.add_field(name="💬 Top Messagers", value=messages_text or "No data yet", inline=False)
+
+    gifs_text = "\n".join([f"{i+1}. {r['nickname'] or r['username']}: {r['gif_count']} GIFs"
+                           for i, r in enumerate(top_gifs)])
+    embed.add_field(name="🎬 GIF Masters", value=gifs_text or "No data yet", inline=False)
+
+    reactions_text = "\n".join([f"{i+1}. {r['nickname'] or r['username']}: {r['reaction_count']} reactions"
+                                for i, r in enumerate(top_reactions)])
+    embed.add_field(name="⭐ Reaction Kings", value=reactions_text or "No data yet", inline=False)
+
+    voice_text = "\n".join([f"{i+1}. {r['nickname'] or r['username']}: {r['voice_time_seconds']//3600}h"
+                            for i, r in enumerate(top_voice)])
+    embed.add_field(name="🎤 Top Voice Chatters", value=voice_text or "No data yet", inline=False)
+
+    oldest_text = "\n".join([
+        f"{i+1}. {r['nickname'] or r['username']}: {r['join_date'].strftime('%b %d, %Y')} "
+        f"({(datetime.now(r['join_date'].tzinfo) - r['join_date']).days} days)"
+        for i, r in enumerate(top_oldest)
+    ])
+    embed.add_field(name="👑 Longest-Standing Members", value=oldest_text or "No data yet", inline=False)
+
+    embed.set_footer(text=f"Updated {datetime.now().strftime('%b %d, %Y at %I:%M %p')} • auto-refreshes every 10 min")
+    return embed
+
 # Initialize database schema
 def _safe_alter(cur, sql):
     """Run an ALTER TABLE using a savepoint so a failure doesn't abort the transaction."""
@@ -194,6 +273,15 @@ def init_database():
             )
         ''')
 
+        # ── live_leaderboards ─────────────────────────────────────────────────
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS live_leaderboards (
+                guild_id   BIGINT PRIMARY KEY,
+                channel_id BIGINT NOT NULL,
+                message_id BIGINT NOT NULL
+            )
+        ''')
+
         # ── indexes ───────────────────────────────────────────────────────────
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
         cur.execute('CREATE INDEX IF NOT EXISTS idx_voice_sessions_user ON voice_sessions(user_id)')
@@ -277,6 +365,11 @@ async def on_ready():
         print("[VOICE] Voice activity tracking started")
 
     _load_stickies()
+    _load_live_leaderboards()
+
+    if not update_live_leaderboards.is_running():
+        update_live_leaderboards.start()
+        print("[LIVE-LB] Live leaderboard updater started")
 
 @bot.event
 async def on_member_join(member):
@@ -608,72 +701,57 @@ async def stats(interaction: discord.Interaction):
 @bot.tree.command(name="leaderboard", description="View the member leaderboard")
 async def leaderboard(interaction: discord.Interaction):
     try:
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-
-        g = interaction.guild.id
-
-        cur.execute('''SELECT username, nickname, message_count FROM member_stats
-            WHERE guild_id = %s AND message_count > 0 AND is_bot IS NOT TRUE
-            ORDER BY message_count DESC LIMIT 10''', (g,))
-        top_messages = cur.fetchall()
-
-        cur.execute('''SELECT username, nickname, gif_count FROM member_stats
-            WHERE guild_id = %s AND gif_count > 0 AND is_bot IS NOT TRUE
-            ORDER BY gif_count DESC LIMIT 10''', (g,))
-        top_gifs = cur.fetchall()
-
-        cur.execute('''SELECT username, nickname, reaction_count FROM member_stats
-            WHERE guild_id = %s AND reaction_count > 0 AND is_bot IS NOT TRUE
-            ORDER BY reaction_count DESC LIMIT 10''', (g,))
-        top_reactions = cur.fetchall()
-
-        cur.execute('''SELECT username, nickname, voice_time_seconds FROM member_stats
-            WHERE guild_id = %s AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
-            ORDER BY voice_time_seconds DESC LIMIT 10''', (g,))
-        top_voice = cur.fetchall()
-
-        cur.execute('''SELECT username, nickname, join_date FROM member_stats
-            WHERE guild_id = %s AND join_date IS NOT NULL AND is_bot IS NOT TRUE AND in_server = TRUE
-            ORDER BY join_date ASC LIMIT 5''', (g,))
-        top_oldest = cur.fetchall()
-
-        cur.close()
-        conn.close()
-
-        embed = discord.Embed(title="Community Leaderboard", color=discord.Color.gold())
-
-        # Messages leaderboard
-        messages_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['message_count']} messages"
-                                   for i, row in enumerate(top_messages)])
-        embed.add_field(name="💬 Top Messagers", value=messages_text or "No data yet", inline=False)
-
-        # GIFs leaderboard
-        gifs_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['gif_count']} GIFs"
-                               for i, row in enumerate(top_gifs)])
-        embed.add_field(name="🎬 GIF Masters", value=gifs_text or "No data yet", inline=False)
-
-        # Reactions leaderboard
-        reactions_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['reaction_count']} reactions"
-                                    for i, row in enumerate(top_reactions)])
-        embed.add_field(name="⭐ Reaction Kings", value=reactions_text or "No data yet", inline=False)
-
-        # Voice leaderboard
-        voice_text = "\n".join([f"{i+1}. {row['nickname'] or row['username']}: {row['voice_time_seconds']//3600}h"
-                                for i, row in enumerate(top_voice)])
-        embed.add_field(name="🎤 Top Voice Chatters", value=voice_text or "No data yet", inline=False)
-
-        oldest_text = "\n".join([
-            f"{i+1}. {row['nickname'] or row['username']}: {row['join_date'].strftime('%b %d, %Y')} "
-            f"({(datetime.now(row['join_date'].tzinfo) - row['join_date']).days} days)"
-            for i, row in enumerate(top_oldest)
-        ])
-        embed.add_field(name="👑 Longest-Standing Members", value=oldest_text or "No data yet", inline=False)
-
+        embed = _build_leaderboard_embed(interaction.guild.id)
         await interaction.response.send_message(embed=embed)
     except Exception as e:
         print(f"[ERROR] /leaderboard command failed: {e}")
         await interaction.response.send_message("Failed to retrieve leaderboard.", ephemeral=True)
+
+@bot.tree.command(name="live-leaderboard", description="Post a live auto-updating leaderboard in this channel (Admin only)")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def live_leaderboard(interaction: discord.Interaction):
+    try:
+        embed = _build_leaderboard_embed(interaction.guild.id)
+        await interaction.response.send_message(embed=embed)
+        msg = await interaction.original_response()
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO live_leaderboards (guild_id, channel_id, message_id)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id, message_id = EXCLUDED.message_id
+        ''', (interaction.guild.id, interaction.channel.id, msg.id))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        _live_leaderboards[interaction.guild.id] = {
+            'guild_id': interaction.guild.id,
+            'channel_id': interaction.channel.id,
+            'message_id': msg.id,
+        }
+        print(f"[LIVE-LB] Set live leaderboard in #{interaction.channel.name}")
+    except Exception as e:
+        print(f"[ERROR] /live-leaderboard failed: {e}")
+        await interaction.response.send_message("Failed to post live leaderboard.", ephemeral=True)
+
+@bot.tree.command(name="live-leaderboard-remove", description="Stop the live leaderboard updates (Admin only)")
+@discord.app_commands.checks.has_permissions(administrator=True)
+async def live_leaderboard_remove(interaction: discord.Interaction):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM live_leaderboards WHERE guild_id = %s', (interaction.guild.id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        _live_leaderboards.pop(interaction.guild.id, None)
+        await interaction.response.send_message("✅ Live leaderboard removed.", ephemeral=True)
+        print(f"[LIVE-LB] Removed live leaderboard for guild {interaction.guild.id}")
+    except Exception as e:
+        print(f"[ERROR] /live-leaderboard-remove failed: {e}")
+        await interaction.response.send_message("Failed to remove live leaderboard.", ephemeral=True)
 
 @bot.tree.command(name="profile", description="View a member's profile")
 @discord.app_commands.describe(member="The member to view")
@@ -1088,6 +1166,35 @@ async def fix_join_dates(interaction: discord.Interaction):
     except Exception as e:
         print(f"[ERROR] fix-join-dates failed: {e}")
         await interaction.followup.send(f"❌ Failed: {str(e)}", ephemeral=True)
+
+@tasks.loop(minutes=10)
+async def update_live_leaderboards():
+    """Edit every live leaderboard message with fresh stats."""
+    if not _live_leaderboards:
+        return
+    for guild_id, info in list(_live_leaderboards.items()):
+        try:
+            guild = bot.get_guild(guild_id)
+            if not guild:
+                continue
+            channel = guild.get_channel(info['channel_id'])
+            if not channel:
+                continue
+            msg = await channel.fetch_message(info['message_id'])
+            embed = _build_leaderboard_embed(guild_id)
+            await msg.edit(embed=embed)
+            print(f"[LIVE-LB] Updated leaderboard in #{channel.name}")
+        except discord.NotFound:
+            print(f"[LIVE-LB] Message deleted for guild {guild_id}, removing entry")
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('DELETE FROM live_leaderboards WHERE guild_id = %s', (guild_id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            _live_leaderboards.pop(guild_id, None)
+        except Exception as e:
+            print(f"[LIVE-LB] Failed to update guild {guild_id}: {e}")
 
 @tasks.loop(minutes=30)
 async def track_voice_activity():
