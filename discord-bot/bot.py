@@ -3,10 +3,7 @@ from discord.ext import commands, tasks
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
-import io
-import asyncio
-import aiohttp
-from PIL import Image, ImageDraw, ImageFont
+import json
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -80,11 +77,17 @@ def _load_live_leaderboards():
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute('SELECT guild_id, channel_id, message_id FROM live_leaderboards')
+        cur.execute('SELECT guild_id, channel_id, message_ids FROM live_leaderboards')
         rows = cur.fetchall()
         cur.close()
         conn.close()
-        _live_leaderboards = {int(r['guild_id']): dict(r) for r in rows}
+        _live_leaderboards = {
+            int(r['guild_id']): {
+                'channel_id':  int(r['channel_id']),
+                'message_ids': json.loads(r['message_ids'] or '[]'),
+            }
+            for r in rows
+        }
         print(f"[LIVE-LB] Loaded {len(_live_leaderboards)} live leaderboard(s)")
     except Exception as e:
         print(f"[LIVE-LB] Failed to load live leaderboards: {e}")
@@ -126,122 +129,56 @@ def _fetch_leaderboard_data(guild_id: int) -> dict:
                 top_reactions=top_reactions, top_voice=top_voice, top_oldest=top_oldest)
 
 
-# ── image generation ──────────────────────────────────────────────────────────
-_FONT_BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
-_FONT_REG  = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+# ── native embed leaderboard ──────────────────────────────────────────────────
+_MEDALS = ['🥇', '🥈', '🥉', '4.', '5.', '6.', '7.', '8.', '9.', '10.']
+_SECTION_COLOR = 0x9d4edd  # purple
 
-async def _dl_avatar(session: aiohttp.ClientSession, url: str, size: int = 40):
-    try:
-        async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as r:
-            data = await r.read()
-        av = Image.open(io.BytesIO(data)).convert('RGBA').resize((size, size), Image.LANCZOS)
-        mask = Image.new('L', (size, size), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, size - 1, size - 1), fill=255)
-        out = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-        out.paste(av, mask=mask)
-        return out
-    except Exception:
-        return None
+_SECTIONS = [
+    ('💬 Top Messagers',      'top_messages',  lambda r: f"{r['message_count']:,} messages"),
+    ('🎬 GIF Masters',         'top_gifs',      lambda r: f"{r['gif_count']:,} GIFs sent"),
+    ('⭐ Reaction Kings',       'top_reactions', lambda r: f"{r['reaction_count']:,} reactions"),
+    ('🎤 Top Voice Chatters',  'top_voice',
+        lambda r: f"{r['voice_time_seconds'] // 3600}h {(r['voice_time_seconds'] % 3600) // 60}m in voice"),
+    ('👑 Longest-Standing',    'top_oldest',
+        lambda r: (f"Member since {r['join_date'].strftime('%B %d, %Y')} "
+                   f"({(datetime.now(r['join_date'].tzinfo) - r['join_date']).days:,} days)")
+                  if r.get('join_date') else 'Unknown'),
+]
 
-async def _generate_leaderboard_image(data: dict) -> io.BytesIO:
-    BG     = (10,  0,  21)
-    CARD   = (20,  5,  40)
-    ROW2   = (14,  2,  28)
-    ACCENT = (157, 78, 221)
-    GOLD   = (255, 215,  0)
-    SILVER = (192, 192, 192)
-    BRONZE = (205, 127,  50)
-    TEXT   = (230, 215, 250)
-    MUTED  = (120, 100, 150)
+def _section_embeds(title: str, rows: list, stat_fn, *, footer: str = '') -> list[discord.Embed]:
+    """Build a list of embeds for one leaderboard section (one embed per person)."""
+    if not rows:
+        e = discord.Embed(title=title, description='No data yet', color=_SECTION_COLOR)
+        if footer:
+            e.set_footer(text=footer)
+        return [e]
 
-    W, PAD, AV = 700, 22, 40
-    ROW_H, HDR_H, GAP = 52, 46, 10
+    embeds = []
+    for i, row in enumerate(rows):
+        name = row.get('nickname') or row.get('username') or 'Unknown'
+        try:
+            stat = stat_fn(row)
+        except Exception:
+            stat = ''
 
-    sections = [
-        ('Top Messagers',         data['top_messages'],  lambda r: f"{r['message_count']:,} messages"),
-        ('GIF Masters',           data['top_gifs'],      lambda r: f"{r['gif_count']:,} GIFs"),
-        ('Reaction Kings',        data['top_reactions'], lambda r: f"{r['reaction_count']:,} reactions"),
-        ('Top Voice Chatters',    data['top_voice'],     lambda r: f"{r['voice_time_seconds'] // 60:,} min"),
-        ('Longest-Standing',      data['top_oldest'],    lambda r: r['join_date'].strftime('%b %d, %Y')
-                                                                   if r.get('join_date') else 'Unknown'),
-    ]
+        medal = _MEDALS[i] if i < len(_MEDALS) else f'{i+1}.'
+        e = discord.Embed(description=f'**{stat}**', color=_SECTION_COLOR)
 
-    total_h = PAD
-    for _, rows, _ in sections:
-        total_h += HDR_H + len(rows) * ROW_H + GAP
-    total_h += 30  # footer
+        av = row.get('avatar_url')
+        if av:
+            e.set_author(name=f'{medal}  {name}', icon_url=av)
+        else:
+            e.set_author(name=f'{medal}  {name}')
 
-    img  = Image.new('RGB', (W, total_h), BG)
-    draw = ImageDraw.Draw(img)
+        # Section title only on the first card
+        if i == 0:
+            e.title = title
+        # Footer (last updated) only on the last card
+        if i == len(rows) - 1 and footer:
+            e.set_footer(text=footer)
 
-    try:
-        f_bold = ImageFont.truetype(_FONT_BOLD, 14)
-        f_reg  = ImageFont.truetype(_FONT_REG,  13)
-        f_sec  = ImageFont.truetype(_FONT_BOLD, 15)
-        f_foot = ImageFont.truetype(_FONT_REG,  11)
-        f_rank = ImageFont.truetype(_FONT_BOLD, 12)
-    except Exception:
-        f_bold = f_reg = f_sec = f_foot = f_rank = ImageFont.load_default()
-
-    # Download all unique avatars concurrently
-    urls = list({r['avatar_url'] for _, rows, _ in sections
-                 for r in rows if r.get('avatar_url')})
-    async with aiohttp.ClientSession() as session:
-        imgs = await asyncio.gather(*[_dl_avatar(session, u, AV) for u in urls],
-                                    return_exceptions=True)
-    avatars = {u: (v if isinstance(v, Image.Image) else None)
-               for u, v in zip(urls, imgs)}
-
-    y = PAD
-    for sec_name, rows, stat_fn in sections:
-        # Section header
-        draw.rectangle((0, y, W, y + HDR_H), fill=CARD)
-        draw.rectangle((0, y, 4, y + HDR_H), fill=ACCENT)
-        draw.text((PAD, y + HDR_H // 2 - 8), sec_name, fill=ACCENT, font=f_sec)
-        y += HDR_H
-
-        for i, row in enumerate(rows):
-            rank       = i + 1
-            rank_color = GOLD if rank == 1 else SILVER if rank == 2 else BRONZE if rank == 3 else MUTED
-            row_bg     = ROW2 if i % 2 == 0 else BG
-            draw.rectangle((0, y, W, y + ROW_H), fill=row_bg)
-
-            # Rank
-            draw.text((PAD, y + ROW_H // 2 - 7), str(rank), fill=rank_color, font=f_rank)
-
-            # Avatar
-            av_x = PAD + 28
-            av_y = y + ROW_H // 2 - AV // 2
-            av   = avatars.get(row.get('avatar_url'))
-            if av:
-                img.paste(av, (av_x, av_y), av)
-            else:
-                draw.ellipse((av_x, av_y, av_x + AV, av_y + AV), fill=(50, 20, 80))
-                init = (row.get('nickname') or row.get('username') or '?')[0].upper()
-                draw.text((av_x + AV // 2 - 4, av_y + AV // 2 - 7), init, fill=TEXT, font=f_bold)
-
-            # Name
-            name = (row.get('nickname') or row.get('username') or 'Unknown')[:26]
-            draw.text((av_x + AV + 12, y + ROW_H // 2 - 7), name, fill=TEXT, font=f_bold)
-
-            # Stat (right-aligned)
-            try:
-                stat = stat_fn(row)
-            except Exception:
-                stat = ''
-            draw.text((W - PAD, y + ROW_H // 2 - 7), stat, fill=MUTED, font=f_reg, anchor='ra')
-
-            y += ROW_H
-        y += GAP
-
-    # Footer
-    ts = datetime.now().strftime('%b %d, %Y at %I:%M %p')
-    draw.text((PAD, y + 6), f"Updated {ts}  ·  auto-refreshes every 10 min", fill=MUTED, font=f_foot)
-
-    buf = io.BytesIO()
-    img.save(buf, 'PNG', optimize=True)
-    buf.seek(0)
-    return buf
+        embeds.append(e)
+    return embeds
 
 # Initialize database schema
 def _safe_alter(cur, sql):
@@ -372,11 +309,12 @@ def init_database():
         # ── live_leaderboards ─────────────────────────────────────────────────
         cur.execute('''
             CREATE TABLE IF NOT EXISTS live_leaderboards (
-                guild_id   BIGINT PRIMARY KEY,
-                channel_id BIGINT NOT NULL,
-                message_id BIGINT NOT NULL
+                guild_id    BIGINT PRIMARY KEY,
+                channel_id  BIGINT NOT NULL,
+                message_ids TEXT   NOT NULL DEFAULT '[]'
             )
         ''')
+        _safe_alter(cur, "ALTER TABLE live_leaderboards ADD COLUMN message_ids TEXT DEFAULT '[]'")
 
         # ── indexes ───────────────────────────────────────────────────────────
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
@@ -796,15 +734,14 @@ async def stats(interaction: discord.Interaction):
 
 @bot.tree.command(name="leaderboard", description="View the member leaderboard")
 async def leaderboard(interaction: discord.Interaction):
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     try:
         data = _fetch_leaderboard_data(interaction.guild.id)
-        buf  = await _generate_leaderboard_image(data)
-        file = discord.File(buf, filename='leaderboard.png')
-        embed = discord.Embed(color=0x9d4edd)
-        embed.set_image(url='attachment://leaderboard.png')
-        embed.set_footer(text=f"Updated {datetime.now().strftime('%b %d, %Y at %I:%M %p')}")
-        await interaction.followup.send(file=file, embed=embed)
+        ts   = datetime.now().strftime('%b %d, %Y at %I:%M %p')
+        for title, key, stat_fn in _SECTIONS:
+            embeds = _section_embeds(title, data[key], stat_fn, footer=f'Updated {ts}')
+            await interaction.channel.send(embeds=embeds)
+        await interaction.followup.send("✅ Leaderboard posted!", ephemeral=True)
     except Exception as e:
         print(f"[ERROR] /leaderboard command failed: {e}")
         await interaction.followup.send("Failed to retrieve leaderboard.", ephemeral=True)
@@ -815,31 +752,33 @@ async def live_leaderboard(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     try:
         data = _fetch_leaderboard_data(interaction.guild.id)
-        buf  = await _generate_leaderboard_image(data)
-        file = discord.File(buf, filename='leaderboard.png')
-        embed = discord.Embed(color=0x9d4edd)
-        embed.set_image(url='attachment://leaderboard.png')
-        embed.set_footer(text=f"Updated {datetime.now().strftime('%b %d, %Y at %I:%M %p')}  ·  auto-refreshes every 10 min")
+        ts   = datetime.now().strftime('%b %d, %Y at %I:%M %p')
+        footer = f'Updated {ts}  ·  auto-refreshes every 10 min'
 
-        msg = await interaction.channel.send(file=file, embed=embed)
+        messages = []
+        for title, key, stat_fn in _SECTIONS:
+            embeds = _section_embeds(title, data[key], stat_fn, footer=footer)
+            msg = await interaction.channel.send(embeds=embeds)
+            messages.append(msg.id)
 
+        msg_ids_json = json.dumps(messages)
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('''
-            INSERT INTO live_leaderboards (guild_id, channel_id, message_id)
+            INSERT INTO live_leaderboards (guild_id, channel_id, message_ids)
             VALUES (%s, %s, %s)
-            ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id, message_id = EXCLUDED.message_id
-        ''', (interaction.guild.id, interaction.channel.id, msg.id))
+            ON CONFLICT (guild_id) DO UPDATE
+              SET channel_id = EXCLUDED.channel_id, message_ids = EXCLUDED.message_ids
+        ''', (interaction.guild.id, interaction.channel.id, msg_ids_json))
         conn.commit()
         cur.close()
         conn.close()
 
         _live_leaderboards[interaction.guild.id] = {
-            'guild_id': interaction.guild.id,
-            'channel_id': interaction.channel.id,
-            'message_id': msg.id,
+            'channel_id':  interaction.channel.id,
+            'message_ids': messages,
         }
-        print(f"[LIVE-LB] Set live leaderboard in #{interaction.channel.name}")
+        print(f"[LIVE-LB] Posted {len(messages)} section messages in #{interaction.channel.name}")
         await interaction.followup.send("✅ Live leaderboard posted!", ephemeral=True)
     except Exception as e:
         print(f"[ERROR] /live-leaderboard failed: {e}")
@@ -1278,7 +1217,7 @@ async def fix_join_dates(interaction: discord.Interaction):
 
 @tasks.loop(minutes=10)
 async def update_live_leaderboards():
-    """Edit every live leaderboard message with a fresh image."""
+    """Edit every live leaderboard section message with fresh embeds."""
     if not _live_leaderboards:
         return
     for guild_id, info in list(_live_leaderboards.items()):
@@ -1289,17 +1228,22 @@ async def update_live_leaderboards():
             channel = guild.get_channel(info['channel_id'])
             if not channel:
                 continue
-            msg  = await channel.fetch_message(info['message_id'])
-            data = _fetch_leaderboard_data(guild_id)
-            buf  = await _generate_leaderboard_image(data)
-            file = discord.File(buf, filename='leaderboard.png')
-            embed = discord.Embed(color=0x9d4edd)
-            embed.set_image(url='attachment://leaderboard.png')
-            embed.set_footer(text=f"Updated {datetime.now().strftime('%b %d, %Y at %I:%M %p')}  ·  auto-refreshes every 10 min")
-            await msg.edit(embed=embed, attachments=[file])
-            print(f"[LIVE-LB] Updated leaderboard in #{channel.name}")
+
+            data    = _fetch_leaderboard_data(guild_id)
+            ts      = datetime.now().strftime('%b %d, %Y at %I:%M %p')
+            footer  = f'Updated {ts}  ·  auto-refreshes every 10 min'
+            msg_ids = info.get('message_ids', [])
+
+            for idx, (title, key, stat_fn) in enumerate(_SECTIONS):
+                if idx >= len(msg_ids):
+                    break
+                embeds = _section_embeds(title, data[key], stat_fn, footer=footer)
+                msg = await channel.fetch_message(msg_ids[idx])
+                await msg.edit(embeds=embeds)
+
+            print(f"[LIVE-LB] Updated {len(msg_ids)} section(s) in #{channel.name}")
         except discord.NotFound:
-            print(f"[LIVE-LB] Message deleted for guild {guild_id}, removing entry")
+            print(f"[LIVE-LB] A message was deleted for guild {guild_id}, removing entry")
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute('DELETE FROM live_leaderboards WHERE guild_id = %s', (guild_id,))
