@@ -146,39 +146,36 @@ _SECTIONS = [
 ]
 
 def _section_embeds(title: str, rows: list, stat_fn, *, footer: str = '') -> list[discord.Embed]:
-    """Build a list of embeds for one leaderboard section (one embed per person)."""
+    """Build a single embed for one leaderboard section."""
+    e = discord.Embed(title=title, color=_SECTION_COLOR)
+
     if not rows:
-        e = discord.Embed(title=title, description='No data yet', color=_SECTION_COLOR)
+        e.description = '*No data yet*'
         if footer:
             e.set_footer(text=footer)
         return [e]
 
-    embeds = []
+    lines = []
     for i, row in enumerate(rows):
         name = row.get('nickname') or row.get('username') or 'Unknown'
+        medal = _MEDALS[i] if i < len(_MEDALS) else f'{i+1}.'
         try:
             stat = stat_fn(row)
         except Exception:
             stat = ''
+        lines.append(f'{medal} **{name}** — {stat}')
 
-        medal = _MEDALS[i] if i < len(_MEDALS) else f'{i+1}.'
-        e = discord.Embed(description=f'**{stat}**', color=_SECTION_COLOR)
+    e.description = '\n'.join(lines)
 
-        av = row.get('avatar_url')
-        if av:
-            e.set_author(name=f'{medal}  {name}', icon_url=av)
-        else:
-            e.set_author(name=f'{medal}  {name}')
+    # Thumbnail = #1 person's pfp
+    av = rows[0].get('avatar_url')
+    if av:
+        e.set_thumbnail(url=av)
 
-        # Section title only on the first card
-        if i == 0:
-            e.title = title
-        # Footer (last updated) only on the last card
-        if i == len(rows) - 1 and footer:
-            e.set_footer(text=footer)
+    if footer:
+        e.set_footer(text=footer)
 
-        embeds.append(e)
-    return embeds
+    return [e]
 
 # Initialize database schema
 def _safe_alter(cur, sql):
