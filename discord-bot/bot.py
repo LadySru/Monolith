@@ -312,6 +312,9 @@ def init_database():
             )
         ''')
         _safe_alter(cur, "ALTER TABLE live_leaderboards ADD COLUMN message_ids TEXT DEFAULT '[]'")
+        # Old schema had message_id BIGINT NOT NULL — drop the constraint so new inserts don't fail
+        _safe_alter(cur, "ALTER TABLE live_leaderboards ALTER COLUMN message_id DROP NOT NULL")
+        _safe_alter(cur, "ALTER TABLE live_leaderboards ALTER COLUMN message_id SET DEFAULT 0")
 
         # ── indexes ───────────────────────────────────────────────────────────
         cur.execute('CREATE INDEX IF NOT EXISTS idx_member_stats_guild ON member_stats(guild_id)')
