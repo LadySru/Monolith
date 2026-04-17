@@ -115,7 +115,7 @@ def _fetch_leaderboard_data(guild_id: int) -> dict:
     top_reactions = cur.fetchall()
 
     cur.execute('''SELECT username, nickname, avatar_url, voice_time_seconds FROM member_stats
-        WHERE guild_id = %s AND voice_time_seconds > 0 AND is_bot IS NOT TRUE
+        WHERE guild_id = %s AND voice_time_seconds >= 60 AND is_bot IS NOT TRUE
         ORDER BY voice_time_seconds DESC LIMIT 5''', (g,))
     top_voice = cur.fetchall()
 
@@ -1260,11 +1260,16 @@ async def track_voice_activity():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Update voice time for all members based on voice_sessions
+        # Update voice time — sum completed sessions + elapsed time for any active session
         cur.execute('''
             UPDATE member_stats SET
                 voice_time_seconds = (
-                    SELECT COALESCE(SUM(duration_seconds), 0)
+                    SELECT COALESCE(SUM(
+                        CASE
+                            WHEN duration_seconds IS NOT NULL THEN duration_seconds
+                            ELSE EXTRACT(EPOCH FROM (NOW() - session_start))::INT
+                        END
+                    ), 0)
                     FROM voice_sessions
                     WHERE user_id = member_stats.user_id
                     AND guild_id = member_stats.guild_id
