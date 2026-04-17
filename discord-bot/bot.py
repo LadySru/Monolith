@@ -416,7 +416,14 @@ async def on_ready():
                 WHERE guild_id = %s AND session_end IS NULL
                   AND user_id != ALL(%s)
             ''', (guild.id, list(voice_member_ids) or [0]))
-            deleted = cur.rowcount
+            deleted_open = cur.rowcount
+
+            # Delete corrupted closed sessions where duration > 12 hours (stale data from pre-fix bot restarts)
+            cur.execute('''
+                DELETE FROM voice_sessions
+                WHERE guild_id = %s AND duration_seconds > 43200
+            ''', (guild.id,))
+            deleted_corrupt = cur.rowcount
 
             # For members currently in voice: delete old open sessions and start fresh
             for uid in voice_member_ids:
@@ -429,10 +436,24 @@ async def on_ready():
                     VALUES (%s, %s, NOW())
                 ''', (uid, guild.id))
 
+            # Recalculate voice_time_seconds for all members from clean session data only
+            cur.execute('''
+                UPDATE member_stats SET
+                    voice_time_seconds = (
+                        SELECT COALESCE(SUM(duration_seconds), 0)
+                        FROM voice_sessions
+                        WHERE user_id = member_stats.user_id
+                          AND guild_id = member_stats.guild_id
+                          AND duration_seconds IS NOT NULL
+                    ),
+                    last_updated = NOW()
+                WHERE guild_id = %s
+            ''', (guild.id,))
+
             conn.commit()
             cur.close()
             conn.close()
-            print(f"[VOICE] Deleted {deleted} stale session(s), reset {len(voice_member_ids)} active session(s)")
+            print(f"[VOICE] Deleted {deleted_open} stale open session(s), {deleted_corrupt} corrupted session(s), reset {len(voice_member_ids)} active session(s)")
     except Exception as e:
         print(f"[VOICE] Session reconcile warning: {e}")
 
@@ -1297,25 +1318,22 @@ async def track_voice_activity():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Update voice time — sum completed sessions + elapsed time for any active session
+        # Update voice time from completed sessions only; on_voice_state_update handles real-time accuracy
         cur.execute('''
             UPDATE member_stats SET
                 voice_time_seconds = (
-                    SELECT COALESCE(SUM(
-                        CASE
-                            WHEN duration_seconds IS NOT NULL THEN duration_seconds
-                            ELSE EXTRACT(EPOCH FROM (NOW() - session_start))::INT
-                        END
-                    ), 0)
+                    SELECT COALESCE(SUM(duration_seconds), 0)
                     FROM voice_sessions
                     WHERE user_id = member_stats.user_id
-                    AND guild_id = member_stats.guild_id
+                      AND guild_id = member_stats.guild_id
+                      AND duration_seconds IS NOT NULL
                 ),
                 last_updated = NOW()
             WHERE EXISTS (
                 SELECT 1 FROM voice_sessions
                 WHERE user_id = member_stats.user_id
                 AND guild_id = member_stats.guild_id
+                AND duration_seconds IS NOT NULL
             )
         ''')
 
