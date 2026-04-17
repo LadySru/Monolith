@@ -400,7 +400,7 @@ async def on_ready():
         print("[VOICE] Voice activity tracking started")
 
     # Reconcile voice sessions on startup:
-    # Close stale open sessions for members not currently in voice,
+    # Delete stale unclosed sessions for members not in voice (corrupted data),
     # then open fresh sessions for members who are currently in voice.
     try:
         for guild in bot.guilds:
@@ -410,29 +410,18 @@ async def on_ready():
             conn = get_db_connection()
             cur = conn.cursor()
 
-            # Close sessions for members who are NOT in voice (left while bot was down)
-            # Cap duration at 12 hours to avoid inflating totals from very stale sessions
+            # Delete all stale open sessions for members NOT currently in voice
             cur.execute('''
-                UPDATE voice_sessions
-                SET session_end = NOW(),
-                    duration_seconds = LEAST(
-                        EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
-                        43200
-                    )
+                DELETE FROM voice_sessions
                 WHERE guild_id = %s AND session_end IS NULL
                   AND user_id != ALL(%s)
             ''', (guild.id, list(voice_member_ids) or [0]))
+            deleted = cur.rowcount
 
-            # Open a fresh session for members currently in voice
-            # (close any old open session first, then insert a new one)
+            # For members currently in voice: delete old open sessions and start fresh
             for uid in voice_member_ids:
                 cur.execute('''
-                    UPDATE voice_sessions
-                    SET session_end = NOW(),
-                        duration_seconds = LEAST(
-                            EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
-                            43200
-                        )
+                    DELETE FROM voice_sessions
                     WHERE guild_id = %s AND user_id = %s AND session_end IS NULL
                 ''', (guild.id, uid))
                 cur.execute('''
@@ -443,7 +432,7 @@ async def on_ready():
             conn.commit()
             cur.close()
             conn.close()
-            print(f"[VOICE] Reconciled voice sessions: {len(voice_member_ids)} member(s) currently in voice")
+            print(f"[VOICE] Deleted {deleted} stale session(s), reset {len(voice_member_ids)} active session(s)")
     except Exception as e:
         print(f"[VOICE] Session reconcile warning: {e}")
 
