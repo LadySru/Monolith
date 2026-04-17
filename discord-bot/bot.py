@@ -399,6 +399,54 @@ async def on_ready():
         track_voice_activity.start()
         print("[VOICE] Voice activity tracking started")
 
+    # Reconcile voice sessions on startup:
+    # Close stale open sessions for members not currently in voice,
+    # then open fresh sessions for members who are currently in voice.
+    try:
+        for guild in bot.guilds:
+            voice_member_ids = {
+                m.id for ch in guild.voice_channels for m in ch.members if not m.bot
+            }
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+            # Close sessions for members who are NOT in voice (left while bot was down)
+            # Cap duration at 12 hours to avoid inflating totals from very stale sessions
+            cur.execute('''
+                UPDATE voice_sessions
+                SET session_end = NOW(),
+                    duration_seconds = LEAST(
+                        EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
+                        43200
+                    )
+                WHERE guild_id = %s AND session_end IS NULL
+                  AND user_id != ALL(%s)
+            ''', (guild.id, list(voice_member_ids) or [0]))
+
+            # Open a fresh session for members currently in voice
+            # (close any old open session first, then insert a new one)
+            for uid in voice_member_ids:
+                cur.execute('''
+                    UPDATE voice_sessions
+                    SET session_end = NOW(),
+                        duration_seconds = LEAST(
+                            EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
+                            43200
+                        )
+                    WHERE guild_id = %s AND user_id = %s AND session_end IS NULL
+                ''', (guild.id, uid))
+                cur.execute('''
+                    INSERT INTO voice_sessions (user_id, guild_id, session_start)
+                    VALUES (%s, %s, NOW())
+                ''', (uid, guild.id))
+
+            conn.commit()
+            cur.close()
+            conn.close()
+            print(f"[VOICE] Reconciled voice sessions: {len(voice_member_ids)} member(s) currently in voice")
+    except Exception as e:
+        print(f"[VOICE] Session reconcile warning: {e}")
+
     _load_stickies()
     _load_live_leaderboards()
 
