@@ -410,29 +410,63 @@ async def on_ready():
             conn = get_db_connection()
             cur = conn.cursor()
 
-            # Delete all stale open sessions for members NOT currently in voice
+            # 1. Close and cap any open sessions for members NOT in voice right now
             cur.execute('''
-                DELETE FROM voice_sessions
+                UPDATE voice_sessions
+                SET session_end = NOW(),
+                    duration_seconds = LEAST(
+                        EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
+                        %s
+                    )
                 WHERE guild_id = %s AND session_end IS NULL
                   AND user_id != ALL(%s)
-            ''', (guild.id, list(voice_member_ids) or [0]))
-            deleted = cur.rowcount
+            ''', (MAX_SESSION_SECONDS, guild.id, list(voice_member_ids) or [0]))
+            closed_stale = cur.rowcount
 
-            # For members currently in voice: delete old open sessions and start fresh
+            # 2. Delete any remaining closed sessions that somehow still exceed the cap
+            #    (corrupted data written before this fix was deployed)
+            cur.execute('''
+                DELETE FROM voice_sessions
+                WHERE guild_id = %s AND duration_seconds > %s
+            ''', (guild.id, MAX_SESSION_SECONDS))
+            deleted_corrupt = cur.rowcount
+
+            # 3. Reset sessions for members currently in voice: close old open session, open fresh one
             for uid in voice_member_ids:
                 cur.execute('''
-                    DELETE FROM voice_sessions
+                    UPDATE voice_sessions
+                    SET session_end = NOW(),
+                        duration_seconds = LEAST(
+                            EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
+                            %s
+                        )
                     WHERE guild_id = %s AND user_id = %s AND session_end IS NULL
-                ''', (guild.id, uid))
-                cur.execute('''
-                    INSERT INTO voice_sessions (user_id, guild_id, session_start)
-                    VALUES (%s, %s, NOW())
-                ''', (uid, guild.id))
+                ''', (MAX_SESSION_SECONDS, guild.id, uid))
+                cur.execute(
+                    'INSERT INTO voice_sessions (user_id, guild_id, session_start) VALUES (%s, %s, NOW())',
+                    (uid, guild.id)
+                )
+
+            # 4. Recalculate all members' voice totals from clean closed-session data
+            cur.execute('''
+                UPDATE member_stats SET
+                    voice_time_seconds = (
+                        SELECT COALESCE(SUM(duration_seconds), 0)
+                        FROM voice_sessions
+                        WHERE user_id = member_stats.user_id
+                          AND guild_id = member_stats.guild_id
+                          AND duration_seconds IS NOT NULL
+                    ),
+                    last_updated = NOW()
+                WHERE guild_id = %s
+            ''', (guild.id,))
 
             conn.commit()
             cur.close()
             conn.close()
-            print(f"[VOICE] Deleted {deleted} stale session(s), reset {len(voice_member_ids)} active session(s)")
+            print(f"[VOICE] Startup: closed {closed_stale} stale session(s), "
+                  f"deleted {deleted_corrupt} corrupted session(s), "
+                  f"reset {len(voice_member_ids)} active session(s), recalculated all voice totals")
     except Exception as e:
         print(f"[VOICE] Session reconcile warning: {e}")
 
@@ -574,58 +608,67 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+MAX_SESSION_SECONDS = 43200  # 12 hours — hard cap per voice session
+
+def _close_open_voice_sessions(cur, user_id: int, guild_id: int):
+    """Close any open voice sessions for a user, capped at MAX_SESSION_SECONDS."""
+    cur.execute('''
+        UPDATE voice_sessions
+        SET session_end = NOW(),
+            duration_seconds = LEAST(
+                EXTRACT(EPOCH FROM (NOW() - session_start))::INT,
+                %s
+            )
+        WHERE user_id = %s AND guild_id = %s AND session_end IS NULL
+    ''', (MAX_SESSION_SECONDS, user_id, guild_id))
+
+def _sync_voice_total(cur, user_id: int, guild_id: int, username: str, join_date):
+    """Recalculate voice_time_seconds for a user from completed sessions and write to member_stats."""
+    cur.execute('''
+        SELECT COALESCE(SUM(duration_seconds), 0)
+        FROM voice_sessions
+        WHERE user_id = %s AND guild_id = %s AND duration_seconds IS NOT NULL
+    ''', (user_id, guild_id))
+    total = cur.fetchone()[0] or 0
+    cur.execute('''
+        UPDATE member_stats SET voice_time_seconds = %s, last_updated = NOW()
+        WHERE user_id = %s AND guild_id = %s
+    ''', (total, user_id, guild_id))
+    if cur.rowcount == 0:
+        cur.execute('''
+            INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        ''', (user_id, guild_id, username, total, join_date))
+    return total
+
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # Ignore if no guild context
-    if not member.guild:
+    if not member.guild or member.bot:
         return
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        uid, gid = member.id, member.guild.id
+        join_date = member.joined_at or member.created_at
 
-        # User joined voice channel
         if before.channel is None and after.channel is not None:
-            cur.execute('''
-                INSERT INTO voice_sessions (user_id, guild_id, session_start)
-                VALUES (%s, %s, NOW())
-            ''', (member.id, member.guild.id))
+            # Joined voice — close any stale open sessions first, then open a fresh one
+            _close_open_voice_sessions(cur, uid, gid)
+            cur.execute(
+                'INSERT INTO voice_sessions (user_id, guild_id, session_start) VALUES (%s, %s, NOW())',
+                (uid, gid)
+            )
             conn.commit()
             print(f"[VOICE] {member} joined voice in {member.guild.name}")
 
-        # User left voice channel
         elif before.channel is not None and after.channel is None:
-            # Update session end time
-            cur.execute('''
-                UPDATE voice_sessions
-                SET session_end = NOW(),
-                    duration_seconds = EXTRACT(EPOCH FROM (NOW() - session_start))::INT
-                WHERE user_id = %s AND guild_id = %s AND session_end IS NULL
-            ''', (member.id, member.guild.id))
-
-            # Calculate total voice time for this user in this guild
-            cur.execute('''
-                SELECT COALESCE(SUM(duration_seconds), 0) as total_seconds
-                FROM voice_sessions
-                WHERE user_id = %s AND guild_id = %s
-            ''', (member.id, member.guild.id))
-
-            result = cur.fetchone()
-            total_voice_seconds = result[0] if result else 0
-
-            voice_join_date = member.joined_at if member.joined_at else member.created_at
-            cur.execute('''
-                UPDATE member_stats SET voice_time_seconds = %s, last_updated = NOW()
-                WHERE user_id = %s AND guild_id = %s
-            ''', (total_voice_seconds, member.id, member.guild.id))
-            if cur.rowcount == 0:
-                cur.execute('''
-                    INSERT INTO member_stats (user_id, guild_id, username, voice_time_seconds, join_date, last_updated)
-                    VALUES (%s, %s, %s, %s, %s, NOW())
-                ''', (member.id, member.guild.id, str(member), total_voice_seconds, voice_join_date))
-
+            # Left voice — close session(s) and sync total
+            _close_open_voice_sessions(cur, uid, gid)
+            total = _sync_voice_total(cur, uid, gid, str(member), join_date)
             conn.commit()
-            print(f"[VOICE] {member} left voice in {member.guild.name} - Total: {total_voice_seconds}s")
+            h, m = total // 3600, (total % 3600) // 60
+            print(f"[VOICE] {member} left voice in {member.guild.name} — total {h}h {m}m")
 
         cur.close()
         conn.close()
@@ -1297,27 +1340,26 @@ async def track_voice_activity():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Update voice time — sum completed sessions + elapsed time for any active session
+        # Safety sync: recalculate totals from completed sessions only.
+        # on_voice_state_update handles real-time accuracy; this is a periodic catch-up.
         cur.execute('''
             UPDATE member_stats SET
                 voice_time_seconds = (
-                    SELECT COALESCE(SUM(
-                        CASE
-                            WHEN duration_seconds IS NOT NULL THEN duration_seconds
-                            ELSE EXTRACT(EPOCH FROM (NOW() - session_start))::INT
-                        END
-                    ), 0)
+                    SELECT COALESCE(SUM(duration_seconds), 0)
                     FROM voice_sessions
                     WHERE user_id = member_stats.user_id
-                    AND guild_id = member_stats.guild_id
+                      AND guild_id = member_stats.guild_id
+                      AND duration_seconds IS NOT NULL
+                      AND duration_seconds <= %s
                 ),
                 last_updated = NOW()
             WHERE EXISTS (
                 SELECT 1 FROM voice_sessions
                 WHERE user_id = member_stats.user_id
-                AND guild_id = member_stats.guild_id
+                  AND guild_id = member_stats.guild_id
+                  AND duration_seconds IS NOT NULL
             )
-        ''')
+        ''', (MAX_SESSION_SECONDS,))
 
         conn.commit()
         cur.close()
