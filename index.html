@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social — A home for curious gamers exploring indie, international, and hidden gem games. Low-pressure Discord community."/>
-  <meta property="og:title" content="Monolith Social — Indie Game Discovery"/>
-  <meta property="og:description" content="Find your niche. Discover indie games. Share what no one knows."/>
+  <meta name="description" content="Monolith Social — An 18+ Discord community for blerds and nerds passionate about gaming, comics, anime, and the culture around it."/>
+  <meta property="og:title" content="Monolith Social — Nerds & Gamers"/>
+  <meta property="og:description" content="An 18+ space for blerds and nerds who are passionate about gaming, comics, anime, and media."/>
   <meta property="og:image" content="banner.jpg"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <title>Monolith Social — Indie Game Discovery</title>
+  <title>Monolith Social — Nerds & Gamers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap&amp;font-display=swap" rel="stylesheet"/>
@@ -210,8 +210,8 @@
 
     /* ═══════ FEATURES ═══════ */
     #features { background: var(--bg); border-top: 1px solid var(--border); }
-    .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; overflow: hidden; }
-    .feat { background: var(--card); padding: 32px 26px; position: relative; overflow: hidden; transition: background .15s; border: 1px solid var(--border); }
+    .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 48px; }
+    .feat { background: var(--card); padding: 28px 24px; position: relative; overflow: hidden; transition: background .15s; border: 1px solid var(--border2); }
     .feat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--fc, var(--teal)); transform: scaleX(0); transform-origin: left; transition: transform .25s; }
     .feat:hover { background: var(--card2); }
     .feat:hover::before { transform: scaleX(1); }
@@ -222,8 +222,8 @@
 
     /* ═══════ INSIDE ═══════ */
     #inside { background: var(--bg2); border-top: 1px solid var(--border); }
-    .inside-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 44px; }
-    .inside-card { background: var(--card); border: 1px solid var(--border2); padding: 24px 20px; display: flex; align-items: flex-start; gap: 14px; transition: border-color .15s, background .15s; }
+    .inside-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 48px; }
+    .inside-card { background: var(--card); border: 1px solid var(--border2); padding: 28px 24px; display: flex; align-items: flex-start; gap: 16px; transition: border-color .15s, background .15s; }
     .inside-card:hover { border-color: var(--teal); background: var(--card2); }
     .inside-icon { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: var(--teal-dim); border: 1px solid rgba(0,255,231,.2); border-radius: 2px; }
     .inside-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .62rem; color: var(--text); margin-bottom: 8px; letter-spacing: 1px; }
@@ -263,8 +263,8 @@
     @media (max-width: 768px) { .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; } }
 
     /* ═══════ MEDIA SECTION ═══════ */
-    .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
-    .media-card { background: var(--card); border: 1px solid var(--border2); padding: 24px 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s, background .15s; }
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 48px; }
+    .media-card { background: var(--card); border: 1px solid var(--border2); padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s, background .15s; }
     .media-card:hover { border-color: var(--teal); background: var(--card2); }
     .media-icon { font-size: 2rem; line-height: 1; min-height: 56px; display: flex; align-items: center; }
     .media-logo { max-height: 56px; max-width: 100%; object-fit: contain; object-position: left center; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
@@ -409,13 +409,13 @@
           <img src="avatar.webp" alt="Your Avatar" class="hero-av" aria-hidden="true"/>
           <span class="hero-av-live" aria-hidden="true"></span>
         </div>
-        <span class="eyebrow">Fighting Games · FFXIV · Media Analysis</span>
+        <span class="eyebrow">Nerds · Gamers · Blerds</span>
         <h1>
           <span class="line1">Monolith</span>
           <span class="line2">Social</span>
         </h1>
-        <p class="hero-hook">A Low-Noise Hub for Adults Who Play With Intent.</p>
-        <p class="hero-tagline">For adults who want to lab matches, run content, and talk narrative depth without the noise of massive public servers. Real life comes first — but dead weight gets cut.</p>
+        <p class="hero-hook">An 18+ Space for Blerds and Nerds.</p>
+        <p class="hero-tagline">A community for people passionate about their interests — gaming, comics, anime, and the culture that connects us. Low noise. High intent. Your people are here.</p>
         <div class="hero-cta">
           <a href="#who" class="btn-primary" aria-label="See who this is for">
             <svg class="icon" aria-hidden="true" width="18" height="18"><use href="#icon-arrow-right"></use></svg>
@@ -733,16 +733,7 @@
           </div>
         </div>
 
-        <div class="media-card">
-          <div class="media-icon">⚔️</div>
-          <div class="media-info">
-            <div class="media-title">The Odyssey</div>
-            <div class="media-sub">Epic Poetry · Literature · Mythology</div>
-            <p class="media-desc">Homer's Odyssey, the myths around it, and what it still means. We run actual literary analysis threads — not surface-level Wikipedia takes.</p>
-          </div>
-        </div>
-
-        <div class="media-card">
+<div class="media-card">
           <div class="media-icon">📚</div>
           <div class="media-info">
             <div class="media-title">Comics &amp; Graphic Novels</div>
