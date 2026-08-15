@@ -155,13 +155,11 @@
         url('banner.jpg') center/cover no-repeat, var(--bg);
       filter: brightness(.32) saturate(.6);
     }
-    /* Static grid — no scroll animation */
     .hero-grid {
       position: absolute; inset: 0; z-index: 0;
       background-image: linear-gradient(rgba(255,228,0,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(255,228,0,0.06) 1px,transparent 1px);
       background-size: 40px 40px;
       mask-image: linear-gradient(180deg,transparent 0%,rgba(0,0,0,.4) 40%,rgba(0,0,0,.8) 100%);
-      /* removed gridScroll animation */
     }
     .hero-vignette {
       position: absolute; inset: 0; z-index: 1;
@@ -170,7 +168,6 @@
         linear-gradient(180deg, rgba(2,0,10,.55) 0%, rgba(2,0,10,.15) 35%, rgba(2,0,10,.55) 70%, rgba(2,0,10,.92) 100%);
     }
 
-    /* Static blobs — no blur filter (GPU expensive), use opacity only */
     .shape { position: absolute; border-radius: 50%; z-index: 0; }
     .s1 { width:320px; height:320px; background:radial-gradient(circle, rgba(139,47,255,0.18) 0%, transparent 70%); top:6%;  left:2%; }
     .s2 { width:240px; height:240px; background:radial-gradient(circle, rgba(255,0,170,0.12) 0%, transparent 70%); top:52%; right:4%; }
@@ -249,8 +246,7 @@
 
     /* ═══════ GAMES ═══════ */
     #games { background: var(--bg); border-top: 1px solid var(--border); }
-    .games-hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
-    .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 48px; }
     .game-card { position: relative; overflow: hidden; aspect-ratio: 2/3; border: 2px solid var(--border2); background: var(--card); transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .15s, box-shadow .15s; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
     .game-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--amber); box-shadow: 6px 6px 0 rgba(0,0,0,0.9), 0 0 20px rgba(255,228,0,0.2); }
     .game-hover-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(2,0,10,.0) 0%, rgba(2,0,10,.85) 45%, rgba(2,0,10,.97) 100%); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 16px 12px; opacity: 0; transition: opacity .25s ease; pointer-events: none; }
@@ -260,189 +256,28 @@
     .game-hover-badge.release { background: rgba(255,45,107,.15); color: var(--red); border: 1px solid rgba(255,45,107,.3); }
     .game-hover-date { font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 900; color: #fff; margin: 4px 0 8px; letter-spacing: 1px; }
     .game-hover-divider { width: 40px; height: 1px; background: rgba(255,255,255,.15); margin: 4px 0 8px; }
-    .game-hover-desc { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: var(--text2); line-height: 1.4; }
-    .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
-    .g1{background:linear-gradient(160deg,#1a0808,#300)} .g2{background:linear-gradient(160deg,#080816,#14143a)} .g3{background:linear-gradient(160deg,#001a18,#003530)} .g4{background:linear-gradient(160deg,#071a03,#0d3008)} .g5{background:linear-gradient(160deg,#1a1500,#342900)}
-    .game-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; contain: layout style paint; }
-    .game-card:hover .game-img { transform: scale(1.06); }
+    .game-hover-desc { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: var(--text2); line-height: 1.4; text-align: center; }
+    .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
     .game-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg,rgba(5,3,15,.97) 0%,transparent 100%); padding: 16px 10px 10px; }
     .game-title { font-family: var(--font-pixel) !important; font-weight: 700; font-size: .5rem; color: var(--text); line-height: 1.5; letter-spacing: .5px; }
     .game-genre { font-family: var(--font-pixel) !important; font-size: .38rem; color: var(--amber); letter-spacing: 1px; margin-top: 4px; }
-    .game-status-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-    .game-status-tag {
-      font-family: 'Orbitron', monospace;
-      font-size: .45rem;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 2px;
-      border: 1px solid transparent;
-    }
-    .game-status-tag.open { color: var(--teal); background: rgba(0,255,231,.12); border-color: rgba(0,255,231,.28); }
-    .game-status-tag.closed { color: #cbbfff; background: rgba(139,47,255,.14); border-color: rgba(139,47,255,.3); }
-    .game-ribbons {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .game-ribbon {
-      position: relative;
-      font-family: 'Orbitron', monospace;
-      font-size: .46rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 4px 8px 4px 10px;
-      border: 1px solid transparent;
-      background: rgba(2,0,10,.86);
-      backdrop-filter: blur(1px);
-    }
-    .game-ribbon::after {
-      content: '';
-      position: absolute;
-      right: -8px;
-      top: 0;
-      width: 0;
-      height: 0;
-      border-top: 11px solid transparent;
-      border-bottom: 11px solid transparent;
-      border-left: 8px solid currentColor;
-      opacity: .28;
-    }
-    .game-ribbon.open {
-      color: var(--teal);
-      border-color: rgba(0,255,231,.28);
-      background: rgba(0,255,231,.1);
-    }
-    .game-ribbon.closed {
-      color: #d5c8ff;
-      border-color: rgba(139,47,255,.35);
-      background: rgba(139,47,255,.16);
-    }
-    .game-card.invincible-card .game-ribbons {
-      top: 0;
-      left: 0;
-      right: 0;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0;
-      border-bottom: 1px solid rgba(139,47,255,.35);
-    }
-    .game-card.invincible-card .game-ribbon {
-      padding: 6px 6px;
-      text-align: center;
-      border: 0;
-      border-radius: 0;
-      backdrop-filter: none;
-      background: rgba(139,47,255,.92);
-    }
-    .game-card.invincible-card .game-ribbon::after {
-      display: none;
-    }
-    .game-card.invincible-card .game-ribbon.open {
-      color: #f2e9ff;
-      border-right: 0;
-      background: rgba(139,47,255,.95);
-    }
-    .game-card.invincible-card .game-ribbon.closed {
-      color: #f2e9ff;
-      background: rgba(116,36,170,.95);
-    }
-    .game-card.invincible-card { overflow: visible; }
-    .invincible-top-tail {
-      position: absolute;
-      top: -24px;
-      left: 0;
-      right: 0;
-      z-index: 4;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border: 1px solid rgba(139,47,255,.55);
-      border-bottom: none;
-      background: rgba(129,46,189,.95);
-      clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 8px 100%);
-      box-shadow: 0 0 14px rgba(139,47,255,.4), 0 0 26px rgba(139,47,255,.18);
-      opacity: 0;
-      transform: translateY(-8px);
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
-    }
-    .game-card.invincible-card:hover .invincible-top-tail,
-    .game-card.invincible-card.locked .invincible-top-tail {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .invincible-top-tail::before,
-    .invincible-top-tail::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      width: 0;
-      height: 0;
-      border-top: 8px solid rgba(129,46,189,.95);
-    }
-    .invincible-top-tail::before {
-      left: 0;
-      border-right: 8px solid transparent;
-    }
-    .invincible-top-tail::after {
-      right: 0;
-      border-left: 8px solid transparent;
-    }
-    .invincible-top-tail span {
-      font-family: 'Orbitron', monospace;
-      font-size: .44rem;
-      letter-spacing: 1.3px;
-      color: #f3ebff;
-      text-align: center;
-      padding: 5px 4px;
-      border-right: 1px solid rgba(255,255,255,.16);
-      text-shadow: 0 0 8px rgba(255,255,255,.22);
-    }
-    .invincible-top-tail span:last-child { border-right: none; }
-    .invincible-bottom-tail {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -22px;
-      z-index: 4;
-      font-family: 'Orbitron', monospace;
-      font-size: .48rem;
-      letter-spacing: 1.8px;
-      color: #ffd9ec;
-      text-align: center;
-      padding: 5px 4px;
-      border: 1px solid rgba(255,45,107,.45);
-      background: rgba(162,27,92,.9);
-      clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
-      box-shadow: 0 0 12px rgba(255,45,107,.35), 0 0 24px rgba(255,45,107,.15);
-      text-shadow: 0 0 8px rgba(255,255,255,.2);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
-    }
-    .game-card.invincible-card:hover .invincible-bottom-tail,
-    .game-card.invincible-card.locked .invincible-bottom-tail {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    @media (min-width: 1025px) {
-      .games-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-        row-gap: 36px;
-      }
-      .game-hover-desc { display: none; }
-    }
+    @media (min-width: 1025px) { .games-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+    @media (max-width: 768px) { .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; } }
+
+    /* ═══════ MEDIA SECTION ═══════ */
+    .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
+    .media-card { background: var(--card); border: 2px solid var(--border2); padding: 24px 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s, background .15s, transform .1s, box-shadow .1s; box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
+    .media-card:hover { border-color: var(--amber); background: var(--card2); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.9), 0 0 16px rgba(255,228,0,0.1); }
+    .media-icon { font-size: 2rem; line-height: 1; }
+    .media-title { font-family: var(--font-pixel) !important; font-size: .6rem; color: var(--text); line-height: 1.6; letter-spacing: 1px; margin-bottom: 4px; }
+    .media-sub { font-family: var(--font-pixel) !important; font-size: .38rem; color: var(--amber); letter-spacing: 1px; margin-bottom: 10px; }
+    .media-desc { font-size: 1rem; color: var(--text2); line-height: 1.7; }
+    @media (max-width: 1024px) { .media-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .media-grid { grid-template-columns: 1fr; } }
+
     /* ═══════ MOBILE RESPONSIVE ═══════ */
     @media (max-width: 1024px) {
       .wrap { padding: 0 32px; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
       .feat-grid { grid-template-columns: repeat(2,1fr); }
       .inside-grid { grid-template-columns: 1fr; }
       .channels-grid { grid-template-columns: repeat(2,1fr); }
@@ -452,7 +287,6 @@
       nav { padding: 0 16px; }
       .nav-hamburger { display: flex; }
       .nav-r > :not(.nav-hamburger) { display: none; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
       .feat-grid { grid-template-columns: 1fr; }
       .hero-stats { flex-direction: column; }
       .stat { border-right: none; border-bottom: 1px solid rgba(0,255,231,.15); }
@@ -460,93 +294,16 @@
       .server-info { flex-direction: column; gap: 12px; }
       .channels-grid { grid-template-columns: 1fr; }
       .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
-      /* Open Beta ribbon — bigger & readable on mobile */
-      .game-ribbon { font-size: .65rem; letter-spacing: 1px; padding: 5px 10px 5px 12px; }
-      .game-card.invincible-card .game-ribbon { font-size: .65rem; padding: 7px 10px; }
-      .invincible-top-tail span { font-size: .55rem; letter-spacing: 1px; }
-      .invincible-bottom-tail { font-size: .58rem; letter-spacing: 1.2px; }
     }
-    /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
-    .game-card-wrapper {
-      position: relative;
-      height: fit-content;
-    }
-    .game-card-sequel {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      margin-top: 8px;
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
-      transition: opacity .3s ease, transform .3s ease;
-      pointer-events: none;
-      z-index: 10;
-      visibility: hidden;
-    }
-    .game-card-wrapper:hover .game-card-sequel {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .game-card-sequel .game-card {
-      margin: 0;
-    }
-
-    /* ═══════ SEQUEL INDICATOR ═══════ */
-    .sequel-indicator {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      font-size: 1.2rem;
-      color: var(--teal);
-      opacity: 0;
-      transform: translateX(0);
-      transition: opacity .3s, transform .3s, color .3s;
-      font-weight: 700;
-      text-shadow: 0 0 8px rgba(0,255,231,.3);
-      z-index: 3;
-      cursor: pointer;
-      user-select: none;
-    }
-    .game-card.has-sequel:hover .sequel-indicator {
-      opacity: 1;
-      transform: translateX(4px);
-    }
-    .sequel-indicator.active {
-      opacity: 1;
-      color: var(--green);
-      text-shadow: 0 0 12px rgba(57,255,138,.5);
-      transform: translateX(8px) rotate(90deg);
-    }
-    .game-card-sequel.active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-      visibility: visible;
-    }
-
-    @media (max-width: 768px) {
-      .sequel-indicator {
-        font-size: 1rem;
-        bottom: 10px;
-        right: 10px;
-        /* Always visible on touch screens so users can tap to toggle */
-        opacity: 0.75;
-      }
-    }
-
     @media (max-width: 480px) {
       .wrap { padding: 0 16px; }
       nav { padding: 0 12px; }
       .nav-name { font-size: .86rem !important; letter-spacing: 2px !important; }
       .section-pad { padding: 64px 0; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
       h1 { font-size: clamp(2rem, 6vw, 3.5rem); }
       h2 { font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
     }
-  
+
     .scroll-cue{left:auto !important;right:18px !important;bottom:22px !important;transform:none !important;width:34px !important;height:34px !important;display:grid !important;place-items:center !important;border:2px solid rgba(255,228,0,.4) !important;background:rgba(0,0,0,.6) !important;cursor:pointer !important;transition:border-color .15s, box-shadow .15s !important;box-shadow:2px 2px 0 rgba(0,0,0,0.9) !important;}
     .scroll-cue:hover{border-color:var(--amber) !important;box-shadow:3px 3px 0 rgba(0,0,0,0.9), 0 0 12px rgba(255,228,0,.3) !important;}
     .scroll-cue::after{content:'\2193' !important;color:var(--amber) !important;font-size:.9rem !important;line-height:1 !important;}
@@ -576,112 +333,41 @@
       margin-bottom: 12px;
       display: block;
     }
-    .control-group {
-      margin-bottom: 14px;
-    }
-    .control-group:last-child {
-      margin-bottom: 0;
-    }
-    .toggle-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .control-group { margin-bottom: 14px; }
+    .control-group:last-child { margin-bottom: 0; }
+    .toggle-group { display: flex; align-items: center; gap: 10px; }
     .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: rgba(255,228,0,.1);
-      border: 2px solid rgba(255,228,0,.25);
-      border-radius: 0;
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
-      flex-shrink: 0;
+      position: relative; width: 44px; height: 24px;
+      background: rgba(255,228,0,.1); border: 2px solid rgba(255,228,0,.25);
+      border-radius: 0; cursor: pointer; transition: background .15s, border-color .15s; flex-shrink: 0;
     }
-    .toggle-switch.enabled {
-      background: rgba(255,228,0,.2);
-      border-color: rgba(255,228,0,.5);
-    }
+    .toggle-switch.enabled { background: rgba(255,228,0,.2); border-color: rgba(255,228,0,.5); }
     .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 16px;
-      background: var(--amber);
-      border-radius: 0;
-      top: 2px;
-      left: 2px;
-      transition: left .15s;
+      content: ''; position: absolute; width: 18px; height: 16px;
+      background: var(--amber); border-radius: 0; top: 2px; left: 2px; transition: left .15s;
     }
-    .toggle-switch.enabled::after {
-      left: 22px;
-    }
-    .toggle-label {
-      font-size: .75rem;
-      color: var(--text);
-      flex: 1;
-    }
-    .intensity-slider-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .intensity-label {
-      font-size: .7rem;
-      color: var(--text2);
-      letter-spacing: 1px;
-    }
-    .slider-value {
-      color: var(--teal);
-      font-weight: 600;
-    }
+    .toggle-switch.enabled::after { left: 22px; }
+    .toggle-label { font-size: .75rem; color: var(--text); flex: 1; }
+    .intensity-slider-group { display: flex; flex-direction: column; gap: 8px; }
+    .intensity-label { font-size: .7rem; color: var(--text2); letter-spacing: 1px; }
+    .slider-value { color: var(--teal); font-weight: 600; }
     input[type="range"] {
-      width: 100%;
-      height: 4px;
-      border-radius: 0;
-      background: rgba(255,228,0,.2);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
+      width: 100%; height: 4px; border-radius: 0; background: rgba(255,228,0,.2);
+      outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
     }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 0;
-      background: var(--amber);
-      cursor: pointer;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+      -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+      border-radius: 0; background: var(--amber); cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 0;
-      background: var(--amber);
-      cursor: pointer;
-      border: none;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+      width: 14px; height: 14px; border-radius: 0; background: var(--amber);
+      cursor: pointer; border: none; box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
     }
     @media (max-width: 768px) {
-      .particle-controls {
-        top: 64px;
-        right: 10px;
-        min-width: 180px;
-        padding: 12px;
-      }
-      .toggle-switch {
-        width: 40px;
-        height: 22px;
-      }
-      .toggle-switch::after {
-        width: 16px;
-        height: 16px;
-      }
-      .toggle-switch.enabled::after {
-        left: 22px;
-      }
+      .particle-controls { top: 64px; right: 10px; min-width: 180px; padding: 12px; }
+      .toggle-switch { width: 40px; height: 22px; }
+      .toggle-switch::after { width: 16px; height: 16px; }
+      .toggle-switch.enabled::after { left: 22px; }
     }
 </style>
 </head>
@@ -706,7 +392,7 @@
     </div>
   </nav>
 
-  <!-- MOBILE MENU (hidden by default) -->
+  <!-- MOBILE MENU -->
   <div class="nav-mobile">
     <a href="index.html" class="nav-link active">Home</a>
     <a href="arcade.html" class="nav-link">Arcade</a>
@@ -733,23 +419,15 @@
         <p class="hero-tagline">For adults who want to lab matches, run content, and talk narrative depth without the noise of massive public servers. Real life comes first — but dead weight gets cut.</p>
         <div class="hero-cta">
           <a href="#who" class="btn-primary" aria-label="See who this is for">
-            <svg class="icon" aria-hidden="true" width="18" height="18">
-              <use href="#icon-arrow-right"></use>
-            </svg>
+            <svg class="icon" aria-hidden="true" width="18" height="18"><use href="#icon-arrow-right"></use></svg>
             Who This Is For
           </a>
           <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Monolith Social Discord">Join Us</a>
         </div>
         <div class="server-info">
-          <div class="server-stat">
-            <span class="server-online">&#x1F7E2; 50 Online</span>
-          </div>
-          <div class="server-stat">
-            <span class="server-members">&#x1F465; 322 Members</span>
-          </div>
-          <div class="server-stat">
-            <span class="server-est">Est. Jul 2021</span>
-          </div>
+          <div class="server-stat"><span class="server-online">&#x1F7E2; 50 Online</span></div>
+          <div class="server-stat"><span class="server-members">&#x1F465; 322 Members</span></div>
+          <div class="server-stat"><span class="server-est">Est. Jul 2021</span></div>
         </div>
         <div class="scroll-cue" aria-hidden="true"></div>
       </div>
@@ -762,7 +440,7 @@
     <div class="shape s3"></div>
   </section>
 
-  <!-- WHO THIS IS FOR SECTION -->
+  <!-- WHO THIS IS FOR -->
   <section id="who" class="section-pad">
     <div class="wrap">
       <div class="reveal">
@@ -902,148 +580,159 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">Active Titles</span>
-        <h2>What We're <em>Actually Playing</em></h2>
-        <p class="sec-sub">The games on rotation right now. These aren't recommendations — members are actively in these.</p>
+        <h2>The <em>Fight Games</em> We Run</h2>
+        <p class="sec-sub">These are the games we're actually in — labbing, running sets, and talking matchups. No casual list padding.</p>
       </div>
-      <div class="games-hdr reveal">
-        <div class="games-tags">
-          <span class="tag">Action</span>
-          <span class="tag">Adventure</span>
-          <span class="tag">FPS</span>
-          <span class="tag">MMORPG</span>
-          <span class="tag">Puzzle</span>
+      <div class="games-grid reveal">
+
+        <div class="game-card" style="background:linear-gradient(160deg,#1a0505,#3d0000);">
+          <div class="game-fb">🥊</div>
+          <div class="game-label">
+            <div class="game-title">Street Fighter 6</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge release">LIVE</div>
+              <div class="game-hover-date">2023</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">The new standard for competitive 2D fighters. Drive System, Modern Controls, World Tour.</div>
+            </div>
+          </div>
         </div>
-        <a href="#" class="btn-primary" aria-label="View All Games">
-          <svg class="icon" aria-hidden="true" width="18" height="18">
-            <use href="#icon-arrow-right"></use>
-          </svg>
-          View All Games
-        </a>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#05050f,#12003d);">
+          <div class="game-fb">⚡</div>
+          <div class="game-label">
+            <div class="game-title">Tekken 8</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge release">LIVE</div>
+              <div class="game-hover-date">2024</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">3D king is back. Heat System, aggressive gameplay, and the Mishima legacy continues.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#1a0800,#3d1800);">
+          <div class="game-fb">💥</div>
+          <div class="game-label">
+            <div class="game-title">Invincible VS</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">NEW</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Fast brutal battles from the Invincible universe. The community's most hyped release right now.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#150010,#3d0020);">
+          <div class="game-fb">🕷️</div>
+          <div class="game-label">
+            <div class="game-title">Marvel Tōkon</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">UPCOMING</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Marvel universe collides in a tag-based fighter. The roster drops are unreal.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#00101a,#002535);">
+          <div class="game-fb">🌊</div>
+          <div class="game-label">
+            <div class="game-title">Avatar Legends</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">UPCOMING</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Bending meets brawling. Avatar-universe fighter — one of the most anticipated titles on our radar.</div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="games-grid">
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('download.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Hotline Miami</div>
-              <div class="game-genre">Action</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge beta">CLASSIC</div>
-              <div class="game-hover-date">Retro Indie</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Brutal top-down action with an unforgettable soundtrack. A cult classic for indie game enthusiasts.</div>
-            </div>
-          </div>
-        </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('dead-by-daylight-1db3d.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Dead by Daylight</div>
-              <div class="game-genre">Survival Horror</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge release">POPULAR</div>
-              <div class="game-hover-date">2016</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Asymmetrical multiplayer horror. Hide or hunt in this twisted game of cat and mouse.</div>
-            </div>
+    </div>
+  </section>
+
+  <!-- MEDIA & CULTURE SECTION -->
+  <section id="media" class="section-pad" style="background: var(--bg2); border-top: 1px solid var(--border);">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="sec-tag">Beyond the Controller</span>
+        <h2>What We <em>Watch, Read &amp; Obsess</em> Over</h2>
+        <p class="sec-sub">This community isn't just gamers. We're comic heads, lore nerds, and narrative obsessives. Here's what's in the rotation.</p>
+      </div>
+      <div class="media-grid reveal">
+
+        <div class="media-card">
+          <div class="media-icon">🟡</div>
+          <div class="media-info">
+            <div class="media-title">Invincible</div>
+            <div class="media-sub">Amazon · Comics · Robert Kirkman</div>
+            <p class="media-desc">The show that broke everyone. We break down every episode, every arc, every brutal twist. Kirkman's run is required reading here.</p>
           </div>
         </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('miku_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Hatsune Miku Logic Paint</div>
-              <div class="game-genre">Puzzle / Rhythm</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge">NEW</div>
-              <div class="game-hover-date">Anime Strategy</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Paint and solve puzzles to Miku's iconic songs. A unique blend of rhythm and logic.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">🕷️</div>
+          <div class="media-info">
+            <div class="media-title">Marvel</div>
+            <div class="media-sub">Comics · MCU · Animated</div>
+            <p class="media-desc">From 616 deep dives to MCU timeline debates. Spider-Man psychology, X-Men lore, and the comics that actually slap.</p>
           </div>
         </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('saya_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">The Song of Saya</div>
-              <div class="game-genre">Visual Novel</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge">INDIE GEM</div>
-              <div class="game-hover-date">Deep Story</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">A haunting visual novel that explores themes of isolation and connection. Unforgettable narrative.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">🦷</div>
+          <div class="media-info">
+            <div class="media-title">DC</div>
+            <div class="media-sub">Comics · Animated · Film</div>
+            <p class="media-desc">Batman arcs, Justice League lore, and the animated universe that still holds up. DC comics run deeper than most people give them credit for.</p>
           </div>
         </div>
-        <div class="game-card-wrapper">
-          <div class="game-card reveal has-sequel">
-            <div class="game-link">
-              <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-              <div class="sequel-indicator" aria-label="More versions available">→</div>
-              <div class="game-label">
-                <div class="game-title">Death Stranding</div>
-                <div class="game-genre">Action Adventure</div>
-              </div>
-            </div>
-            <div class="game-hover-overlay">
-              <div class="game-hover-content">
-                <div class="game-hover-badge release">GAME</div>
-                <div class="game-hover-date">2019</div>
-                <div class="game-hover-divider"></div>
-                <div class="game-hover-desc">Kojima's surreal masterpiece. Connect the disconnected in this bold, experimental adventure.</div>
-              </div>
-            </div>
-          </div>
-          <div class="game-card-sequel">
-            <div class="game-card">
-              <div class="game-link">
-                <div class="game-img" style="background-image:url('MV5BYmVkNDM3MzUtN2YyYS00MDg0LWIxN2EtMjQ2ZGQ1ZDhlZWY4XkEyXkFqcGc@._V1_.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-                <div class="game-label">
-                  <div class="game-title">Death Stranding 2</div>
-                  <div class="game-genre">Action Adventure</div>
-                </div>
-              </div>
-              <div class="game-hover-overlay">
-                <div class="game-hover-content">
-                  <div class="game-hover-badge release">Game</div>
-                  <div class="game-hover-date">2025</div>
-                  <div class="game-hover-divider"></div>
-                  <div class="game-hover-desc">The continuation of Kojima's vision. A new journey awaits.</div>
-                </div>
-              </div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">⚔️</div>
+          <div class="media-info">
+            <div class="media-title">The Odyssey</div>
+            <div class="media-sub">Epic Poetry · Literature · Mythology</div>
+            <p class="media-desc">Homer's Odyssey, the myths around it, and what it still means. We run actual literary analysis threads — not surface-level Wikipedia takes.</p>
           </div>
         </div>
-        <div class="game-card reveal invincible-card">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('invincible_vs.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Invincible vs</div>
-              <div class="game-genre">Action / Fighting</div>
-            </div>
-            <div class="invincible-bottom-tail" aria-hidden="true">RELEASE: APRIL 30TH</div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Fast-paced battles inspired by the Invincible universe. Full release April 30th.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">📚</div>
+          <div class="media-info">
+            <div class="media-title">Comics &amp; Graphic Novels</div>
+            <div class="media-sub">Indie · Manga · Big Two</div>
+            <p class="media-desc">Saga, Sandman, Berserk, One Piece — if it's got panels and substance, we're reading it and we're talking about it.</p>
           </div>
         </div>
+
+        <div class="media-card">
+          <div class="media-icon">🎬</div>
+          <div class="media-info">
+            <div class="media-title">Film &amp; Anime</div>
+            <div class="media-sub">Analysis · Rankings · Deep Dives</div>
+            <p class="media-desc">From Akira to Everything Everywhere. If a piece of media has something worth dissecting, it's fair game. No gatekeeping on genre.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1061,20 +750,18 @@
     </div>
   </div>
 
-  <!-- JS LIBRARIES (if any) -->
   <script src="script.js" defer="defer"></script>
   <script src="discord-live-stats.js" defer="defer"></script>
   <script src="particle-controls.js" defer="defer"></script>
   <script>
   (function(){
     function getEmoji(el){ var m = el.textContent.match(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u); return m ? m[0] : '✨'; }
-
     function spawnBurst(x, y, emoji, count){
       for(var i=0;i<count;i++){
         var p = document.createElement('span');
         p.className = 'emoji-rise';
-        var spread = (Math.random()-0.5) * (60 + count*4);  // wider spread at higher counts
-        var rise = 80 + Math.random() * (80 + count*6);      // higher rise at higher counts
+        var spread = (Math.random()-0.5) * (60 + count*4);
+        var rise = 80 + Math.random() * (80 + count*6);
         var size = 1.2 + Math.random() * 0.8 + (count > 6 ? 0.4 : 0);
         var dur = (0.7 + Math.random()*0.5) + 's';
         p.textContent = emoji;
@@ -1083,25 +770,20 @@
         p.addEventListener('animationend',function(){this.remove();});
       }
     }
-
     document.querySelectorAll('.channel-tag').forEach(function(el){
       var emoji = getEmoji(el);
       var heat = 0, lastClick = 0, decayTimer = null;
-
       function fire(x, y){
         var now = Date.now();
         var gap = now - lastClick;
         lastClick = now;
-        // rapid taps/clicks build heat (max 8), slow inputs cool it
         if(gap < 400) heat = Math.min(heat + 1.2, 8);
         else heat = Math.max(heat - 1, 0);
-        var count = Math.round(2 + heat * 1.5);  // 2 at cold, up to ~14 at max heat
+        var count = Math.round(2 + heat * 1.5);
         spawnBurst(x, y, emoji, count);
         clearTimeout(decayTimer);
         decayTimer = setTimeout(function(){ heat = 0; }, 1200);
       }
-
-      // desktop click + hold (fires repeatedly while held)
       var holdTimer = null;
       el.addEventListener('mousedown', function(e){
         var r = el.getBoundingClientRect();
@@ -1112,8 +794,6 @@
         }, 180);
       });
       document.addEventListener('mouseup', function(){ clearInterval(holdTimer); });
-
-      // mobile tap
       el.addEventListener('touchstart', function(e){
         var t = e.touches[0];
         fire(t.clientX, t.clientY);
