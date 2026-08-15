@@ -254,17 +254,20 @@
     .game-hover-divider { width: 40px; height: 1px; background: rgba(255,255,255,.15); margin: 4px 0 8px; }
     .game-hover-desc { font-family: 'Rajdhani', sans-serif !important; font-size: .88rem; color: var(--text2); line-height: 1.4; text-align: center; }
     .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .game-logo { max-width: 80%; max-height: 55%; object-fit: contain; filter: drop-shadow(0 2px 16px rgba(0,0,0,0.9)); display: block; }
+    .game-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
     .game-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg,rgba(5,3,15,.97) 0%,transparent 100%); padding: 16px 10px 10px; }
     .game-title { font-family: 'Orbitron', monospace !important; font-weight: 700; font-size: .56rem; color: var(--text); line-height: 1.5; letter-spacing: .5px; }
     .game-genre { font-family: 'Orbitron', monospace !important; font-size: .46rem; color: var(--teal); letter-spacing: 1px; margin-top: 4px; }
-    @media (min-width: 1025px) { .games-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+    @media (min-width: 1025px) { .games-grid { grid-template-columns: repeat(6, 1fr); gap: 20px; } }
     @media (max-width: 768px) { .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; } }
 
     /* ═══════ MEDIA SECTION ═══════ */
     .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
     .media-card { background: var(--card); border: 1px solid var(--border2); padding: 24px 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s, background .15s; }
     .media-card:hover { border-color: var(--teal); background: var(--card2); }
-    .media-icon { font-size: 2rem; line-height: 1; }
+    .media-icon { font-size: 2rem; line-height: 1; min-height: 56px; display: flex; align-items: center; }
+    .media-logo { max-height: 56px; max-width: 100%; object-fit: contain; object-position: left center; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
     .media-title { font-family: 'Orbitron', monospace !important; font-size: .62rem; color: var(--text); line-height: 1.4; letter-spacing: 1px; margin-bottom: 4px; }
     .media-sub { font-family: 'Orbitron', monospace !important; font-size: .46rem; color: var(--teal); letter-spacing: 1px; margin-bottom: 10px; }
     .media-desc { font-size: 1rem; color: var(--text2); line-height: 1.7; }
@@ -576,13 +579,14 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">Active Titles</span>
-        <h2>The <em>Fight Games</em> We Run</h2>
-        <p class="sec-sub">These are the games we're actually in — labbing, running sets, and talking matchups. No casual list padding.</p>
+        <h2>The <em>Games</em> We Run</h2>
+        <p class="sec-sub">Fighting games we lab and the MMO we call home. These are the active titles in the community — no filler, no hype lists.</p>
       </div>
       <div class="games-grid reveal">
 
         <div class="game-card" style="background:linear-gradient(160deg,#1a0505,#3d0000);">
-          <div class="game-fb">🥊</div>
+          <img class="game-art" src="logos/sf6.jpg" alt="Street Fighter 6" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">🥊</div>
           <div class="game-label">
             <div class="game-title">Street Fighter 6</div>
             <div class="game-genre">Fighting</div>
@@ -598,7 +602,8 @@
         </div>
 
         <div class="game-card" style="background:linear-gradient(160deg,#05050f,#12003d);">
-          <div class="game-fb">⚡</div>
+          <img class="game-art" src="logos/tekken8.jpg" alt="Tekken 8" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">⚡</div>
           <div class="game-label">
             <div class="game-title">Tekken 8</div>
             <div class="game-genre">Fighting</div>
@@ -614,7 +619,8 @@
         </div>
 
         <div class="game-card" style="background:linear-gradient(160deg,#1a0800,#3d1800);">
-          <div class="game-fb">💥</div>
+          <img class="game-art" src="logos/invincible-vs.jpg" alt="Invincible VS" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">💥</div>
           <div class="game-label">
             <div class="game-title">Invincible VS</div>
             <div class="game-genre">Fighting</div>
@@ -630,7 +636,8 @@
         </div>
 
         <div class="game-card" style="background:linear-gradient(160deg,#150010,#3d0020);">
-          <div class="game-fb">🕷️</div>
+          <img class="game-art" src="logos/marvel-tokon.jpg" alt="Marvel Tōkon" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">🕷️</div>
           <div class="game-label">
             <div class="game-title">Marvel Tōkon</div>
             <div class="game-genre">Fighting</div>
@@ -646,7 +653,8 @@
         </div>
 
         <div class="game-card" style="background:linear-gradient(160deg,#00101a,#002535);">
-          <div class="game-fb">🌊</div>
+          <img class="game-art" src="logos/avatar-legends.jpg" alt="Avatar Legends" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">🌊</div>
           <div class="game-label">
             <div class="game-title">Avatar Legends</div>
             <div class="game-genre">Fighting</div>
@@ -657,6 +665,23 @@
               <div class="game-hover-date">2025</div>
               <div class="game-hover-divider"></div>
               <div class="game-hover-desc">Bending meets brawling. Avatar-universe fighter — one of the most anticipated titles on our radar.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#001a2e,#003a5c);">
+          <img class="game-art" src="logos/ffxiv.jpg" alt="Final Fantasy XIV" onerror="this.nextElementSibling.style.display='flex';this.remove()"/>
+          <div class="game-fb" style="display:none">⚔️</div>
+          <div class="game-label">
+            <div class="game-title">Final Fantasy XIV</div>
+            <div class="game-genre">MMO · RPG</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge release">LIVE</div>
+              <div class="game-hover-date">Ongoing</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Our MMO home base. Raids, housing, crafting — a quiet corner for Eorzea regulars.</div>
             </div>
           </div>
         </div>
@@ -676,7 +701,9 @@
       <div class="media-grid reveal">
 
         <div class="media-card">
-          <div class="media-icon">🟡</div>
+          <div class="media-icon">
+            <img class="media-logo" src="logos/invincible-logo.png" alt="Invincible" onerror="this.parentNode.innerHTML='🟡'"/>
+          </div>
           <div class="media-info">
             <div class="media-title">Invincible</div>
             <div class="media-sub">Amazon · Comics · Robert Kirkman</div>
@@ -685,7 +712,9 @@
         </div>
 
         <div class="media-card">
-          <div class="media-icon">🕷️</div>
+          <div class="media-icon">
+            <img class="media-logo" src="logos/marvel-logo.jpg" alt="Marvel" onerror="this.parentNode.innerHTML='🕷️'"/>
+          </div>
           <div class="media-info">
             <div class="media-title">Marvel</div>
             <div class="media-sub">Comics · MCU · Animated</div>
@@ -694,7 +723,9 @@
         </div>
 
         <div class="media-card">
-          <div class="media-icon">🦷</div>
+          <div class="media-icon">
+            <img class="media-logo" src="logos/dc-logo.png" alt="DC" onerror="this.parentNode.innerHTML='🦇'"/>
+          </div>
           <div class="media-info">
             <div class="media-title">DC</div>
             <div class="media-sub">Comics · Animated · Film</div>
