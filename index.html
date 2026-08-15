@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social — A home for curious gamers exploring indie, international, and hidden gem games. Low-pressure Discord community."/>
-  <meta property="og:title" content="Monolith Social — Indie Game Discovery"/>
-  <meta property="og:description" content="Find your niche. Discover indie games. Share what no one knows."/>
+  <meta name="description" content="Monolith Social — A low-noise hub for fighting games, FFXIV, and media analysis. For adults who want to lab, run content, and talk substance."/>
+  <meta property="og:title" content="Monolith Social — Lab. Play. Analyze."/>
+  <meta property="og:description" content="A curated Discord for competitors, FFXIV players, and narrative analysts. Real life first. Dead weight gets cut."/>
   <meta property="og:image" content="banner.jpg"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <title>Monolith Social — Indie Game Discovery</title>
+  <title>Monolith Social — Lab. Play. Analyze.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap&amp;font-display=swap" rel="stylesheet"/>
@@ -151,13 +151,11 @@
         url('banner.jpg') center/cover no-repeat, var(--bg);
       filter: brightness(.32) saturate(.6);
     }
-    /* Static grid — no scroll animation */
     .hero-grid {
       position: absolute; inset: 0; z-index: 0;
       background-image: linear-gradient(rgba(0,255,231,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,231,0.04) 1px,transparent 1px);
       background-size: 60px 60px;
       mask-image: linear-gradient(180deg,transparent 0%,rgba(0,0,0,.4) 40%,rgba(0,0,0,.8) 100%);
-      /* removed gridScroll animation */
     }
     .hero-vignette {
       position: absolute; inset: 0; z-index: 1;
@@ -166,7 +164,6 @@
         linear-gradient(180deg, rgba(2,0,10,.55) 0%, rgba(2,0,10,.15) 35%, rgba(2,0,10,.55) 70%, rgba(2,0,10,.92) 100%);
     }
 
-    /* Static blobs — no blur filter (GPU expensive), use opacity only */
     .shape { position: absolute; border-radius: 50%; z-index: 0; }
     .s1 { width:320px; height:320px; background:radial-gradient(circle, rgba(139,47,255,0.18) 0%, transparent 70%); top:6%;  left:2%; }
     .s2 { width:240px; height:240px; background:radial-gradient(circle, rgba(255,0,170,0.12) 0%, transparent 70%); top:52%; right:4%; }
@@ -185,7 +182,7 @@
     h1 .line2 { display: block; color: var(--teal); text-shadow: 0 0 20px rgba(0,255,231,0.4); }
 
     .hero-hook { font-family: 'Rajdhani', sans-serif; font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 600; color: #c8c0e8; letter-spacing: 3px; margin-bottom: 10px; opacity: 0; animation: fadeUp .8s .3s ease forwards; text-transform: uppercase; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
-    .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 460px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+    .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 520px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
 
     .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; opacity: 0; animation: fadeUp .8s .48s ease forwards; }
     .hero-cta .btn-primary, .hero-cta .btn-outline { justify-content: center; min-width: 220px; }
@@ -211,7 +208,8 @@
     .server-members { color: var(--text); font-weight: 600; }
     .server-est { color: var(--teal); font-weight: 500; font-size: .65rem; letter-spacing: 2px; text-transform: uppercase; }
 
-    /* ═══════ FEATURES ═══════ */
+    /* ═══════ WHO / FEATURES ═══════ */
+    #who { background: var(--bg); border-top: 1px solid var(--border); }
     #features { background: var(--bg); border-top: 1px solid var(--border); }
     .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; overflow: hidden; }
     .feat { background: var(--card); padding: 32px 26px; position: relative; overflow: hidden; transition: background .2s, box-shadow .3s; }
@@ -320,119 +318,55 @@
       background: rgba(139,47,255,.16);
     }
     .game-card.invincible-card .game-ribbons {
-      top: 0;
-      left: 0;
-      right: 0;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0;
+      top: 0; left: 0; right: 0;
+      display: grid; grid-template-columns: 1fr; gap: 0;
       border-bottom: 1px solid rgba(139,47,255,.35);
     }
     .game-card.invincible-card .game-ribbon {
-      padding: 6px 6px;
-      text-align: center;
-      border: 0;
-      border-radius: 0;
-      backdrop-filter: none;
-      background: rgba(139,47,255,.92);
+      padding: 6px 6px; text-align: center; border: 0; border-radius: 0;
+      backdrop-filter: none; background: rgba(139,47,255,.92);
     }
-    .game-card.invincible-card .game-ribbon::after {
-      display: none;
-    }
-    .game-card.invincible-card .game-ribbon.open {
-      color: #f2e9ff;
-      border-right: 0;
-      background: rgba(139,47,255,.95);
-    }
-    .game-card.invincible-card .game-ribbon.closed {
-      color: #f2e9ff;
-      background: rgba(116,36,170,.95);
-    }
+    .game-card.invincible-card .game-ribbon::after { display: none; }
+    .game-card.invincible-card .game-ribbon.open { color: #f2e9ff; border-right: 0; background: rgba(139,47,255,.95); }
+    .game-card.invincible-card .game-ribbon.closed { color: #f2e9ff; background: rgba(116,36,170,.95); }
     .game-card.invincible-card { overflow: visible; }
     .invincible-top-tail {
-      position: absolute;
-      top: -24px;
-      left: 0;
-      right: 0;
-      z-index: 4;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border: 1px solid rgba(139,47,255,.55);
-      border-bottom: none;
+      position: absolute; top: -24px; left: 0; right: 0; z-index: 4;
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid rgba(139,47,255,.55); border-bottom: none;
       background: rgba(129,46,189,.95);
       clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 8px 100%);
       box-shadow: 0 0 14px rgba(139,47,255,.4), 0 0 26px rgba(139,47,255,.18);
-      opacity: 0;
-      transform: translateY(-8px);
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
+      opacity: 0; transform: translateY(-8px); transition: opacity .3s, transform .3s; pointer-events: none;
     }
     .game-card.invincible-card:hover .invincible-top-tail,
-    .game-card.invincible-card.locked .invincible-top-tail {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .invincible-top-tail::before,
-    .invincible-top-tail::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      width: 0;
-      height: 0;
+    .game-card.invincible-card.locked .invincible-top-tail { opacity: 1; transform: translateY(0); }
+    .invincible-top-tail::before, .invincible-top-tail::after {
+      content: ''; position: absolute; top: 100%; width: 0; height: 0;
       border-top: 8px solid rgba(129,46,189,.95);
     }
-    .invincible-top-tail::before {
-      left: 0;
-      border-right: 8px solid transparent;
-    }
-    .invincible-top-tail::after {
-      right: 0;
-      border-left: 8px solid transparent;
-    }
+    .invincible-top-tail::before { left: 0; border-right: 8px solid transparent; }
+    .invincible-top-tail::after  { right: 0; border-left: 8px solid transparent; }
     .invincible-top-tail span {
-      font-family: 'Orbitron', monospace;
-      font-size: .44rem;
-      letter-spacing: 1.3px;
-      color: #f3ebff;
-      text-align: center;
-      padding: 5px 4px;
-      border-right: 1px solid rgba(255,255,255,.16);
-      text-shadow: 0 0 8px rgba(255,255,255,.22);
+      font-family: 'Orbitron', monospace; font-size: .44rem; letter-spacing: 1.3px;
+      color: #f3ebff; text-align: center; padding: 5px 4px;
+      border-right: 1px solid rgba(255,255,255,.16); text-shadow: 0 0 8px rgba(255,255,255,.22);
     }
     .invincible-top-tail span:last-child { border-right: none; }
     .invincible-bottom-tail {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -22px;
-      z-index: 4;
-      font-family: 'Orbitron', monospace;
-      font-size: .48rem;
-      letter-spacing: 1.8px;
-      color: #ffd9ec;
-      text-align: center;
-      padding: 5px 4px;
-      border: 1px solid rgba(255,45,107,.45);
-      background: rgba(162,27,92,.9);
+      position: absolute; left: 0; right: 0; bottom: -22px; z-index: 4;
+      font-family: 'Orbitron', monospace; font-size: .48rem; letter-spacing: 1.8px;
+      color: #ffd9ec; text-align: center; padding: 5px 4px;
+      border: 1px solid rgba(255,45,107,.45); background: rgba(162,27,92,.9);
       clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
       box-shadow: 0 0 12px rgba(255,45,107,.35), 0 0 24px rgba(255,45,107,.15);
       text-shadow: 0 0 8px rgba(255,255,255,.2);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
+      opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none;
     }
     .game-card.invincible-card:hover .invincible-bottom-tail,
-    .game-card.invincible-card.locked .invincible-bottom-tail {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .game-card.invincible-card.locked .invincible-bottom-tail { opacity: 1; transform: translateY(0); }
     @media (min-width: 1025px) {
-      .games-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-        row-gap: 36px;
-      }
+      .games-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; row-gap: 36px; }
       .game-hover-desc { display: none; }
     }
     /* ═══════ MOBILE RESPONSIVE ═══════ */
@@ -456,83 +390,34 @@
       .server-info { flex-direction: column; gap: 12px; }
       .channels-grid { grid-template-columns: 1fr; }
       .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
-      /* Open Beta ribbon — bigger & readable on mobile */
       .game-ribbon { font-size: .65rem; letter-spacing: 1px; padding: 5px 10px 5px 12px; }
       .game-card.invincible-card .game-ribbon { font-size: .65rem; padding: 7px 10px; }
       .invincible-top-tail span { font-size: .55rem; letter-spacing: 1px; }
       .invincible-bottom-tail { font-size: .58rem; letter-spacing: 1.2px; }
     }
     /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
-    .game-card-wrapper {
-      position: relative;
-      height: fit-content;
-    }
+    .game-card-wrapper { position: relative; height: fit-content; }
     .game-card-sequel {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      margin-top: 8px;
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
+      position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px;
+      opacity: 0; transform: translateY(-10px) scale(0.95);
       transition: opacity .3s ease, transform .3s ease;
-      pointer-events: none;
-      z-index: 10;
-      visibility: hidden;
+      pointer-events: none; z-index: 10; visibility: hidden;
     }
-    .game-card-wrapper:hover .game-card-sequel {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .game-card-sequel .game-card {
-      margin: 0;
-    }
-
-    /* ═══════ SEQUEL INDICATOR ═══════ */
+    .game-card-wrapper:hover .game-card-sequel { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; visibility: visible; }
+    .game-card-sequel .game-card { margin: 0; }
     .sequel-indicator {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      font-size: 1.2rem;
-      color: var(--teal);
-      opacity: 0;
-      transform: translateX(0);
+      position: absolute; bottom: 12px; right: 12px; font-size: 1.2rem;
+      color: var(--teal); opacity: 0; transform: translateX(0);
       transition: opacity .3s, transform .3s, color .3s;
-      font-weight: 700;
-      text-shadow: 0 0 8px rgba(0,255,231,.3);
-      z-index: 3;
-      cursor: pointer;
-      user-select: none;
+      font-weight: 700; text-shadow: 0 0 8px rgba(0,255,231,.3);
+      z-index: 3; cursor: pointer; user-select: none;
     }
-    .game-card.has-sequel:hover .sequel-indicator {
-      opacity: 1;
-      transform: translateX(4px);
-    }
-    .sequel-indicator.active {
-      opacity: 1;
-      color: var(--green);
-      text-shadow: 0 0 12px rgba(57,255,138,.5);
-      transform: translateX(8px) rotate(90deg);
-    }
-    .game-card-sequel.active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-      visibility: visible;
-    }
-
+    .game-card.has-sequel:hover .sequel-indicator { opacity: 1; transform: translateX(4px); }
+    .sequel-indicator.active { opacity: 1; color: var(--green); text-shadow: 0 0 12px rgba(57,255,138,.5); transform: translateX(8px) rotate(90deg); }
+    .game-card-sequel.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; visibility: visible; }
     @media (max-width: 768px) {
-      .sequel-indicator {
-        font-size: 1rem;
-        bottom: 10px;
-        right: 10px;
-        /* Always visible on touch screens so users can tap to toggle */
-        opacity: 0.75;
-      }
+      .sequel-indicator { font-size: 1rem; bottom: 10px; right: 10px; opacity: 0.75; }
     }
-
     @media (max-width: 480px) {
       .wrap { padding: 0 16px; }
       nav { padding: 0 12px; }
@@ -551,133 +436,31 @@
 
     /* ═══════ PARTICLE CONTROLS ═══════ */
     .particle-controls {
-      position: fixed;
-      top: 88px;
-      right: 18px;
-      z-index: 100;
-      background: rgba(2,0,10,.95);
-      border: 1px solid rgba(0,255,231,.2);
-      border-radius: 4px;
-      padding: 16px;
-      box-shadow: 0 0 16px rgba(0,255,231,.15);
-      backdrop-filter: blur(2px);
-      font-family: 'Orbitron', monospace;
-      min-width: 200px;
+      position: fixed; top: 88px; right: 18px; z-index: 100;
+      background: rgba(2,0,10,.95); border: 1px solid rgba(0,255,231,.2); border-radius: 4px;
+      padding: 16px; box-shadow: 0 0 16px rgba(0,255,231,.15); backdrop-filter: blur(2px);
+      font-family: 'Orbitron', monospace; min-width: 200px;
     }
-    .particle-controls-label {
-      font-size: .7rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 12px;
-      display: block;
-    }
-    .control-group {
-      margin-bottom: 14px;
-    }
-    .control-group:last-child {
-      margin-bottom: 0;
-    }
-    .toggle-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: rgba(139,47,255,.2);
-      border: 1px solid rgba(0,255,231,.2);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background .3s, border-color .3s;
-      flex-shrink: 0;
-    }
-    .toggle-switch.enabled {
-      background: rgba(0,255,231,.25);
-      border-color: rgba(0,255,231,.4);
-    }
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      background: var(--teal);
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-      transition: left .3s;
-    }
-    .toggle-switch.enabled::after {
-      left: 24px;
-    }
-    .toggle-label {
-      font-size: .75rem;
-      color: var(--text);
-      flex: 1;
-    }
-    .intensity-slider-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .intensity-label {
-      font-size: .7rem;
-      color: var(--text2);
-      letter-spacing: 1px;
-    }
-    .slider-value {
-      color: var(--teal);
-      font-weight: 600;
-    }
-    input[type="range"] {
-      width: 100%;
-      height: 4px;
-      border-radius: 2px;
-      background: rgba(139,47,255,.3);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--teal);
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(0,255,231,.5);
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--teal);
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 0 8px rgba(0,255,231,.5);
-    }
+    .particle-controls-label { font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; display: block; }
+    .control-group { margin-bottom: 14px; }
+    .control-group:last-child { margin-bottom: 0; }
+    .toggle-group { display: flex; align-items: center; gap: 10px; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; background: rgba(139,47,255,.2); border: 1px solid rgba(0,255,231,.2); border-radius: 12px; cursor: pointer; transition: background .3s, border-color .3s; flex-shrink: 0; }
+    .toggle-switch.enabled { background: rgba(0,255,231,.25); border-color: rgba(0,255,231,.4); }
+    .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: var(--teal); border-radius: 50%; top: 2px; left: 2px; transition: left .3s; }
+    .toggle-switch.enabled::after { left: 24px; }
+    .toggle-label { font-size: .75rem; color: var(--text); flex: 1; }
+    .intensity-slider-group { display: flex; flex-direction: column; gap: 8px; }
+    .intensity-label { font-size: .7rem; color: var(--text2); letter-spacing: 1px; }
+    .slider-value { color: var(--teal); font-weight: 600; }
+    input[type="range"] { width: 100%; height: 4px; border-radius: 2px; background: rgba(139,47,255,.3); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; box-shadow: 0 0 8px rgba(0,255,231,.5); }
+    input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; border: none; box-shadow: 0 0 8px rgba(0,255,231,.5); }
     @media (max-width: 768px) {
-      .particle-controls {
-        top: 64px;
-        right: 10px;
-        min-width: 180px;
-        padding: 12px;
-      }
-      .toggle-switch {
-        width: 40px;
-        height: 22px;
-      }
-      .toggle-switch::after {
-        width: 16px;
-        height: 16px;
-      }
-      .toggle-switch.enabled::after {
-        left: 22px;
-      }
+      .particle-controls { top: 64px; right: 10px; min-width: 180px; padding: 12px; }
+      .toggle-switch { width: 40px; height: 22px; }
+      .toggle-switch::after { width: 16px; height: 16px; }
+      .toggle-switch.enabled::after { left: 22px; }
     }
 </style>
 </head>
@@ -686,7 +469,7 @@
   <nav>
     <div class="nav-l">
       <a href="index.html" class="logo" aria-label="Monolith Social">
-        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">◆ Monolith Social ◆</span>
+        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">&#9670; Monolith Social &#9670;</span>
       </a>
     </div>
     <div class="nav-r">
@@ -695,21 +478,21 @@
       <a href="quiz.html" class="nav-link">Quiz</a>
       <a href="reviews.html" class="nav-link">Reviews</a>
       <a href="stats.html" class="nav-link">Member Luv</a>
-      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
+      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join &#8594;</a>
       <button class="nav-hamburger" aria-label="Menu toggle">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
 
-  <!-- MOBILE MENU (hidden by default) -->
+  <!-- MOBILE MENU -->
   <div class="nav-mobile">
     <a href="index.html" class="nav-link active">Home</a>
     <a href="arcade.html" class="nav-link">Arcade</a>
     <a href="quiz.html" class="nav-link">Quiz</a>
     <a href="reviews.html" class="nav-link">Reviews</a>
     <a href="stats.html" class="nav-link">Member Luv</a>
-    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community &#8594;</a>
   </div>
 
   <!-- HERO SECTION -->
@@ -717,22 +500,22 @@
     <div class="wrap">
       <div class="hero-inner reveal">
         <div class="hero-av-wrap">
-          <img src="avatar.jpg" alt="Your Avatar" class="hero-av" aria-hidden="true"/>
+          <img src="avatar.webp" alt="Monolith Social" class="hero-av" aria-hidden="true"/>
           <span class="hero-av-live" aria-hidden="true"></span>
         </div>
-        <span class="eyebrow">A Home for Curious Gamers</span>
+        <span class="eyebrow">Fighting Games &middot; FFXIV &middot; Media Analysis</span>
         <h1>
           <span class="line1">Monolith</span>
           <span class="line2">Social</span>
         </h1>
-        <p class="hero-hook">Beyond blockbusters. Discover indie gems. Find your niche.</p>
-        <p class="hero-tagline">Low-pressure space for explorers who love the art of gaming.</p>
+        <p class="hero-hook">A Low-Noise Hub for Adults Who Play With Intent.</p>
+        <p class="hero-tagline">For adults who want to lab matches, run content, and talk narrative depth without the noise of massive public servers. Real life comes first &mdash; but dead weight gets cut.</p>
         <div class="hero-cta">
-          <a href="#features" class="btn-primary" aria-label="Discover our community">
+          <a href="#who" class="btn-primary" aria-label="See who this is for">
             <svg class="icon" aria-hidden="true" width="18" height="18">
               <use href="#icon-arrow-right"></use>
             </svg>
-            Explore Niches
+            Who This Is For
           </a>
           <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Monolith Social Discord">Join Us</a>
         </div>
@@ -758,37 +541,37 @@
     <div class="shape s3"></div>
   </section>
 
-  <!-- FEATURES SECTION -->
-  <section id="features" class="section-pad">
+  <!-- WHO THIS IS FOR -->
+  <section id="who" class="section-pad">
     <div class="wrap">
       <div class="reveal">
-        <span class="sec-tag">What's Inside</span>
-        <h2>Why You'll Love Monolith Social</h2>
-        <p class="sec-sub">We've created spaces for indie explorers, discovery seekers, and art-game enthusiasts.</p>
+        <span class="sec-tag">Who This Is For</span>
+        <h2>Three Types of <em>Players</em></h2>
+        <p class="sec-sub">This isn&rsquo;t a general gaming server. If you fit one of these, you&rsquo;ll find your people here.</p>
       </div>
       <div class="feat-grid">
-        <div class="feat reveal">
-          <div class="feat-icon">🗺️</div>
+        <div class="feat reveal" style="--fc: var(--red)">
+          <div class="feat-icon">&#x1F94A;</div>
           <div>
-            <h3 class="feat-title">Find Your Niche</h3>
-            <p class="feat-body">Roles for JRPGs, Roguelikes, Cozy Sims, and more. Discover communities built around games you love.</p>
-            <span class="feat-footnote">Browse All Niches &#160;&#8226;&#160; Get Verified</span>
+            <h3 class="feat-title">The Competitors &amp; Lab Partners</h3>
+            <p class="feat-body">Active players in Marvel T&#333;kon, Avatar Legends, and Invincible VS. People who study matchups, share tech, and actually show up for sets. If you lab, you belong here.</p>
+            <span class="feat-footnote">Marvel T&#333;kon &nbsp;&bull;&nbsp; Avatar Legends &nbsp;&bull;&nbsp; Invincible VS</span>
           </div>
         </div>
-        <div class="feat reveal">
-          <div class="feat-icon">📰</div>
+        <div class="feat reveal" style="--fc: var(--teal)">
+          <div class="feat-icon">&#x2694;&#xFE0F;</div>
           <div>
-            <h3 class="feat-title">Discovery Feed</h3>
-            <p class="feat-body">Daily news on indie and international titles. Stay updated on what the world is playing.</p>
-            <span class="feat-footnote">Read Stories &#160;&#8226;&#160; Submit Finds</span>
+            <h3 class="feat-title">The MMO Crowd</h3>
+            <p class="feat-body">FFXIV players who want a quiet home base, not server drama. Whether you&rsquo;re clearing savage raids or going full crafting goblin, this is a low-noise zone for serious players.</p>
+            <span class="feat-footnote">FFXIV &nbsp;&bull;&nbsp; Raids &nbsp;&bull;&nbsp; Crafting &amp; Housing</span>
           </div>
         </div>
-        <div class="feat reveal">
-          <div class="feat-icon">📸</div>
+        <div class="feat reveal" style="--fc: var(--purple)">
+          <div class="feat-icon">&#x1F9E0;</div>
           <div>
-            <h3 class="feat-title">Share the Love</h3>
-            <p class="feat-body">Post screenshots and reviews of "the game no one knows." Show off your hidden gems.</p>
-            <span class="feat-footnote">Browse Gallery &#160;&#8226;&#160; Upload</span>
+            <h3 class="feat-title">The Analysts</h3>
+            <p class="feat-body">People who want to actually dissect narrative media &mdash; superhero arcs, mental health parallels in Spider-Man, the philosophy of The Odyssey. Substance over surface-level takes.</p>
+            <span class="feat-footnote">Narrative Analysis &nbsp;&bull;&nbsp; Media Threads &nbsp;&bull;&nbsp; Deep Dives</span>
           </div>
         </div>
       </div>
@@ -800,60 +583,101 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">Inside Monolith Social</span>
-        <h2>What Awaits the Explorer</h2>
-        <p class="sec-sub">A low-stakes, open-minded space where you can go at your own pace.</p>
+        <h2>What You <em>Actually</em> Get</h2>
+        <p class="sec-sub">A curated, intentionally small space. No trending-topic chasing, no clout games.</p>
       </div>
       <div class="inside-grid">
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">🎮</div>
+          <div class="inside-icon" aria-hidden="true">&#x1F94B;</div>
           <div>
-            <h3 class="inside-title">Niche Communities</h3>
-            <p class="inside-body">Find your people. Connect with fellow explorers who share your gaming interests.</p>
+            <h3 class="inside-title">Lab &amp; Matchup Channels</h3>
+            <p class="inside-body">Dedicated spaces for frame data, tech sharing, and finding sparring partners. No casual hype posts drowning out the actual work.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">🌍</div>
+          <div class="inside-icon" aria-hidden="true">&#x1F310;</div>
           <div>
-            <h3 class="inside-title">International Titles</h3>
-            <p class="inside-body">Discover games from developers around the world. Expand your gaming horizons.</p>
+            <h3 class="inside-title">FFXIV Home Base</h3>
+            <p class="inside-body">Raid planning, housing flexes, crafting threads. A quiet corner for Eorzea regulars who want community without the noise of mega-servers.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">✨</div>
+          <div class="inside-icon" aria-hidden="true">&#x1F4D6;</div>
           <div>
-            <h3 class="inside-title">Indie Spotlights</h3>
-            <p class="inside-body">Regular features on indie projects and art games making waves.</p>
+            <h3 class="inside-title">Narrative Deep Dives</h3>
+            <p class="inside-body">Long-form analysis threads on superhero arcs, game writing, and media that actually has something to say. Bring your takes, back them up.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">🌿</div>
+          <div class="inside-icon" aria-hidden="true">&#x1F507;</div>
           <div>
-            <h3 class="inside-title">Low-Stakes Vibes</h3>
-            <p class="inside-body">Mature, open-minded community. No pressure. Explore at your pace.</p>
+            <h3 class="inside-title">Low Drama by Design</h3>
+            <p class="inside-body">Adult-only, intentionally curated. Moderation keeps the floor clean so conversations stay worth having. No tolerance for performative nonsense.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">📝</div>
+          <div class="inside-icon" aria-hidden="true">&#x1F3AE;</div>
           <div>
-            <h3 class="inside-title">Share Reviews</h3>
-            <p class="inside-body">Post your thoughts, screenshots, and discoveries. Help others find hidden gems.</p>
+            <h3 class="inside-title">Active Game Nights</h3>
+            <p class="inside-body">Organized sessions, not wishful scheduling. When something is happening, it actually happens &mdash; because the people here show up.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">🔍</div>
+          <div class="inside-icon" aria-hidden="true">&#x26A1;</div>
           <div>
-            <h3 class="inside-title">Discovery Engine</h3>
-            <p class="inside-body">Constantly learning about games the mainstream doesn't know about.</p>
+            <h3 class="inside-title">18+ Spaces</h3>
+            <p class="inside-body">Rooms for adult conversation that doesn&rsquo;t need to be sanitized. Chill, off-topic, and the occasional chaotic tangent that ends up being the best thread of the week.</p>
           </div>
         </div>
       </div>
       <div class="server-channels reveal">
-        <h3 class="channels-title">Community Channels</h3>
+        <h3 class="channels-title">Active Channels</h3>
         <div class="channels-grid">
-          <div class="channel-tag">🛋️ Cozy Chat!</div>
-          <div class="channel-tag">🐕 A Lil Silly</div>
-          <div class="channel-tag">🍾 18+ Areas</div>
-          <div class="channel-tag">💖 Support Gaming!</div>
+          <div class="channel-tag">&#x1F94A; Fighting Game Lab</div>
+          <div class="channel-tag">&#x2694;&#xFE0F; FFXIV Base Camp</div>
+          <div class="channel-tag">&#x1F9E0; Media Analysis</div>
+          <div class="channel-tag">&#x1F37E; 18+ Lounge</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPECTATIONS / RULES OF ENGAGEMENT -->
+  <section id="expectations" class="section-pad" style="background: var(--bg2); border-top: 1px solid var(--border);">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="sec-tag">Rules of Engagement</span>
+        <h2>Read This <em>Before</em> You Join</h2>
+        <p class="sec-sub">This is not a server for passive observers. These are the expectations, stated plainly.</p>
+      </div>
+      <div class="inside-grid reveal" style="margin-top: 44px;">
+        <div class="inside-card" style="border-color: var(--red); align-items: flex-start;">
+          <div class="inside-icon" aria-hidden="true" style="background: rgba(255,45,107,0.1); border-color: rgba(255,45,107,0.25);">&#x2702;&#xFE0F;</div>
+          <div>
+            <h3 class="inside-title">Inactivity Gets You Cut</h3>
+            <p class="inside-body">This is an intentionally small, curated space. Join and stay a silent ghost with zero engagement, and you will be pruned. We value quality over headcount. If you&rsquo;re just collecting server icons, keep moving.</p>
+          </div>
+        </div>
+        <div class="inside-card" style="align-items: flex-start;">
+          <div class="inside-icon" aria-hidden="true">&#x1F91D;</div>
+          <div>
+            <h3 class="inside-title">Real Life Comes First</h3>
+            <p class="inside-body">Go on vacation, get busy, disappear for a few weeks &mdash; no problem. This isn&rsquo;t a clocking-in arrangement. But if you never engage at all, that&rsquo;s a different story.</p>
+          </div>
+        </div>
+        <div class="inside-card" style="align-items: flex-start;">
+          <div class="inside-icon" aria-hidden="true">&#x1F3AF;</div>
+          <div>
+            <h3 class="inside-title">Contribute Something Real</h3>
+            <p class="inside-body">Drop a take, share a clip, ask a question, respond to someone. The bar isn&rsquo;t high &mdash; it just can&rsquo;t be zero. If you&rsquo;re here, be here.</p>
+          </div>
+        </div>
+        <div class="inside-card" style="align-items: flex-start;">
+          <div class="inside-icon" aria-hidden="true">&#x1F6AB;</div>
+          <div>
+            <h3 class="inside-title">No Dead Weight</h3>
+            <p class="inside-body">We prune regularly to keep the community tight and worth being in. A small, active group is worth ten times more than a bloated server full of lurkers. You&rsquo;ve been warned &mdash; in a good way.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -863,16 +687,16 @@
   <section id="games" class="section-pad">
     <div class="wrap">
       <div class="reveal">
-        <span class="sec-tag">Community Games</span>
-        <h2>Indie Favorites &amp; Hidden Gems</h2>
-        <p class="sec-sub">Discover what members are playing and loving. From cozy sims to roguelikes.</p>
+        <span class="sec-tag">Active Titles</span>
+        <h2>What We&rsquo;re <em>Actually Playing</em></h2>
+        <p class="sec-sub">The games on rotation right now. These aren&rsquo;t recommendations &mdash; members are actively in these.</p>
       </div>
       <div class="games-hdr reveal">
         <div class="games-tags">
-          <span class="tag">Action</span>
-          <span class="tag">Adventure</span>
-          <span class="tag">FPS</span>
+          <span class="tag">Fighting</span>
           <span class="tag">MMORPG</span>
+          <span class="tag">Action</span>
+          <span class="tag">Visual Novel</span>
           <span class="tag">Puzzle</span>
         </div>
         <a href="#" class="btn-primary" aria-label="View All Games">
@@ -896,7 +720,7 @@
               <div class="game-hover-badge beta">CLASSIC</div>
               <div class="game-hover-date">Retro Indie</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Brutal top-down action with an unforgettable soundtrack. A cult classic for indie game enthusiasts.</div>
+              <div class="game-hover-desc">Brutal top-down action with an unforgettable soundtrack. A cult classic.</div>
             </div>
           </div>
         </div>
@@ -913,7 +737,7 @@
               <div class="game-hover-badge release">POPULAR</div>
               <div class="game-hover-date">2016</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Asymmetrical multiplayer horror. Hide or hunt in this twisted game of cat and mouse.</div>
+              <div class="game-hover-desc">Asymmetrical multiplayer horror. Hide or hunt.</div>
             </div>
           </div>
         </div>
@@ -927,10 +751,10 @@
           </div>
           <div class="game-hover-overlay">
             <div class="game-hover-content">
-              <div class="game-hover-badge">NEW</div>
+              <div class="game-hover-badge">GEM</div>
               <div class="game-hover-date">Anime Strategy</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Paint and solve puzzles to Miku's iconic songs. A unique blend of rhythm and logic.</div>
+              <div class="game-hover-desc">Paint and solve puzzles to Miku&rsquo;s iconic songs.</div>
             </div>
           </div>
         </div>
@@ -947,7 +771,7 @@
               <div class="game-hover-badge">INDIE GEM</div>
               <div class="game-hover-date">Deep Story</div>
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">A haunting visual novel that explores themes of isolation and connection. Unforgettable narrative.</div>
+              <div class="game-hover-desc">A haunting visual novel about isolation and connection.</div>
             </div>
           </div>
         </div>
@@ -955,7 +779,7 @@
           <div class="game-card reveal has-sequel">
             <div class="game-link">
               <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-              <div class="sequel-indicator" aria-label="More versions available">→</div>
+              <div class="sequel-indicator" aria-label="More versions available">&rarr;</div>
               <div class="game-label">
                 <div class="game-title">Death Stranding</div>
                 <div class="game-genre">Action Adventure</div>
@@ -966,7 +790,7 @@
                 <div class="game-hover-badge release">GAME</div>
                 <div class="game-hover-date">2019</div>
                 <div class="game-hover-divider"></div>
-                <div class="game-hover-desc">Kojima's surreal masterpiece. Connect the disconnected in this bold, experimental adventure.</div>
+                <div class="game-hover-desc">Kojima&rsquo;s surreal masterpiece.</div>
               </div>
             </div>
           </div>
@@ -984,7 +808,7 @@
                   <div class="game-hover-badge release">Game</div>
                   <div class="game-hover-date">2025</div>
                   <div class="game-hover-divider"></div>
-                  <div class="game-hover-desc">The continuation of Kojima's vision. A new journey awaits.</div>
+                  <div class="game-hover-desc">The continuation of Kojima&rsquo;s vision.</div>
                 </div>
               </div>
             </div>
@@ -1002,7 +826,7 @@
           <div class="game-hover-overlay">
             <div class="game-hover-content">
               <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Fast-paced battles inspired by the Invincible universe. Full release April 30th.</div>
+              <div class="game-hover-desc">Fast-paced battles inspired by the Invincible universe.</div>
             </div>
           </div>
         </div>
@@ -1012,7 +836,7 @@
 
   <!-- PARTICLE CONTROLS -->
   <div class="particle-controls" id="particleControls">
-    <label class="particle-controls-label">✦ Particles</label>
+    <label class="particle-controls-label">&#10022; Particles</label>
     <div class="control-group toggle-group">
       <div class="toggle-switch enabled" id="particleToggle"></div>
       <span class="toggle-label">Enabled</span>
@@ -1023,7 +847,6 @@
     </div>
   </div>
 
-  <!-- JS LIBRARIES (if any) -->
   <script src="script.js" defer="defer"></script>
   <script src="discord-live-stats.js" defer="defer"></script>
   <script src="particle-controls.js" defer="defer"></script>
@@ -1035,8 +858,8 @@
       for(var i=0;i<count;i++){
         var p = document.createElement('span');
         p.className = 'emoji-rise';
-        var spread = (Math.random()-0.5) * (60 + count*4);  // wider spread at higher counts
-        var rise = 80 + Math.random() * (80 + count*6);      // higher rise at higher counts
+        var spread = (Math.random()-0.5) * (60 + count*4);
+        var rise = 80 + Math.random() * (80 + count*6);
         var size = 1.2 + Math.random() * 0.8 + (count > 6 ? 0.4 : 0);
         var dur = (0.7 + Math.random()*0.5) + 's';
         p.textContent = emoji;
@@ -1054,16 +877,14 @@
         var now = Date.now();
         var gap = now - lastClick;
         lastClick = now;
-        // rapid taps/clicks build heat (max 8), slow inputs cool it
         if(gap < 400) heat = Math.min(heat + 1.2, 8);
         else heat = Math.max(heat - 1, 0);
-        var count = Math.round(2 + heat * 1.5);  // 2 at cold, up to ~14 at max heat
+        var count = Math.round(2 + heat * 1.5);
         spawnBurst(x, y, emoji, count);
         clearTimeout(decayTimer);
         decayTimer = setTimeout(function(){ heat = 0; }, 1200);
       }
 
-      // desktop click + hold (fires repeatedly while held)
       var holdTimer = null;
       el.addEventListener('mousedown', function(e){
         var r = el.getBoundingClientRect();
@@ -1075,7 +896,6 @@
       });
       document.addEventListener('mouseup', function(){ clearInterval(holdTimer); });
 
-      // mobile tap
       el.addEventListener('touchstart', function(e){
         var t = e.touches[0];
         fire(t.clientX, t.clientY);
@@ -1085,49 +905,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
