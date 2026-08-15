@@ -3,54 +3,56 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Monolith Social — A low-noise hub for fighting games, FFXIV, and media analysis. For adults who want to lab, run content, and talk substance."/>
-  <meta property="og:title" content="Monolith Social — Lab. Play. Analyze."/>
-  <meta property="og:description" content="A curated Discord for competitors, FFXIV players, and narrative analysts. Real life first. Dead weight gets cut."/>
+  <meta name="description" content="Monolith Social — A home for curious gamers exploring indie, international, and hidden gem games. Low-pressure Discord community."/>
+  <meta property="og:title" content="Monolith Social — Indie Game Discovery"/>
+  <meta property="og:description" content="Find your niche. Discover indie games. Share what no one knows."/>
   <meta property="og:image" content="banner.jpg"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <title>Monolith Social — Lab. Play. Analyze.</title>
+  <title>Monolith Social — Indie Game Discovery</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;family=Noto+Sans+JP:wght@300;400;700&amp;display=swap&amp;font-display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@300;400;600;700&amp;display=swap&amp;font-display=swap" rel="stylesheet"/>
   <style>
     /* ═══════ TOKENS ═══════ */
     :root {
-      --bg:       #02000a;
-      --bg2:      #06041a;
-      --card:     #0a0818;
-      --card2:    #100d28;
-      --border:   #1a1540;
-      --border2:  #2e2870;
-      --teal:     #00ffe7;
-      --teal2:    #00cfff;
-      --teal-dim: rgba(0,255,231,0.10);
-      --teal-glow:rgba(0,255,231,0.5);
-      --green:    #39ff8a;
-      --amber:    #ffd200;
-      --red:      #ff2d6b;
-      --pink:     #ff00aa;
-      --purple:   #8b2fff;
-      --text:     #f0e8ff;
-      --text2:    #7a6faa;
-      --text3:    #3a3460;
-      --star:     #ffd200;
-      --neon-t:   0 0 8px #00ffe7, 0 0 20px rgba(0,255,231,0.5);
-      --neon-p:   0 0 8px #8b2fff, 0 0 20px rgba(139,47,255,0.4);
-      --neon-r:   0 0 8px #ff2d6b, 0 0 20px rgba(255,45,107,0.4);
-      --font-jp:  "Yu Gothic UI", "Yu Gothic", "YuGothic", "Yu Mincho", "Hiragino Mincho ProN", "Meiryo", sans-serif;
+      --bg:       #080808;
+      --bg2:      #0f0f0f;
+      --card:     #141414;
+      --card2:    #1e1e1e;
+      --border:   #2a2a2a;
+      --border2:  #3a3a3a;
+      --teal:     #00FFEE;
+      --teal2:    #00CCDD;
+      --teal-dim: rgba(0,255,238,0.10);
+      --teal-glow:rgba(0,255,238,0.5);
+      --green:    #00FF44;
+      --amber:    #FFE400;
+      --red:      #FF2200;
+      --pink:     #FF0066;
+      --purple:   #CC00FF;
+      --text:     #FFFFFF;
+      --text2:    #999999;
+      --text3:    #444444;
+      --star:     #FFE400;
+      --neon-t:   0 0 10px #00FFEE, 0 0 20px rgba(0,255,238,0.5);
+      --neon-p:   0 0 10px #CC00FF, 0 0 20px rgba(204,0,255,0.4);
+      --neon-r:   0 0 10px #FF2200, 0 0 20px rgba(255,34,0,0.4);
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-screen: 'VT323', monospace;
+      --font-jp:  'VT323', monospace;
     }
 
     /* ═══════ RESET ═══════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: linear-gradient(rgba(10,0,21,0.70), rgba(10,0,21,0.70)), url('bg-room.gif'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; background-color: var(--bg); color: var(--text); font-family: var(--font-jp); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: auto; }
-    body * { font-family: var(--font-jp) !important; }
+    body { background: linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.88)), url('bg-room.gif'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; background-color: var(--bg); color: var(--text); font-family: var(--font-screen); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: auto; }
+    body * { font-family: var(--font-screen) !important; }
 
     /* ═══════ CURSOR ═══════ */
     #cur { display: none; }
 
     /* ═══════ SCANLINES ═══════ */
-    body::after { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 3px); }
+    body::after { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.25) 2px, rgba(0,0,0,0.25) 3px); }
 
     /* ═══════ NOISE ═══════ */
     body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .55; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
@@ -78,39 +80,41 @@
     .reveal.in { opacity: 1; transform: none; }
 
     /* ══════ SHARED SECTION HEADERS ═══════ */
-    .sec-tag { font-family: 'Orbitron', monospace; font-size: .62rem; letter-spacing: 5px; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; display: block; }
-    h2 { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.1; letter-spacing: 1px; color: var(--text); margin-bottom: 12px; }
-    h2 em { color: var(--teal); font-style: normal; }
-    .sec-sub { font-size: 1rem; font-weight: 300; color: var(--text2); max-width: 500px; line-height: 1.8; }
+    .sec-tag { font-family: var(--font-pixel) !important; font-size: .48rem; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 18px; display: block; }
+    .sec-tag::before { content: '▶ '; }
+    h2 { font-family: var(--font-pixel) !important; font-weight: 900; font-size: clamp(.9rem, 2.2vw, 1.6rem); line-height: 1.5; letter-spacing: 2px; color: var(--text); margin-bottom: 16px; }
+    h2 em { color: var(--amber); font-style: normal; }
+    .sec-sub { font-size: 1.1rem; font-weight: 400; color: var(--text2); max-width: 500px; line-height: 1.8; }
 
     /* ═══════ BUTTONS ═══════ */
     .btn-primary {
       display: inline-flex; align-items: center; gap: 9px;
-      background: rgba(0,255,231,0.1); color: var(--teal);
-      border: 1px solid var(--teal);
-      font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 700;
-      letter-spacing: 2px; padding: 13px 28px; text-decoration: none; cursor: pointer;
-      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-      transition: box-shadow .25s, transform .2s, background .2s;
+      background: transparent; color: var(--amber);
+      border: 2px solid var(--amber);
+      font-family: var(--font-pixel) !important; font-size: .55rem; font-weight: 700;
+      letter-spacing: 2px; padding: 14px 28px; text-decoration: none; cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.9);
+      transition: box-shadow .1s, transform .1s, background .15s;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 16px rgba(0,255,231,.35); background: rgba(0,255,231,0.18); }
+    .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.9), 0 0 16px rgba(255,228,0,0.3); background: rgba(255,228,0,0.1); }
     .btn-outline {
       display: inline-flex; align-items: center; gap: 9px;
-      background: transparent; color: var(--purple); border: 1px solid var(--purple);
-      font-family: 'Orbitron', monospace; font-size: .72rem; letter-spacing: 2px; padding: 13px 28px;
+      background: transparent; color: var(--teal); border: 2px solid var(--teal);
+      font-family: var(--font-pixel) !important; font-size: .55rem; letter-spacing: 2px; padding: 14px 28px;
       text-decoration: none; cursor: pointer;
-      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-      transition: box-shadow .25s, background .2s, transform .2s;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.9);
+      transition: box-shadow .1s, background .15s, transform .1s;
     }
-    .btn-outline:hover { background: rgba(139,47,255,.12); transform: translateY(-2px); box-shadow: 0 0 16px rgba(139,47,255,.3); }
+    .btn-outline:hover { background: rgba(0,255,238,0.1); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.9), 0 0 16px rgba(0,255,238,0.3); }
 
     /* ═══════ NAV ═══════ */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       height: 64px; display: flex; align-items: center; justify-content: space-between;
       padding: 0 48px;
-      background: rgba(2,0,10,.97);
-      border-bottom: 1px solid rgba(0,255,231,0.12);
+      background: rgba(0,0,0,.97);
+      border-bottom: 2px solid var(--amber);
+      box-shadow: 0 2px 0 var(--amber), 0 4px 24px rgba(255,228,0,0.15);
       backdrop-filter: blur(6px);
     }
     .nav-l { display: flex; align-items: center; gap: 12px; }
@@ -119,25 +123,25 @@
     .nav-name span { color: var(--teal); }
     .nav-r { display: flex; align-items: center; gap: 16px; margin-left: auto; }
     .nav-link { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--text2); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s, text-shadow .2s; }
-    .nav-link:hover, .nav-link.active { color: var(--teal); text-shadow: 0 0 10px rgba(0,255,231,.35); }
+    .nav-link:hover, .nav-link.active { color: var(--amber); text-shadow: 0 0 10px rgba(255,228,0,.5); }
     .nav-cta {
-      background: transparent; color: var(--teal); border: 1px solid var(--teal);
-      font-family: 'Orbitron', monospace; font-size: .6rem; font-weight: 700;
-      letter-spacing: 2px; padding: 8px 18px; text-decoration: none;
-      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-      transition: background .2s, transform .2s, box-shadow .2s;
+      background: var(--amber); color: #000;
+      font-family: var(--font-pixel) !important; font-size: .5rem; font-weight: 700;
+      letter-spacing: 1px; padding: 9px 18px; text-decoration: none;
+      border: 2px solid var(--amber); box-shadow: 3px 3px 0 rgba(0,0,0,0.9);
+      transition: background .1s, transform .1s, box-shadow .1s;
     }
-    .nav-cta:hover { background: rgba(0,255,231,0.12); transform: translateY(-1px); box-shadow: 0 0 12px rgba(0,255,231,.25); }
+    .nav-cta:hover { background: #fff; color: #000; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(0,0,0,0.9); }
     .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:201;}
-    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--teal);transition:all .3s;}
+    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--amber);transition:all .3s;}
     .nav-hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
     .nav-hamburger.active span:nth-child(2) { opacity: 0; }
     .nav-hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
-    .nav-mobile{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(2,0,10,.98);border-bottom:1px solid rgba(0,255,231,.12);padding:16px 20px;flex-direction:column;gap:0;z-index:199;max-height:calc(100vh - 64px);overflow-y:auto;}
+    .nav-mobile{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(0,0,0,.98);border-bottom:1px solid rgba(255,228,0,.2);padding:16px 20px;flex-direction:column;gap:0;z-index:199;max-height:calc(100vh - 64px);overflow-y:auto;}
     .nav-mobile.open{display:flex;}
-    .nav-mobile .nav-link{font-family:'Orbitron',monospace;font-size:.72rem;color:var(--text2);text-decoration:none;letter-spacing:2px;text-transform:uppercase;padding:14px 0;border-bottom:1px solid var(--border);width:100%;display:block;}
-    .nav-mobile .nav-link:hover,.nav-mobile .nav-link.active{color:var(--teal);}
-    .nav-mobile .nav-cta{margin-top:14px;justify-content:center;clip-path:none;border-radius:2px;display:flex;}
+    .nav-mobile .nav-link{font-family:var(--font-pixel) !important;font-size:.55rem;color:var(--text2);text-decoration:none;letter-spacing:2px;text-transform:uppercase;padding:14px 0;border-bottom:1px solid var(--border);width:100%;display:block;}
+    .nav-mobile .nav-link:hover,.nav-mobile .nav-link.active{color:var(--amber);}
+    .nav-mobile .nav-cta{margin-top:14px;justify-content:center;display:flex;}
 
     /* ═══════ HERO ═══════ */
     #hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding: 80px 24px 60px; }
@@ -153,8 +157,8 @@
     }
     .hero-grid {
       position: absolute; inset: 0; z-index: 0;
-      background-image: linear-gradient(rgba(0,255,231,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,231,0.04) 1px,transparent 1px);
-      background-size: 60px 60px;
+      background-image: linear-gradient(rgba(255,228,0,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(255,228,0,0.06) 1px,transparent 1px);
+      background-size: 40px 40px;
       mask-image: linear-gradient(180deg,transparent 0%,rgba(0,0,0,.4) 40%,rgba(0,0,0,.8) 100%);
     }
     .hero-vignette {
@@ -172,28 +176,28 @@
     .hero-inner { position: relative; z-index: 2; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 
     .hero-av-wrap { position: relative; margin-bottom: 28px; opacity: 0; animation: fadeUp .8s .05s ease forwards; }
-    .hero-av { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; object-position: center top; border: 2px solid var(--teal); box-shadow: 0 0 0 4px rgba(0,255,231,.08), 0 0 30px rgba(0,255,231,.25); display: block; }
+    .hero-av { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; object-position: center top; border: 3px solid var(--amber); box-shadow: 0 0 0 4px rgba(255,228,0,.1), 0 0 30px rgba(255,228,0,.35), 4px 4px 0 rgba(0,0,0,0.9); display: block; }
     .hero-av-live { position: absolute; bottom: 5px; right: 5px; width: 15px; height: 15px; border-radius: 50%; background: var(--green); border: 2px solid var(--bg); animation: pulse 2s ease-in-out infinite; box-shadow: 0 0 8px var(--green); }
 
-    .eyebrow { font-family: 'Orbitron', monospace; font-size: .6rem; letter-spacing: 5px; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; opacity: 0; animation: fadeUp .7s .12s ease forwards; }
+    .eyebrow { font-family: var(--font-pixel) !important; font-size: .48rem; letter-spacing: 4px; text-transform: uppercase; color: var(--amber); margin-bottom: 18px; opacity: 0; animation: fadeUp .7s .12s ease forwards; }
 
-    h1 { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(2.8rem, 8vw, 6rem); line-height: .95; letter-spacing: 3px; margin-bottom: 18px; opacity: 0; animation: fadeUp .8s .2s ease forwards, glitch 8s 3s ease-in-out infinite; }
+    h1 { font-family: var(--font-pixel) !important; font-weight: 900; font-size: clamp(1.6rem, 5vw, 3.5rem); line-height: 1.2; letter-spacing: 3px; margin-bottom: 18px; opacity: 0; animation: fadeUp .8s .2s ease forwards, glitch 8s 3s ease-in-out infinite; }
     h1 .line1 { display: block; color: #ffffff; }
-    h1 .line2 { display: block; color: var(--teal); text-shadow: 0 0 20px rgba(0,255,231,0.4); }
+    h1 .line2 { display: block; color: var(--amber); text-shadow: 0 0 20px rgba(255,228,0,0.5); }
 
     .hero-hook { font-family: 'Rajdhani', sans-serif; font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 600; color: #c8c0e8; letter-spacing: 3px; margin-bottom: 10px; opacity: 0; animation: fadeUp .8s .3s ease forwards; text-transform: uppercase; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
-    .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 520px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+    .hero-tagline { font-size: 1rem; font-weight: 400; color: #a098c8; max-width: 460px; line-height: 1.9; margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .38s ease forwards; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
 
     .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; opacity: 0; animation: fadeUp .8s .48s ease forwards; }
     .hero-cta .btn-primary, .hero-cta .btn-outline { justify-content: center; min-width: 220px; }
 
-    .hero-stats { display: flex; align-items: stretch; border: 1px solid rgba(0,255,231,.2); overflow: hidden; opacity: 0; animation: fadeUp .8s .6s ease forwards; }
-    .stat { padding: 14px 28px; text-align: center; border-right: 1px solid rgba(0,255,231,.15); background: rgba(0,255,231,.03); }
+    .hero-stats { display: flex; align-items: stretch; border: 2px solid rgba(255,228,0,.35); overflow: hidden; opacity: 0; animation: fadeUp .8s .6s ease forwards; box-shadow: 4px 4px 0 rgba(0,0,0,0.9); }
+    .stat { padding: 14px 28px; text-align: center; border-right: 1px solid rgba(255,228,0,.2); background: rgba(255,228,0,.04); }
     .stat:last-child { border-right: none; }
-    .stat-n { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 1.5rem; display: block; }
+    .stat-n { font-family: var(--font-pixel) !important; font-weight: 900; font-size: 1.2rem; display: block; }
     .stat-n.green { color: var(--green); }
-    .stat-n.teal  { color: var(--teal); }
-    .stat-l { font-family: 'Orbitron', monospace; font-size: .52rem; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; margin-top: 3px; display: block; }
+    .stat-n.teal  { color: var(--amber); }
+    .stat-l { font-family: var(--font-pixel) !important; font-size: .4rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-top: 6px; display: block; }
 
     .scroll-cue { position: absolute; right: 18px; left: auto; bottom: 22px; transform: none; z-index: 2; width: 34px; height: 34px; border: 1px solid rgba(0,255,231,.28); background: rgba(2,0,10,.45); display: grid; place-items: center; color: var(--teal); animation: scrollBob 2.5s ease-in-out infinite; cursor: pointer; transition: border-color .3s, box-shadow .3s; }
     .scroll-cue:hover { border-color: var(--teal); box-shadow: 0 0 12px rgba(0,255,231,.3); }
@@ -201,34 +205,33 @@
     .scroll-cue span { display: none; }
 
     /* ═══════ SERVER INFO ═══════ */
-    .server-info { display: flex; align-items: center; justify-content: space-evenly; gap: 0; margin-top: 28px; padding: 16px 0; width: 100%; max-width: 480px; background: rgba(139,47,255,0.06); border: 1px solid rgba(139,47,255,0.2); border-radius: 4px; opacity: 0; animation: fadeUp .8s .7s ease forwards; }
-    .server-stat { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', monospace; font-size: .72rem; color: var(--text2); letter-spacing: 1px; flex: 1; justify-content: center; border-right: 1px solid rgba(139,47,255,0.2); }
+    .server-info { display: flex; align-items: center; justify-content: space-evenly; gap: 0; margin-top: 28px; padding: 16px 0; width: 100%; max-width: 480px; background: rgba(255,228,0,0.05); border: 2px solid rgba(255,228,0,0.25); border-radius: 0; opacity: 0; animation: fadeUp .8s .7s ease forwards; box-shadow: 4px 4px 0 rgba(0,0,0,0.9); }
+    .server-stat { display: flex; align-items: center; gap: 8px; font-family: var(--font-pixel) !important; font-size: .5rem; color: var(--text2); letter-spacing: 1px; flex: 1; justify-content: center; border-right: 1px solid rgba(255,228,0,0.2); }
     .server-stat:last-child { border-right: none; }
     .server-online { color: var(--green); font-weight: 600; }
     .server-members { color: var(--text); font-weight: 600; }
     .server-est { color: var(--teal); font-weight: 500; font-size: .65rem; letter-spacing: 2px; text-transform: uppercase; }
 
-    /* ═══════ WHO / FEATURES ═══════ */
-    #who { background: var(--bg); border-top: 1px solid var(--border); }
+    /* ═══════ FEATURES ═══════ */
     #features { background: var(--bg); border-top: 1px solid var(--border); }
     .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; overflow: hidden; }
-    .feat { background: var(--card); padding: 32px 26px; position: relative; overflow: hidden; transition: background .2s, box-shadow .3s; }
-    .feat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--fc, var(--teal)); transform: scaleX(0); transform-origin: left; transition: transform .35s; box-shadow: 0 0 12px var(--fc, var(--teal)); }
-    .feat:hover { background: var(--card2); box-shadow: inset 0 0 40px rgba(0,255,231,.04); }
+    .feat { background: var(--card); padding: 32px 26px; position: relative; overflow: hidden; transition: background .15s, box-shadow .15s, border-color .15s; border: 2px solid var(--border2); box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
+    .feat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--fc, var(--amber)); transform: scaleX(0); transform-origin: left; transition: transform .25s; }
+    .feat:hover { background: var(--card2); border-color: var(--amber); box-shadow: 5px 5px 0 rgba(0,0,0,0.9); }
     .feat:hover::before { transform: scaleX(1); }
     .feat-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
-    .feat-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .82rem; color: var(--text); margin-bottom: 8px; letter-spacing: 1px; }
-    .feat-body { font-size: .9rem; color: var(--text2); line-height: 1.75; font-weight: 300; }
-    .feat-footnote { margin-top: 18px; text-align: center; font-family: 'Orbitron', monospace; font-size: .52rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; }
+    .feat-title { font-family: var(--font-pixel) !important; font-weight: 700; font-size: .6rem; color: var(--text); margin-bottom: 12px; letter-spacing: 1px; line-height: 1.6; }
+    .feat-body { font-size: 1rem; color: var(--text2); line-height: 1.75; font-weight: 400; }
+    .feat-footnote { margin-top: 18px; text-align: center; font-family: var(--font-pixel) !important; font-size: .42rem; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; }
 
     /* ═══════ INSIDE ═══════ */
     #inside { background: var(--bg2); border-top: 1px solid var(--border); }
     .inside-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 44px; }
-    .inside-card { background: var(--card); border: 1px solid var(--border); padding: 24px 20px; display: flex; align-items: flex-start; gap: 14px; transition: border-color .2s, background .2s, transform .2s, box-shadow .2s; clip-path: polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%); }
-    .inside-card:hover { border-color: var(--teal); background: var(--card2); transform: translateY(-2px); }
-    .inside-icon { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: var(--teal-dim); border: 1px solid rgba(0,255,231,.2); }
-    .inside-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .78rem; color: var(--text); margin-bottom: 5px; letter-spacing: 1px; }
-    .inside-body { font-size: .85rem; color: var(--text2); line-height: 1.7; font-weight: 300; }
+    .inside-card { background: var(--card); border: 2px solid var(--border2); padding: 24px 20px; display: flex; align-items: flex-start; gap: 14px; transition: border-color .15s, background .15s, transform .1s, box-shadow .1s; box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
+    .inside-card:hover { border-color: var(--amber); background: var(--card2); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.9), 0 0 16px rgba(255,228,0,0.15); }
+    .inside-icon { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: rgba(255,228,0,0.08); border: 2px solid rgba(255,228,0,0.25); }
+    .inside-title { font-family: var(--font-pixel) !important; font-weight: 700; font-size: .55rem; color: var(--text); margin-bottom: 8px; letter-spacing: 1px; line-height: 1.6; }
+    .inside-body { font-size: 1rem; color: var(--text2); line-height: 1.7; font-weight: 400; }
     .badge { display: inline-block; font-family: 'Orbitron', monospace; font-size: .5rem; letter-spacing: 2px; padding: 2px 7px; text-transform: uppercase; margin-left: 5px; vertical-align: middle; }
     .b-hot { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,255,231,.25); }
 
@@ -236,17 +239,16 @@
     .server-channels { margin-top: 64px; padding-top: 48px; border-top: 1px solid rgba(0,255,231,.1); }
     .channels-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 20px; letter-spacing: 1px; text-align: center; }
     .channels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-    .channel-tag { background: rgba(139,47,255,0.08); border: 1px solid rgba(0,255,231,.15); padding: 12px 16px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: .9rem; color: var(--text); text-align: center; transition: all .3s; position: relative; overflow: visible; cursor: pointer; }
-    .channel-tag:hover { border-color: var(--teal); background: rgba(0,255,231,.08); box-shadow: 0 0 12px rgba(0,255,231,.1); }
+    .channel-tag { background: var(--card); border: 2px solid var(--border2); padding: 12px 16px; border-radius: 0; font-family: var(--font-pixel) !important; font-size: .5rem; color: var(--text); text-align: center; transition: all .15s; position: relative; overflow: visible; cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.9); }
+    .channel-tag:hover { border-color: var(--amber); background: rgba(255,228,0,.06); box-shadow: 3px 3px 0 rgba(0,0,0,0.9), 0 0 12px rgba(255,228,0,.15); }
     @keyframes emoji-rise { 0%{transform:translateY(0) translateX(var(--ex)) scale(var(--es));opacity:1;} 70%{opacity:1;} 100%{transform:translateY(var(--ey)) translateX(calc(var(--ex) * 1.4)) scale(calc(var(--es) * .5));opacity:0;} }
     .emoji-rise { position:fixed; pointer-events:none; z-index:9999; line-height:1; animation:emoji-rise var(--ed) cubic-bezier(.2,.8,.4,1) forwards; }
 
     /* ═══════ GAMES ═══════ */
     #games { background: var(--bg); border-top: 1px solid var(--border); }
-    .games-hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
-    .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
-    .game-card { position: relative; overflow: hidden; aspect-ratio: 2/3; border: 1px solid var(--border2); background: var(--card); transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .28s; cursor: pointer; }
-    .game-card:hover { transform: translateY(-10px) scale(1.03); border-color: var(--teal); box-shadow: 0 12px 32px rgba(0,0,0,.6); }
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 48px; }
+    .game-card { position: relative; overflow: hidden; aspect-ratio: 2/3; border: 2px solid var(--border2); background: var(--card); transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .15s, box-shadow .15s; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
+    .game-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--amber); box-shadow: 6px 6px 0 rgba(0,0,0,0.9), 0 0 20px rgba(255,228,0,0.2); }
     .game-hover-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(2,0,10,.0) 0%, rgba(2,0,10,.85) 45%, rgba(2,0,10,.97) 100%); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 16px 12px; opacity: 0; transition: opacity .25s ease; pointer-events: none; }
     .game-card:hover .game-hover-overlay { opacity: 1; }
     .game-hover-badge { font-family: 'Orbitron', monospace; font-size: .58rem; font-weight: 700; letter-spacing: 2px; padding: 3px 10px; border-radius: 2px; text-transform: uppercase; }
@@ -254,125 +256,28 @@
     .game-hover-badge.release { background: rgba(255,45,107,.15); color: var(--red); border: 1px solid rgba(255,45,107,.3); }
     .game-hover-date { font-family: 'Orbitron', monospace; font-size: .72rem; font-weight: 900; color: #fff; margin: 4px 0 8px; letter-spacing: 1px; }
     .game-hover-divider { width: 40px; height: 1px; background: rgba(255,255,255,.15); margin: 4px 0 8px; }
-    .game-hover-desc { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: var(--text2); line-height: 1.4; }
-    .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
-    .g1{background:linear-gradient(160deg,#1a0808,#300)} .g2{background:linear-gradient(160deg,#080816,#14143a)} .g3{background:linear-gradient(160deg,#001a18,#003530)} .g4{background:linear-gradient(160deg,#071a03,#0d3008)} .g5{background:linear-gradient(160deg,#1a1500,#342900)}
-    .game-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; contain: layout style paint; }
-    .game-card:hover .game-img { transform: scale(1.06); }
+    .game-hover-desc { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: var(--text2); line-height: 1.4; text-align: center; }
+    .game-fb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
     .game-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg,rgba(5,3,15,.97) 0%,transparent 100%); padding: 16px 10px 10px; }
-    .game-title { font-family: 'Orbitron', monospace; font-weight: 700; font-size: .65rem; color: var(--text); line-height: 1.2; letter-spacing: .5px; }
-    .game-genre { font-family: 'Orbitron', monospace; font-size: .52rem; color: var(--teal); letter-spacing: 1px; margin-top: 2px; }
-    .game-status-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-    .game-status-tag {
-      font-family: 'Orbitron', monospace;
-      font-size: .45rem;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 2px;
-      border: 1px solid transparent;
-    }
-    .game-status-tag.open { color: var(--teal); background: rgba(0,255,231,.12); border-color: rgba(0,255,231,.28); }
-    .game-status-tag.closed { color: #cbbfff; background: rgba(139,47,255,.14); border-color: rgba(139,47,255,.3); }
-    .game-ribbons {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .game-ribbon {
-      position: relative;
-      font-family: 'Orbitron', monospace;
-      font-size: .46rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 4px 8px 4px 10px;
-      border: 1px solid transparent;
-      background: rgba(2,0,10,.86);
-      backdrop-filter: blur(1px);
-    }
-    .game-ribbon::after {
-      content: '';
-      position: absolute;
-      right: -8px;
-      top: 0;
-      width: 0;
-      height: 0;
-      border-top: 11px solid transparent;
-      border-bottom: 11px solid transparent;
-      border-left: 8px solid currentColor;
-      opacity: .28;
-    }
-    .game-ribbon.open {
-      color: var(--teal);
-      border-color: rgba(0,255,231,.28);
-      background: rgba(0,255,231,.1);
-    }
-    .game-ribbon.closed {
-      color: #d5c8ff;
-      border-color: rgba(139,47,255,.35);
-      background: rgba(139,47,255,.16);
-    }
-    .game-card.invincible-card .game-ribbons {
-      top: 0; left: 0; right: 0;
-      display: grid; grid-template-columns: 1fr; gap: 0;
-      border-bottom: 1px solid rgba(139,47,255,.35);
-    }
-    .game-card.invincible-card .game-ribbon {
-      padding: 6px 6px; text-align: center; border: 0; border-radius: 0;
-      backdrop-filter: none; background: rgba(139,47,255,.92);
-    }
-    .game-card.invincible-card .game-ribbon::after { display: none; }
-    .game-card.invincible-card .game-ribbon.open { color: #f2e9ff; border-right: 0; background: rgba(139,47,255,.95); }
-    .game-card.invincible-card .game-ribbon.closed { color: #f2e9ff; background: rgba(116,36,170,.95); }
-    .game-card.invincible-card { overflow: visible; }
-    .invincible-top-tail {
-      position: absolute; top: -24px; left: 0; right: 0; z-index: 4;
-      display: grid; grid-template-columns: 1fr 1fr;
-      border: 1px solid rgba(139,47,255,.55); border-bottom: none;
-      background: rgba(129,46,189,.95);
-      clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 8px 100%);
-      box-shadow: 0 0 14px rgba(139,47,255,.4), 0 0 26px rgba(139,47,255,.18);
-      opacity: 0; transform: translateY(-8px); transition: opacity .3s, transform .3s; pointer-events: none;
-    }
-    .game-card.invincible-card:hover .invincible-top-tail,
-    .game-card.invincible-card.locked .invincible-top-tail { opacity: 1; transform: translateY(0); }
-    .invincible-top-tail::before, .invincible-top-tail::after {
-      content: ''; position: absolute; top: 100%; width: 0; height: 0;
-      border-top: 8px solid rgba(129,46,189,.95);
-    }
-    .invincible-top-tail::before { left: 0; border-right: 8px solid transparent; }
-    .invincible-top-tail::after  { right: 0; border-left: 8px solid transparent; }
-    .invincible-top-tail span {
-      font-family: 'Orbitron', monospace; font-size: .44rem; letter-spacing: 1.3px;
-      color: #f3ebff; text-align: center; padding: 5px 4px;
-      border-right: 1px solid rgba(255,255,255,.16); text-shadow: 0 0 8px rgba(255,255,255,.22);
-    }
-    .invincible-top-tail span:last-child { border-right: none; }
-    .invincible-bottom-tail {
-      position: absolute; left: 0; right: 0; bottom: -22px; z-index: 4;
-      font-family: 'Orbitron', monospace; font-size: .48rem; letter-spacing: 1.8px;
-      color: #ffd9ec; text-align: center; padding: 5px 4px;
-      border: 1px solid rgba(255,45,107,.45); background: rgba(162,27,92,.9);
-      clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
-      box-shadow: 0 0 12px rgba(255,45,107,.35), 0 0 24px rgba(255,45,107,.15);
-      text-shadow: 0 0 8px rgba(255,255,255,.2);
-      opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none;
-    }
-    .game-card.invincible-card:hover .invincible-bottom-tail,
-    .game-card.invincible-card.locked .invincible-bottom-tail { opacity: 1; transform: translateY(0); }
-    @media (min-width: 1025px) {
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; row-gap: 36px; }
-      .game-hover-desc { display: none; }
-    }
+    .game-title { font-family: var(--font-pixel) !important; font-weight: 700; font-size: .5rem; color: var(--text); line-height: 1.5; letter-spacing: .5px; }
+    .game-genre { font-family: var(--font-pixel) !important; font-size: .38rem; color: var(--amber); letter-spacing: 1px; margin-top: 4px; }
+    @media (min-width: 1025px) { .games-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+    @media (max-width: 768px) { .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; } }
+
+    /* ═══════ MEDIA SECTION ═══════ */
+    .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
+    .media-card { background: var(--card); border: 2px solid var(--border2); padding: 24px 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s, background .15s, transform .1s, box-shadow .1s; box-shadow: 3px 3px 0 rgba(0,0,0,0.9); }
+    .media-card:hover { border-color: var(--amber); background: var(--card2); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.9), 0 0 16px rgba(255,228,0,0.1); }
+    .media-icon { font-size: 2rem; line-height: 1; }
+    .media-title { font-family: var(--font-pixel) !important; font-size: .6rem; color: var(--text); line-height: 1.6; letter-spacing: 1px; margin-bottom: 4px; }
+    .media-sub { font-family: var(--font-pixel) !important; font-size: .38rem; color: var(--amber); letter-spacing: 1px; margin-bottom: 10px; }
+    .media-desc { font-size: 1rem; color: var(--text2); line-height: 1.7; }
+    @media (max-width: 1024px) { .media-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .media-grid { grid-template-columns: 1fr; } }
+
     /* ═══════ MOBILE RESPONSIVE ═══════ */
     @media (max-width: 1024px) {
       .wrap { padding: 0 32px; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
       .feat-grid { grid-template-columns: repeat(2,1fr); }
       .inside-grid { grid-template-columns: 1fr; }
       .channels-grid { grid-template-columns: repeat(2,1fr); }
@@ -382,7 +287,6 @@
       nav { padding: 0 16px; }
       .nav-hamburger { display: flex; }
       .nav-r > :not(.nav-hamburger) { display: none; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
       .feat-grid { grid-template-columns: 1fr; }
       .hero-stats { flex-direction: column; }
       .stat { border-right: none; border-bottom: 1px solid rgba(0,255,231,.15); }
@@ -390,72 +294,75 @@
       .server-info { flex-direction: column; gap: 12px; }
       .channels-grid { grid-template-columns: 1fr; }
       .scroll-cue { right: 10px; bottom: 14px; width: 30px; height: 30px; }
-      .game-ribbon { font-size: .65rem; letter-spacing: 1px; padding: 5px 10px 5px 12px; }
-      .game-card.invincible-card .game-ribbon { font-size: .65rem; padding: 7px 10px; }
-      .invincible-top-tail span { font-size: .55rem; letter-spacing: 1px; }
-      .invincible-bottom-tail { font-size: .58rem; letter-spacing: 1.2px; }
-    }
-    /* ═══════ GAME CARD HOVER SEQUEL ═══════ */
-    .game-card-wrapper { position: relative; height: fit-content; }
-    .game-card-sequel {
-      position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px;
-      opacity: 0; transform: translateY(-10px) scale(0.95);
-      transition: opacity .3s ease, transform .3s ease;
-      pointer-events: none; z-index: 10; visibility: hidden;
-    }
-    .game-card-wrapper:hover .game-card-sequel { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; visibility: visible; }
-    .game-card-sequel .game-card { margin: 0; }
-    .sequel-indicator {
-      position: absolute; bottom: 12px; right: 12px; font-size: 1.2rem;
-      color: var(--teal); opacity: 0; transform: translateX(0);
-      transition: opacity .3s, transform .3s, color .3s;
-      font-weight: 700; text-shadow: 0 0 8px rgba(0,255,231,.3);
-      z-index: 3; cursor: pointer; user-select: none;
-    }
-    .game-card.has-sequel:hover .sequel-indicator { opacity: 1; transform: translateX(4px); }
-    .sequel-indicator.active { opacity: 1; color: var(--green); text-shadow: 0 0 12px rgba(57,255,138,.5); transform: translateX(8px) rotate(90deg); }
-    .game-card-sequel.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; visibility: visible; }
-    @media (max-width: 768px) {
-      .sequel-indicator { font-size: 1rem; bottom: 10px; right: 10px; opacity: 0.75; }
     }
     @media (max-width: 480px) {
       .wrap { padding: 0 16px; }
       nav { padding: 0 12px; }
       .nav-name { font-size: .86rem !important; letter-spacing: 2px !important; }
       .section-pad { padding: 64px 0; }
-      .games-grid { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
       h1 { font-size: clamp(2rem, 6vw, 3.5rem); }
       h2 { font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
     }
-  
-    .scroll-cue{left:auto !important;right:18px !important;bottom:22px !important;transform:none !important;width:34px !important;height:34px !important;display:grid !important;place-items:center !important;border:1px solid rgba(0,255,231,.28) !important;background:rgba(2,0,10,.45) !important;cursor:pointer !important;transition:border-color .3s, box-shadow .3s !important;}
-    .scroll-cue:hover{border-color:var(--teal) !important;box-shadow:0 0 12px rgba(0,255,231,.3) !important;}
-    .scroll-cue::after{content:'\2193' !important;color:var(--teal) !important;font-size:.9rem !important;line-height:1 !important;}
+
+    .scroll-cue{left:auto !important;right:18px !important;bottom:22px !important;transform:none !important;width:34px !important;height:34px !important;display:grid !important;place-items:center !important;border:2px solid rgba(255,228,0,.4) !important;background:rgba(0,0,0,.6) !important;cursor:pointer !important;transition:border-color .15s, box-shadow .15s !important;box-shadow:2px 2px 0 rgba(0,0,0,0.9) !important;}
+    .scroll-cue:hover{border-color:var(--amber) !important;box-shadow:3px 3px 0 rgba(0,0,0,0.9), 0 0 12px rgba(255,228,0,.3) !important;}
+    .scroll-cue::after{content:'\2193' !important;color:var(--amber) !important;font-size:.9rem !important;line-height:1 !important;}
     .scroll-cue span{display:none !important;}
     @media (max-width: 768px){ .scroll-cue{right:10px !important;bottom:14px !important;width:30px !important;height:30px !important;} }
 
     /* ═══════ PARTICLE CONTROLS ═══════ */
     .particle-controls {
-      position: fixed; top: 88px; right: 18px; z-index: 100;
-      background: rgba(2,0,10,.95); border: 1px solid rgba(0,255,231,.2); border-radius: 4px;
-      padding: 16px; box-shadow: 0 0 16px rgba(0,255,231,.15); backdrop-filter: blur(2px);
-      font-family: 'Orbitron', monospace; min-width: 200px;
+      position: fixed;
+      top: 88px;
+      right: 18px;
+      z-index: 100;
+      background: rgba(0,0,0,.95);
+      border: 2px solid rgba(255,228,0,.3);
+      border-radius: 0;
+      padding: 16px;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.9);
+      backdrop-filter: blur(2px);
+      font-family: var(--font-pixel);
+      min-width: 200px;
     }
-    .particle-controls-label { font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; display: block; }
+    .particle-controls-label {
+      font-size: .55rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 12px;
+      display: block;
+    }
     .control-group { margin-bottom: 14px; }
     .control-group:last-child { margin-bottom: 0; }
     .toggle-group { display: flex; align-items: center; gap: 10px; }
-    .toggle-switch { position: relative; width: 44px; height: 24px; background: rgba(139,47,255,.2); border: 1px solid rgba(0,255,231,.2); border-radius: 12px; cursor: pointer; transition: background .3s, border-color .3s; flex-shrink: 0; }
-    .toggle-switch.enabled { background: rgba(0,255,231,.25); border-color: rgba(0,255,231,.4); }
-    .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: var(--teal); border-radius: 50%; top: 2px; left: 2px; transition: left .3s; }
-    .toggle-switch.enabled::after { left: 24px; }
+    .toggle-switch {
+      position: relative; width: 44px; height: 24px;
+      background: rgba(255,228,0,.1); border: 2px solid rgba(255,228,0,.25);
+      border-radius: 0; cursor: pointer; transition: background .15s, border-color .15s; flex-shrink: 0;
+    }
+    .toggle-switch.enabled { background: rgba(255,228,0,.2); border-color: rgba(255,228,0,.5); }
+    .toggle-switch::after {
+      content: ''; position: absolute; width: 18px; height: 16px;
+      background: var(--amber); border-radius: 0; top: 2px; left: 2px; transition: left .15s;
+    }
+    .toggle-switch.enabled::after { left: 22px; }
     .toggle-label { font-size: .75rem; color: var(--text); flex: 1; }
     .intensity-slider-group { display: flex; flex-direction: column; gap: 8px; }
     .intensity-label { font-size: .7rem; color: var(--text2); letter-spacing: 1px; }
     .slider-value { color: var(--teal); font-weight: 600; }
-    input[type="range"] { width: 100%; height: 4px; border-radius: 2px; background: rgba(139,47,255,.3); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; box-shadow: 0 0 8px rgba(0,255,231,.5); }
-    input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; border: none; box-shadow: 0 0 8px rgba(0,255,231,.5); }
+    input[type="range"] {
+      width: 100%; height: 4px; border-radius: 0; background: rgba(255,228,0,.2);
+      outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+      border-radius: 0; background: var(--amber); cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 0; background: var(--amber);
+      cursor: pointer; border: none; box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+    }
     @media (max-width: 768px) {
       .particle-controls { top: 64px; right: 10px; min-width: 180px; padding: 12px; }
       .toggle-switch { width: 40px; height: 22px; }
@@ -469,7 +376,7 @@
   <nav>
     <div class="nav-l">
       <a href="index.html" class="logo" aria-label="Monolith Social">
-        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">&#9670; Monolith Social &#9670;</span>
+        <span class="nav-name" style="font-size: 1.1rem; letter-spacing: 3px;">◆ Monolith Social ◆</span>
       </a>
     </div>
     <div class="nav-r">
@@ -478,7 +385,7 @@
       <a href="quiz.html" class="nav-link">Quiz</a>
       <a href="reviews.html" class="nav-link">Reviews</a>
       <a href="stats.html" class="nav-link">Member Luv</a>
-      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join &#8594;</a>
+      <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
       <button class="nav-hamburger" aria-label="Menu toggle">
         <span></span><span></span><span></span>
       </button>
@@ -492,7 +399,7 @@
     <a href="quiz.html" class="nav-link">Quiz</a>
     <a href="reviews.html" class="nav-link">Reviews</a>
     <a href="stats.html" class="nav-link">Member Luv</a>
-    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community &#8594;</a>
+    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
   </div>
 
   <!-- HERO SECTION -->
@@ -500,35 +407,27 @@
     <div class="wrap">
       <div class="hero-inner reveal">
         <div class="hero-av-wrap">
-          <img src="avatar.webp" alt="Monolith Social" class="hero-av" aria-hidden="true"/>
+          <img src="avatar.webp" alt="Your Avatar" class="hero-av" aria-hidden="true"/>
           <span class="hero-av-live" aria-hidden="true"></span>
         </div>
-        <span class="eyebrow">Fighting Games &middot; FFXIV &middot; Media Analysis</span>
+        <span class="eyebrow">Fighting Games · FFXIV · Media Analysis</span>
         <h1>
           <span class="line1">Monolith</span>
           <span class="line2">Social</span>
         </h1>
         <p class="hero-hook">A Low-Noise Hub for Adults Who Play With Intent.</p>
-        <p class="hero-tagline">For adults who want to lab matches, run content, and talk narrative depth without the noise of massive public servers. Real life comes first &mdash; but dead weight gets cut.</p>
+        <p class="hero-tagline">For adults who want to lab matches, run content, and talk narrative depth without the noise of massive public servers. Real life comes first — but dead weight gets cut.</p>
         <div class="hero-cta">
           <a href="#who" class="btn-primary" aria-label="See who this is for">
-            <svg class="icon" aria-hidden="true" width="18" height="18">
-              <use href="#icon-arrow-right"></use>
-            </svg>
+            <svg class="icon" aria-hidden="true" width="18" height="18"><use href="#icon-arrow-right"></use></svg>
             Who This Is For
           </a>
           <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="btn-outline" aria-label="Join Monolith Social Discord">Join Us</a>
         </div>
         <div class="server-info">
-          <div class="server-stat">
-            <span class="server-online">&#x1F7E2; 50 Online</span>
-          </div>
-          <div class="server-stat">
-            <span class="server-members">&#x1F465; 322 Members</span>
-          </div>
-          <div class="server-stat">
-            <span class="server-est">Est. Jul 2021</span>
-          </div>
+          <div class="server-stat"><span class="server-online">&#x1F7E2; 50 Online</span></div>
+          <div class="server-stat"><span class="server-members">&#x1F465; 322 Members</span></div>
+          <div class="server-stat"><span class="server-est">Est. Jul 2021</span></div>
         </div>
         <div class="scroll-cue" aria-hidden="true"></div>
       </div>
@@ -547,31 +446,31 @@
       <div class="reveal">
         <span class="sec-tag">Who This Is For</span>
         <h2>Three Types of <em>Players</em></h2>
-        <p class="sec-sub">This isn&rsquo;t a general gaming server. If you fit one of these, you&rsquo;ll find your people here.</p>
+        <p class="sec-sub">This isn't a general gaming server. If you fit one of these, you'll find your people here.</p>
       </div>
       <div class="feat-grid">
         <div class="feat reveal" style="--fc: var(--red)">
-          <div class="feat-icon">&#x1F94A;</div>
+          <div class="feat-icon">🥊</div>
           <div>
             <h3 class="feat-title">The Competitors &amp; Lab Partners</h3>
-            <p class="feat-body">Active players in Marvel T&#333;kon, Avatar Legends, and Invincible VS. People who study matchups, share tech, and actually show up for sets. If you lab, you belong here.</p>
-            <span class="feat-footnote">Marvel T&#333;kon &nbsp;&bull;&nbsp; Avatar Legends &nbsp;&bull;&nbsp; Invincible VS</span>
+            <p class="feat-body">Active players in Marvel Tōkon, Avatar Legends, and Invincible VS. People who study matchups, share tech, and actually show up for sets. If you lab, you belong here.</p>
+            <span class="feat-footnote">Marvel Tōkon &#160;&#8226;&#160; Avatar Legends &#160;&#8226;&#160; Invincible VS</span>
           </div>
         </div>
         <div class="feat reveal" style="--fc: var(--teal)">
-          <div class="feat-icon">&#x2694;&#xFE0F;</div>
+          <div class="feat-icon">⚔️</div>
           <div>
             <h3 class="feat-title">The MMO Crowd</h3>
-            <p class="feat-body">FFXIV players who want a quiet home base, not server drama. Whether you&rsquo;re clearing savage raids or going full crafting goblin, this is a low-noise zone for serious players.</p>
-            <span class="feat-footnote">FFXIV &nbsp;&bull;&nbsp; Raids &nbsp;&bull;&nbsp; Crafting &amp; Housing</span>
+            <p class="feat-body">FFXIV players who want a quiet home base, not server drama. Whether you're clearing savage raids or going full crafting goblin, this is a low-noise zone for serious players.</p>
+            <span class="feat-footnote">FFXIV &#160;&#8226;&#160; Raids &#160;&#8226;&#160; Crafting &amp; Housing</span>
           </div>
         </div>
         <div class="feat reveal" style="--fc: var(--purple)">
-          <div class="feat-icon">&#x1F9E0;</div>
+          <div class="feat-icon">🧠</div>
           <div>
             <h3 class="feat-title">The Analysts</h3>
-            <p class="feat-body">People who want to actually dissect narrative media &mdash; superhero arcs, mental health parallels in Spider-Man, the philosophy of The Odyssey. Substance over surface-level takes.</p>
-            <span class="feat-footnote">Narrative Analysis &nbsp;&bull;&nbsp; Media Threads &nbsp;&bull;&nbsp; Deep Dives</span>
+            <p class="feat-body">People who want to actually dissect narrative media — superhero arcs, mental health parallels in Spider-Man, the philosophy of The Odyssey. Substance over surface-level takes.</p>
+            <span class="feat-footnote">Narrative Analysis &#160;&#8226;&#160; Media Threads &#160;&#8226;&#160; Deep Dives</span>
           </div>
         </div>
       </div>
@@ -583,66 +482,66 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">Inside Monolith Social</span>
-        <h2>What You <em>Actually</em> Get</h2>
+        <h2>What You Actually Get</h2>
         <p class="sec-sub">A curated, intentionally small space. No trending-topic chasing, no clout games.</p>
       </div>
       <div class="inside-grid">
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x1F94B;</div>
+          <div class="inside-icon" aria-hidden="true">🥋</div>
           <div>
             <h3 class="inside-title">Lab &amp; Matchup Channels</h3>
             <p class="inside-body">Dedicated spaces for frame data, tech sharing, and finding sparring partners. No casual hype posts drowning out the actual work.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x1F310;</div>
+          <div class="inside-icon" aria-hidden="true">🌐</div>
           <div>
             <h3 class="inside-title">FFXIV Home Base</h3>
             <p class="inside-body">Raid planning, housing flexes, crafting threads. A quiet corner for Eorzea regulars who want community without the noise of mega-servers.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x1F4D6;</div>
+          <div class="inside-icon" aria-hidden="true">📖</div>
           <div>
             <h3 class="inside-title">Narrative Deep Dives</h3>
             <p class="inside-body">Long-form analysis threads on superhero arcs, game writing, and media that actually has something to say. Bring your takes, back them up.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x1F507;</div>
+          <div class="inside-icon" aria-hidden="true">🔇</div>
           <div>
             <h3 class="inside-title">Low Drama by Design</h3>
             <p class="inside-body">Adult-only, intentionally curated. Moderation keeps the floor clean so conversations stay worth having. No tolerance for performative nonsense.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x1F3AE;</div>
+          <div class="inside-icon" aria-hidden="true">🎮</div>
           <div>
             <h3 class="inside-title">Active Game Nights</h3>
-            <p class="inside-body">Organized sessions, not wishful scheduling. When something is happening, it actually happens &mdash; because the people here show up.</p>
+            <p class="inside-body">Organized sessions, not wishful scheduling. When something is happening, it actually happens — because the people here show up.</p>
           </div>
         </div>
         <div class="inside-card reveal">
-          <div class="inside-icon" aria-hidden="true">&#x26A1;</div>
+          <div class="inside-icon" aria-hidden="true">⚡</div>
           <div>
             <h3 class="inside-title">18+ Spaces</h3>
-            <p class="inside-body">Rooms for adult conversation that doesn&rsquo;t need to be sanitized. Chill, off-topic, and the occasional chaotic tangent that ends up being the best thread of the week.</p>
+            <p class="inside-body">Rooms for adult conversation that doesn't need to be sanitized. Chill, off-topic, and the occasional chaotic tangent that somehow ends up being the best thread of the week.</p>
           </div>
         </div>
       </div>
       <div class="server-channels reveal">
         <h3 class="channels-title">Active Channels</h3>
         <div class="channels-grid">
-          <div class="channel-tag">&#x1F94A; Fighting Game Lab</div>
-          <div class="channel-tag">&#x2694;&#xFE0F; FFXIV Base Camp</div>
-          <div class="channel-tag">&#x1F9E0; Media Analysis</div>
-          <div class="channel-tag">&#x1F37E; 18+ Lounge</div>
+          <div class="channel-tag">🥊 Fighting Game Lab</div>
+          <div class="channel-tag">⚔️ FFXIV Base Camp</div>
+          <div class="channel-tag">🧠 Media Analysis</div>
+          <div class="channel-tag">🍾 18+ Lounge</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- EXPECTATIONS / RULES OF ENGAGEMENT -->
+  <!-- EXPECTATIONS SECTION -->
   <section id="expectations" class="section-pad" style="background: var(--bg2); border-top: 1px solid var(--border);">
     <div class="wrap">
       <div class="reveal">
@@ -651,32 +550,25 @@
         <p class="sec-sub">This is not a server for passive observers. These are the expectations, stated plainly.</p>
       </div>
       <div class="inside-grid reveal" style="margin-top: 44px;">
-        <div class="inside-card" style="border-color: var(--red); align-items: flex-start;">
-          <div class="inside-icon" aria-hidden="true" style="background: rgba(255,45,107,0.1); border-color: rgba(255,45,107,0.25);">&#x2702;&#xFE0F;</div>
-          <div>
-            <h3 class="inside-title">Inactivity Gets You Cut</h3>
-            <p class="inside-body">This is an intentionally small, curated space. Join and stay a silent ghost with zero engagement, and you will be pruned. We value quality over headcount. If you&rsquo;re just collecting server icons, keep moving.</p>
-          </div>
-        </div>
         <div class="inside-card" style="align-items: flex-start;">
-          <div class="inside-icon" aria-hidden="true">&#x1F91D;</div>
+          <div class="inside-icon" aria-hidden="true">🤝</div>
           <div>
             <h3 class="inside-title">Real Life Comes First</h3>
-            <p class="inside-body">Go on vacation, get busy, disappear for a few weeks &mdash; no problem. This isn&rsquo;t a clocking-in arrangement. But if you never engage at all, that&rsquo;s a different story.</p>
+            <p class="inside-body">Go on vacation, get busy, disappear for a few weeks — no problem. This isn't a clocking-in arrangement. But if you never engage at all, that's a different story.</p>
           </div>
         </div>
         <div class="inside-card" style="align-items: flex-start;">
-          <div class="inside-icon" aria-hidden="true">&#x1F3AF;</div>
+          <div class="inside-icon" aria-hidden="true">🎯</div>
           <div>
             <h3 class="inside-title">Contribute Something Real</h3>
-            <p class="inside-body">Drop a take, share a clip, ask a question, respond to someone. The bar isn&rsquo;t high &mdash; it just can&rsquo;t be zero. If you&rsquo;re here, be here.</p>
+            <p class="inside-body">Drop a take, share a clip, ask a question, respond to someone. The bar isn't high — it just can't be zero. If you're here, be here.</p>
           </div>
         </div>
         <div class="inside-card" style="align-items: flex-start;">
-          <div class="inside-icon" aria-hidden="true">&#x1F6AB;</div>
+          <div class="inside-icon" aria-hidden="true">🚫</div>
           <div>
             <h3 class="inside-title">No Dead Weight</h3>
-            <p class="inside-body">We prune regularly to keep the community tight and worth being in. A small, active group is worth ten times more than a bloated server full of lurkers. You&rsquo;ve been warned &mdash; in a good way.</p>
+            <p class="inside-body">We prune regularly to keep the community tight and worth being in. A small, active group is worth ten times more than a bloated server full of lurkers. You've been warned — in a good way.</p>
           </div>
         </div>
       </div>
@@ -688,155 +580,166 @@
     <div class="wrap">
       <div class="reveal">
         <span class="sec-tag">Active Titles</span>
-        <h2>What We&rsquo;re <em>Actually Playing</em></h2>
-        <p class="sec-sub">The games on rotation right now. These aren&rsquo;t recommendations &mdash; members are actively in these.</p>
+        <h2>The <em>Fight Games</em> We Run</h2>
+        <p class="sec-sub">These are the games we're actually in — labbing, running sets, and talking matchups. No casual list padding.</p>
       </div>
-      <div class="games-hdr reveal">
-        <div class="games-tags">
-          <span class="tag">Fighting</span>
-          <span class="tag">MMORPG</span>
-          <span class="tag">Action</span>
-          <span class="tag">Visual Novel</span>
-          <span class="tag">Puzzle</span>
+      <div class="games-grid reveal">
+
+        <div class="game-card" style="background:linear-gradient(160deg,#1a0505,#3d0000);">
+          <div class="game-fb">🥊</div>
+          <div class="game-label">
+            <div class="game-title">Street Fighter 6</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge release">LIVE</div>
+              <div class="game-hover-date">2023</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">The new standard for competitive 2D fighters. Drive System, Modern Controls, World Tour.</div>
+            </div>
+          </div>
         </div>
-        <a href="#" class="btn-primary" aria-label="View All Games">
-          <svg class="icon" aria-hidden="true" width="18" height="18">
-            <use href="#icon-arrow-right"></use>
-          </svg>
-          View All Games
-        </a>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#05050f,#12003d);">
+          <div class="game-fb">⚡</div>
+          <div class="game-label">
+            <div class="game-title">Tekken 8</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge release">LIVE</div>
+              <div class="game-hover-date">2024</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">3D king is back. Heat System, aggressive gameplay, and the Mishima legacy continues.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#1a0800,#3d1800);">
+          <div class="game-fb">💥</div>
+          <div class="game-label">
+            <div class="game-title">Invincible VS</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">NEW</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Fast brutal battles from the Invincible universe. The community's most hyped release right now.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#150010,#3d0020);">
+          <div class="game-fb">🕷️</div>
+          <div class="game-label">
+            <div class="game-title">Marvel Tōkon</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">UPCOMING</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Marvel universe collides in a tag-based fighter. The roster drops are unreal.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-card" style="background:linear-gradient(160deg,#00101a,#002535);">
+          <div class="game-fb">🌊</div>
+          <div class="game-label">
+            <div class="game-title">Avatar Legends</div>
+            <div class="game-genre">Fighting</div>
+          </div>
+          <div class="game-hover-overlay">
+            <div class="game-hover-content">
+              <div class="game-hover-badge beta">UPCOMING</div>
+              <div class="game-hover-date">2025</div>
+              <div class="game-hover-divider"></div>
+              <div class="game-hover-desc">Bending meets brawling. Avatar-universe fighter — one of the most anticipated titles on our radar.</div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="games-grid">
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('download.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Hotline Miami</div>
-              <div class="game-genre">Action</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge beta">CLASSIC</div>
-              <div class="game-hover-date">Retro Indie</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Brutal top-down action with an unforgettable soundtrack. A cult classic.</div>
-            </div>
-          </div>
-        </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('dead-by-daylight-1db3d.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Dead by Daylight</div>
-              <div class="game-genre">Survival Horror</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge release">POPULAR</div>
-              <div class="game-hover-date">2016</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Asymmetrical multiplayer horror. Hide or hunt.</div>
-            </div>
+    </div>
+  </section>
+
+  <!-- MEDIA & CULTURE SECTION -->
+  <section id="media" class="section-pad" style="background: var(--bg2); border-top: 1px solid var(--border);">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="sec-tag">Beyond the Controller</span>
+        <h2>What We <em>Watch, Read &amp; Obsess</em> Over</h2>
+        <p class="sec-sub">This community isn't just gamers. We're comic heads, lore nerds, and narrative obsessives. Here's what's in the rotation.</p>
+      </div>
+      <div class="media-grid reveal">
+
+        <div class="media-card">
+          <div class="media-icon">🟡</div>
+          <div class="media-info">
+            <div class="media-title">Invincible</div>
+            <div class="media-sub">Amazon · Comics · Robert Kirkman</div>
+            <p class="media-desc">The show that broke everyone. We break down every episode, every arc, every brutal twist. Kirkman's run is required reading here.</p>
           </div>
         </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('miku_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Hatsune Miku Logic Paint</div>
-              <div class="game-genre">Puzzle / Rhythm</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge">GEM</div>
-              <div class="game-hover-date">Anime Strategy</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Paint and solve puzzles to Miku&rsquo;s iconic songs.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">🕷️</div>
+          <div class="media-info">
+            <div class="media-title">Marvel</div>
+            <div class="media-sub">Comics · MCU · Animated</div>
+            <p class="media-desc">From 616 deep dives to MCU timeline debates. Spider-Man psychology, X-Men lore, and the comics that actually slap.</p>
           </div>
         </div>
-        <div class="game-card reveal">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('saya_cover.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">The Song of Saya</div>
-              <div class="game-genre">Visual Novel</div>
-            </div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-badge">INDIE GEM</div>
-              <div class="game-hover-date">Deep Story</div>
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">A haunting visual novel about isolation and connection.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">🦷</div>
+          <div class="media-info">
+            <div class="media-title">DC</div>
+            <div class="media-sub">Comics · Animated · Film</div>
+            <p class="media-desc">Batman arcs, Justice League lore, and the animated universe that still holds up. DC comics run deeper than most people give them credit for.</p>
           </div>
         </div>
-        <div class="game-card-wrapper">
-          <div class="game-card reveal has-sequel">
-            <div class="game-link">
-              <div class="game-img" style="background-image:url('deathstranding.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-              <div class="sequel-indicator" aria-label="More versions available">&rarr;</div>
-              <div class="game-label">
-                <div class="game-title">Death Stranding</div>
-                <div class="game-genre">Action Adventure</div>
-              </div>
-            </div>
-            <div class="game-hover-overlay">
-              <div class="game-hover-content">
-                <div class="game-hover-badge release">GAME</div>
-                <div class="game-hover-date">2019</div>
-                <div class="game-hover-divider"></div>
-                <div class="game-hover-desc">Kojima&rsquo;s surreal masterpiece.</div>
-              </div>
-            </div>
-          </div>
-          <div class="game-card-sequel">
-            <div class="game-card">
-              <div class="game-link">
-                <div class="game-img" style="background-image:url('MV5BYmVkNDM3MzUtN2YyYS00MDg0LWIxN2EtMjQ2ZGQ1ZDhlZWY4XkEyXkFqcGc@._V1_.jpg');background-size:cover;background-position:center;" aria-hidden="true"></div>
-                <div class="game-label">
-                  <div class="game-title">Death Stranding 2</div>
-                  <div class="game-genre">Action Adventure</div>
-                </div>
-              </div>
-              <div class="game-hover-overlay">
-                <div class="game-hover-content">
-                  <div class="game-hover-badge release">Game</div>
-                  <div class="game-hover-date">2025</div>
-                  <div class="game-hover-divider"></div>
-                  <div class="game-hover-desc">The continuation of Kojima&rsquo;s vision.</div>
-                </div>
-              </div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">⚔️</div>
+          <div class="media-info">
+            <div class="media-title">The Odyssey</div>
+            <div class="media-sub">Epic Poetry · Literature · Mythology</div>
+            <p class="media-desc">Homer's Odyssey, the myths around it, and what it still means. We run actual literary analysis threads — not surface-level Wikipedia takes.</p>
           </div>
         </div>
-        <div class="game-card reveal invincible-card">
-          <div class="game-link">
-            <div class="game-img" style="background-image:url('invincible_vs.png');background-size:cover;background-position:center;" aria-hidden="true"></div>
-            <div class="game-label">
-              <div class="game-title">Invincible vs</div>
-              <div class="game-genre">Action / Fighting</div>
-            </div>
-            <div class="invincible-bottom-tail" aria-hidden="true">RELEASE: APRIL 30TH</div>
-          </div>
-          <div class="game-hover-overlay">
-            <div class="game-hover-content">
-              <div class="game-hover-divider"></div>
-              <div class="game-hover-desc">Fast-paced battles inspired by the Invincible universe.</div>
-            </div>
+
+        <div class="media-card">
+          <div class="media-icon">📚</div>
+          <div class="media-info">
+            <div class="media-title">Comics &amp; Graphic Novels</div>
+            <div class="media-sub">Indie · Manga · Big Two</div>
+            <p class="media-desc">Saga, Sandman, Berserk, One Piece — if it's got panels and substance, we're reading it and we're talking about it.</p>
           </div>
         </div>
+
+        <div class="media-card">
+          <div class="media-icon">🎬</div>
+          <div class="media-info">
+            <div class="media-title">Film &amp; Anime</div>
+            <div class="media-sub">Analysis · Rankings · Deep Dives</div>
+            <p class="media-desc">From Akira to Everything Everywhere. If a piece of media has something worth dissecting, it's fair game. No gatekeeping on genre.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
   <!-- PARTICLE CONTROLS -->
   <div class="particle-controls" id="particleControls">
-    <label class="particle-controls-label">&#10022; Particles</label>
+    <label class="particle-controls-label">✦ Particles</label>
     <div class="control-group toggle-group">
       <div class="toggle-switch enabled" id="particleToggle"></div>
       <span class="toggle-label">Enabled</span>
@@ -853,7 +756,6 @@
   <script>
   (function(){
     function getEmoji(el){ var m = el.textContent.match(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u); return m ? m[0] : '✨'; }
-
     function spawnBurst(x, y, emoji, count){
       for(var i=0;i<count;i++){
         var p = document.createElement('span');
@@ -868,11 +770,9 @@
         p.addEventListener('animationend',function(){this.remove();});
       }
     }
-
     document.querySelectorAll('.channel-tag').forEach(function(el){
       var emoji = getEmoji(el);
       var heat = 0, lastClick = 0, decayTimer = null;
-
       function fire(x, y){
         var now = Date.now();
         var gap = now - lastClick;
@@ -884,7 +784,6 @@
         clearTimeout(decayTimer);
         decayTimer = setTimeout(function(){ heat = 0; }, 1200);
       }
-
       var holdTimer = null;
       el.addEventListener('mousedown', function(e){
         var r = el.getBoundingClientRect();
@@ -895,7 +794,6 @@
         }, 180);
       });
       document.addEventListener('mouseup', function(){ clearInterval(holdTimer); });
-
       el.addEventListener('touchstart', function(e){
         var t = e.touches[0];
         fire(t.clientX, t.clientY);
