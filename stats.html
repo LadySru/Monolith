@@ -27,7 +27,8 @@
     .booster-section{background:linear-gradient(135deg,rgba(255,115,250,.07),rgba(139,47,255,.10));border-top:1px solid rgba(255,115,250,.2);border-bottom:1px solid rgba(255,115,250,.2);padding:36px 0;}
     .booster-inner{max-width:860px;margin:0 auto;text-align:center;}
     .booster-title{font-family:'Orbitron',monospace;font-size:.75rem;letter-spacing:3px;color:#ff73fa;text-transform:uppercase;margin-bottom:6px;}
-    .booster-tag{height:36px;border-radius:8px;margin-bottom:14px;opacity:.9;filter:drop-shadow(0 0 8px rgba(255,115,250,.4));}
+    .booster-tag{height:36px;border-radius:8px;margin-bottom:14px;opacity:.9;filter:drop-shadow(0 0 8px rgba(255,115,250,.4));transition:filter .6s ease;}
+    .booster-tag.locked{filter:grayscale(1) brightness(.5);opacity:.5;}
     .booster-msg{font-size:1rem;color:var(--text2);margin-bottom:24px;line-height:1.6;}
     .booster-msg strong{color:var(--text);}
     .booster-list{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
@@ -113,8 +114,8 @@
 <div class="booster-section" id="booster-section" style="display:none;">
   <div class="booster-inner">
     <div class="booster-title">💗 Server Boosters</div>
-    <img src="server-tag.png" class="booster-tag" alt="Monolith Social Server Tag" onerror="this.style.display='none'">
-    <p class="booster-msg">A heartfelt thank you to the incredible members who boosted Monolith Social — <strong>your support unlocked our very own Server Tag!</strong></p>
+    <img src="server-tag.png" class="booster-tag locked" id="booster-tag-img" alt="Monolith Social Server Tag" onerror="this.style.display='none'">
+    <p class="booster-msg" id="booster-msg"></p>
     <div class="booster-list" id="booster-list"></div>
   </div>
 </div>
@@ -239,7 +240,20 @@
       if (!res.ok) return;
       const data = await res.json();
       if (!data.boosters || data.boosters.length === 0) return;
+      const count = data.boosters.length;
       document.getElementById('booster-section').style.display = '';
+
+      const tagImg = document.getElementById('booster-tag-img');
+      const msgEl  = document.getElementById('booster-msg');
+
+      if (count >= 6) {
+        tagImg && tagImg.classList.remove('locked');
+        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Social — <strong>your support unlocked our very own Server Tag!</strong>';
+      } else {
+        tagImg && tagImg.classList.add('locked');
+        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Social!';
+      }
+
       document.getElementById('booster-list').innerHTML = data.boosters.map(m => {
         const name = m.nickname || m.username || 'Unknown';
         const initial = name.charAt(0).toUpperCase();
