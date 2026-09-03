@@ -315,7 +315,9 @@ async function loadReviews() {
     if (!response.ok) throw new Error('Failed to fetch reviews');
 
     const data = await response.json();
-    const { reviews = [], stats = {} } = data;
+    const BLOCKED = ['Aasda'];
+    const { stats = {} } = data;
+    const reviews = (data.reviews || []).filter(r => !BLOCKED.includes(r.player_name));
 
     const total = parseInt(stats.total_reviews, 10) || 0;
     const avg = parseFloat(stats.avg_rating) || 0;
