@@ -54,7 +54,7 @@ exports.handler = async (event, context) => {
     console.log("approximate_member_count:", guildData.approximate_member_count);
 
     // Get approximate online count (requires GUILD_PRESENCES intent)
-    const guildName = guildData.name || "Monolith Social";
+    const guildName = guildData.name || "Monolith Network";
 
     // Build guild icon URL
     let iconUrl = null;
