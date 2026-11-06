@@ -102,6 +102,24 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // DELETE - Remove a review by id (requires ADMIN_SECRET header)
+    if (event.httpMethod === 'DELETE') {
+      const secret = event.headers['x-admin-secret'] || event.queryStringParameters?.secret;
+      if (!secret || secret !== process.env.ADMIN_SECRET) {
+        return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+      }
+      const { id, player_name } = JSON.parse(event.body || event.queryStringParameters || '{}');
+      if (id) {
+        await sql`DELETE FROM reviews WHERE id = ${parseInt(id, 10)}`;
+        return { statusCode: 200, body: JSON.stringify({ message: 'Deleted by id', id }) };
+      }
+      if (player_name) {
+        await sql`DELETE FROM reviews WHERE player_name = ${player_name}`;
+        return { statusCode: 200, body: JSON.stringify({ message: 'Deleted by name', player_name }) };
+      }
+      return { statusCode: 400, body: JSON.stringify({ error: 'Provide id or player_name' }) };
+    }
+
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   } catch (error) {
     console.error('Reviews error:', error);

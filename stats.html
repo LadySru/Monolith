@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Monolith Member Luv — Member statistics and leaderboards"/>
-  <title>Member Luv — Monolith Social</title>
+  <title>Member Luv — Monolith Network</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="shared.css"/>
@@ -88,7 +88,7 @@
     <a href="reviews.html" class="nav-link">Reviews</a>
 
     <a href="stats.html" class="nav-link active">Member Luv</a>
-    <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join →</a>
+    <a href="https://discord.gg/XRM25wMckh" target="_blank" class="nav-cta">Join →</a>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -101,7 +101,7 @@
   <a href="reviews.html" class="nav-link">Reviews</a>
   <a href="index.html#features" class="nav-link">Features</a>
   <a href="stats.html" class="nav-link active">Member Luv</a>
-  <a href="https://discord.gg/pnRCbEAtTk" target="_blank" class="nav-cta">Join the Community →</a>
+  <a href="https://discord.gg/XRM25wMckh" target="_blank" class="nav-cta">Join the Community →</a>
 </div>
 
 <div class="page-hero">
@@ -114,7 +114,7 @@
 <div class="booster-section" id="booster-section" style="display:none;">
   <div class="booster-inner">
     <div class="booster-title">💗 Server Boosters</div>
-    <img src="server-tag.png" class="booster-tag locked" id="booster-tag-img" alt="Monolith Social Server Tag" onerror="this.style.display='none'">
+    <img src="server-tag.png" class="booster-tag locked" id="booster-tag-img" alt="Monolith Network Server Tag" onerror="this.style.display='none'">
     <p class="booster-msg" id="booster-msg"></p>
     <div class="booster-list" id="booster-list"></div>
   </div>
@@ -195,7 +195,7 @@
     <img src="avatar.webp" class="footer-av" alt="" onerror="this.style.display='none'"/>
     <div class="footer-name">Monolith <span>Social</span></div>
   </div>
-  <p class="footer-copy">© 2026 Monolith Social · discord.gg/pnRCbEAtTk</p>
+  <p class="footer-copy">© 2026 Monolith Network · discord.gg/XRM25wMckh</p>
 </footer>
 
 <script src="shared.js"></script>
@@ -248,10 +248,10 @@
 
       if (count >= 6) {
         tagImg && tagImg.classList.remove('locked');
-        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Social — <strong>your support unlocked our very own Server Tag!</strong>';
+        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Network — <strong>your support unlocked our very own Server Tag!</strong>';
       } else {
         tagImg && tagImg.classList.add('locked');
-        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Social!';
+        msgEl.innerHTML = 'A heartfelt thank you to the incredible members who boosted Monolith Network!';
       }
 
       document.getElementById('booster-list').innerHTML = data.boosters.map(m => {
