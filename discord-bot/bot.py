@@ -399,6 +399,15 @@ async def on_ready():
         track_voice_activity.start()
         print("[VOICE] Voice activity tracking started")
 
+    # Init MOTW table and start weekly checker
+    try:
+        _init_motw_table()
+        if not motw_weekly_check.is_running():
+            motw_weekly_check.start()
+            print("[MOTW] Weekly Member of the Week checker started")
+    except Exception as e:
+        print(f"[MOTW] Setup error: {e}")
+
     # Reconcile voice sessions on startup:
     # Delete stale unclosed sessions for members not in voice (corrupted data),
     # then open fresh sessions for members who are currently in voice.
@@ -1367,6 +1376,188 @@ async def track_voice_activity():
         print(f"[VOICE] Voice activity sync completed")
     except Exception as e:
         print(f"[ERROR] Voice activity tracking failed: {e}")
+
+# ── MEMBER OF THE WEEK ───────────────────────────────────────────────────────
+
+def _init_motw_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS motw_config (
+            guild_id      BIGINT PRIMARY KEY,
+            channel_id    BIGINT NOT NULL,
+            role_id       BIGINT,
+            current_motw  BIGINT,
+            last_picked   TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def _get_motw_config(guild_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('SELECT * FROM motw_config WHERE guild_id = %s', (guild_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
+
+async def _pick_and_announce_motw(guild: discord.Guild):
+    cfg = _get_motw_config(guild.id)
+    if not cfg:
+        return
+
+    channel = guild.get_channel(int(cfg['channel_id']))
+    if not channel:
+        return
+
+    # Pick a random active (in-server, non-bot) member
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('''
+        SELECT user_id, username, nickname, avatar_url
+        FROM member_stats
+        WHERE guild_id = %s AND is_bot IS NOT TRUE AND in_server = TRUE
+          AND message_count > 0
+        ORDER BY RANDOM()
+        LIMIT 1
+    ''', (guild.id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not row:
+        return
+
+    winner_id = int(row['user_id'])
+    display_name = row.get('nickname') or row.get('username') or 'Mystery Member'
+
+    # Remove role from previous MOTW
+    if cfg.get('role_id') and cfg.get('current_motw'):
+        prev_member = guild.get_member(int(cfg['current_motw']))
+        if prev_member:
+            role = guild.get_role(int(cfg['role_id']))
+            if role and role in prev_member.roles:
+                try:
+                    await prev_member.remove_roles(role, reason='MOTW rotation')
+                except Exception as e:
+                    print(f'[MOTW] Could not remove role from prev winner: {e}')
+
+    # Assign role to new MOTW
+    member = guild.get_member(winner_id)
+    if member and cfg.get('role_id'):
+        role = guild.get_role(int(cfg['role_id']))
+        if role:
+            try:
+                await member.add_roles(role, reason='Member of the Week')
+            except Exception as e:
+                print(f'[MOTW] Could not assign role: {e}')
+
+    # Save to DB
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        UPDATE motw_config
+        SET current_motw = %s, last_picked = NOW()
+        WHERE guild_id = %s
+    ''', (winner_id, guild.id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    # Build announcement embed
+    embed = discord.Embed(
+        title='🏆 Member of the Week',
+        description=(
+            f'Congrats to **{display_name}** for being this week\'s '
+            f'Member of the Week! 🎉\n\n'
+            f'<@{winner_id}> — thanks for being part of the network. '
+            f'Keep showing up! 💪'
+        ),
+        color=0xf4c430,
+    )
+    if row.get('avatar_url'):
+        embed.set_thumbnail(url=row['avatar_url'])
+    embed.set_footer(text='Monolith Network · picked weekly')
+
+    await channel.send(embed=embed)
+    print(f'[MOTW] Announced {display_name} (id={winner_id}) in #{channel.name}')
+
+
+@tasks.loop(hours=1)
+async def motw_weekly_check():
+    """Every hour, check if 7 days have passed since last pick."""
+    from datetime import timezone, timedelta
+    for guild in bot.guilds:
+        cfg = _get_motw_config(guild.id)
+        if not cfg:
+            continue
+        last = cfg.get('last_picked')
+        if last is None:
+            continue
+        if last.tzinfo is None:
+            last = last.replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) - last >= timedelta(days=7):
+            try:
+                await _pick_and_announce_motw(guild)
+            except Exception as e:
+                print(f'[MOTW] Weekly pick error for guild {guild.id}: {e}')
+
+
+@bot.tree.command(name='motw-setup', description='Set up Member of the Week — picks a winner every 7 days (Admin only)')
+@discord.app_commands.describe(
+    channel='Channel to post the weekly announcement',
+    role='Role to assign the winner (optional)',
+)
+async def motw_setup(interaction: discord.Interaction, channel: discord.TextChannel, role: discord.Role = None):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message('❌ Admins only.', ephemeral=True)
+        return
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        INSERT INTO motw_config (guild_id, channel_id, role_id, last_picked)
+        VALUES (%s, %s, %s, NOW() - INTERVAL '8 days')
+        ON CONFLICT (guild_id) DO UPDATE
+          SET channel_id = EXCLUDED.channel_id,
+              role_id    = EXCLUDED.role_id
+    ''', (interaction.guild.id, channel.id, role.id if role else None))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    role_txt = f' and will assign the **{role.name}** role' if role else ''
+    await interaction.response.send_message(
+        f'✅ Member of the Week set up! Announcements will post in {channel.mention}{role_txt}.\n'
+        f'The first pick will happen within the hour.',
+        ephemeral=True,
+    )
+    print(f'[MOTW] Configured for guild {interaction.guild.id} → channel {channel.id}, role {role.id if role else None}')
+
+
+@bot.tree.command(name='motw-pick', description='Manually trigger a new Member of the Week pick right now (Admin only)')
+async def motw_pick(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message('❌ Admins only.', ephemeral=True)
+        return
+
+    cfg = _get_motw_config(interaction.guild.id)
+    if not cfg:
+        await interaction.response.send_message(
+            '❌ Run `/motw-setup` first to configure a channel.', ephemeral=True
+        )
+        return
+
+    await interaction.response.defer(ephemeral=True)
+    try:
+        await _pick_and_announce_motw(interaction.guild)
+        await interaction.followup.send('✅ New Member of the Week picked and announced!', ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f'❌ Error: {e}', ephemeral=True)
+
 
 # Run bot
 if __name__ == "__main__":
