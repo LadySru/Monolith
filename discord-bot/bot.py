@@ -1506,6 +1506,43 @@ async def motw_weekly_check():
                 print(f'[MOTW] Weekly pick error for guild {guild.id}: {e}')
 
 
+@bot.tree.command(name='reset-stats', description='Reset all activity stats to 0 while keeping usernames and join dates (Admin only)')
+async def reset_stats(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message('❌ Admins only.', ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            UPDATE member_stats
+            SET message_count = 0,
+                gif_count = 0,
+                image_count = 0,
+                reaction_count = 0,
+                voice_time_seconds = 0,
+                in_server = FALSE,
+                last_updated = NOW()
+            WHERE guild_id = %s
+        ''', (interaction.guild.id,))
+        affected = cur.rowcount
+        cur.execute('DELETE FROM message_reactions WHERE guild_id = %s', (interaction.guild.id,))
+        cur.execute('DELETE FROM voice_sessions WHERE guild_id = %s', (interaction.guild.id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        await interaction.followup.send(
+            f'✅ Stats reset for {affected} member(s). Usernames, nicknames, and join dates preserved. '
+            f'The bot will rebuild activity as people use the new server.',
+            ephemeral=True,
+        )
+        print(f'[RESET] Stats reset for guild {interaction.guild.id} — {affected} members zeroed')
+    except Exception as e:
+        await interaction.followup.send(f'❌ Error: {e}', ephemeral=True)
+
+
 @bot.tree.command(name='motw-setup', description='Set up Member of the Week — picks a winner every 7 days (Admin only)')
 @discord.app_commands.describe(
     channel='Channel to post the weekly announcement',
